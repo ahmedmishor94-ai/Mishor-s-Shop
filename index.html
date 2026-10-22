@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>আমারবাজার</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f5f8;color:#222}
+header{background:#ed5b13;color:white;padding:16px}
+header h2{margin:0 0 12px}
+input,button{font:inherit}
+input{padding:12px;border:1px solid #ddd;border-radius:8px;width:100%}
+main{max-width:850px;margin:auto;padding:16px}
+h3{margin-top:22px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:white;padding:12px;border-radius:12px}
+.pic{font-size:55px;text-align:center;padding:18px;background:#fff0e5;border-radius:8px}
+.price{color:#e6530c;font-weight:bold}
+button{border:0;border-radius:8px;background:#ed5b13;color:white;padding:10px;cursor:pointer}
+.card button{width:100%}
+#cart{background:white;padding:14px;border-radius:12px;margin-top:20px}
+#message{white-space:pre-line;color:#087443}
+small{color:#666}
+</style>
+</head>
+<body>
+<header>
+  <h2>🛍️ আমারবাজার</h2>
+  <input id="search" placeholder="পণ্য খুঁজুন..."
+    oninput="render()">
+</header>
+
+<main>
+  <h3>জনপ্রিয় পণ্য</h3>
+  <div class="products" id="products"></div>
+
+  <section id="cart">
+    <h3>🛒 তোমার কার্ট</h3>
+    <div id="items">এখনও কোনো পণ্য নেই।</div>
+    <p>মোট: ৳<b id="total">0</b></p>
+    <button onclick="checkout()">অর্ডার করো</button>
+    <p id="message"></p>
+  </section>
+</main>
+
+<script>
+const products = [
+  {id:1,name:"হেডফোন",price:550,icon:"🎧"},
+  {id:2,name:"জুতা",price:950,icon:"👟"},
+  {id:3,name:"ঘড়ি",price:700,icon:"⌚"},
+  {id:4,name:"ব্যাগ",price:650,icon:"🎒"}
+];
+let cart = {};
+
+function render(){
+  const q = document.getElementById("search").value.toLowerCase();
+  document.getElementById("products").innerHTML =
+    products.filter(p=>p.name.toLowerCase().includes(q))
+    .map(p=>`
+      <div class="card">
+        <div class="pic">${p.icon}</div>
+        <h4>${p.name}</h4>
+        <p class="price">৳${p.price}</p>
+        <button onclick="add(${p.id})">কার্টে যোগ</button>
+      </div>`).join("");
+  showCart();
+}
+
+function add(id){
+  cart[id]=(cart[id]||0)+1;
+  showCart();
+}
+
+function showCart(){
+  const selected=products.filter(p=>cart[p.id]);
+  document.getElementById("items").innerHTML=selected.length
+    ? selected.map(p=>`
+      <p>${p.name} × ${cart[p.id]}
+      — ৳${p.price*cart[p.id]}
+      <button onclick="removeItem(${p.id})">বাদ</button></p>`
+    ).join("")
+    : "এখনও কোনো পণ্য নেই।";
+  document.getElementById("total").textContent=
+    selected.reduce((sum,p)=>sum+p.price*cart[p.id],0);
+}
+
+function removeItem(id){
+  delete cart[id];
+  showCart();
+}
+
+function checkout(){
+  if(!Object.keys(cart).length){
+    alert("আগে কার্টে পণ্য যোগ করো!");
+    return;
+  }
+  const name=prompt("পরীক্ষামূলক অর্ডার: তোমার নাম লিখো");
+  if(!name || !name.trim()) return;
+  const address=prompt("ডেমোর জন্য একটি ঠিকানা লিখো");
+  if(!address || !address.trim()) return;
+  const orderId="DEMO-"+Date.now().toString().slice(-6);
+  document.getElementById("message").textContent=
+    "ডেমো অর্ডার তৈরি হয়েছে!\nঅর্ডার নম্বর: "+orderId+
+    "\nনাম: "+name+"\nঠিকানা: "+address+
+    "\nমোট: ৳"+document.getElementById("total").textContent+
+    "\nএটি শুধু পরীক্ষামূলক অর্ডার; কোনো তথ্য সার্ভারে সংরক্ষিত হয়নি।";
+}
+render();
+</script>
+</body>
+</html>
