@@ -72,11 +72,9 @@ function renderProducts(){
  document.getElementById("products").innerHTML=products
  .filter(p=>p.name.toLowerCase().includes(q))
  .map(p=>`<article class="product">
-<div class="pic">
-  ${p.id===3
-    <img src="images/realistic%20beg.jpg" alt="${p.name}" style="width:100%;height:95px;object-fit:contain;">`
-    : p.emoji}
-</div>
+<div class="pic">${p.id===3
+  ? `<img src="images/realistic%20beg.jpg" alt="${p.name}" style="width:100%;height:95px;object-fit:contain;">`
+  : p.emoji}</div>
  <h3>${p.name}</h3>
  <div class="price">৳${p.price}</div>
  <button onclick="addToCart(${p.id})">+ কার্টে যোগ করুন</button>
