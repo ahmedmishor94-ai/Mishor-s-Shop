@@ -3,108 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>আমারবাজার</title>
+<title>Mishor's Shop</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f5f8;color:#222}
-header{background:#ed5b13;color:white;padding:16px}
-header h2{margin:0 0 12px}
-input,button{font:inherit}
-input{padding:12px;border:1px solid #ddd;border-radius:8px;width:100%}
-main{max-width:850px;margin:auto;padding:16px}
-h3{margin-top:22px}
+body{margin:0;background:#f5f6fa;color:#202433;font-family:Arial,sans-serif}
+header{background:#f15a24;color:white;padding:18px 15px}
+.top{max-width:1000px;margin:auto}
+.brand{font-size:25px;font-weight:800;margin-bottom:14px}
+.brand span{color:#ffe2a8}
+.search{display:flex;gap:8px}
+input{min-width:0;flex:1;padding:13px;border:0;border-radius:10px;font-size:15px}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;font-weight:bold}
+.search button{background:#292b39;color:white}
+.hero{margin:16px auto;background:#fff0df;border-radius:18px;padding:23px 18px;max-width:1000px}
+.hero h1{font-size:26px;margin:0 0 9px;color:#9b3b17}
+.hero p{margin:0 0 15px;color:#634c43;line-height:1.5}
+.hero button{background:#f15a24;color:white}
+main{max-width:1000px;margin:auto;padding:0 13px 30px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:23px 0 13px}
+.section-title h2{font-size:21px;margin:0}
+#count{font-size:13px;color:#666}
 .products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{background:white;padding:12px;border-radius:12px}
-.pic{font-size:55px;text-align:center;padding:18px;background:#fff0e5;border-radius:8px}
-.price{color:#e6530c;font-weight:bold}
-button{border:0;border-radius:8px;background:#ed5b13;color:white;padding:10px;cursor:pointer}
-.card button{width:100%}
-#cart{background:white;padding:14px;border-radius:12px;margin-top:20px}
-#message{white-space:pre-line;color:#087443}
-small{color:#666}
+.card{background:white;border-radius:15px;overflow:hidden;box-shadow:0 3px 12px #1720330c}
+.photo{height:125px;display:flex;align-items:center;justify-content:center;background:#fff0e8;font-size:58px}
+.card:nth-child(4n+2) .photo{background:#e8f2ff}
+.card:nth-child(4n+3) .photo{background:#f4eafa}
+.card:nth-child(4n) .photo{background:#e5f5e9}
+.info{padding:12px}
+.name{font-weight:bold;line-height:1.4;min-height:40px}
+.price{color:#e65322;font-weight:800;font-size:19px;margin:8px 0 11px}
+.add{background:#f15a24;color:white;width:100%}
+.add:active{transform:scale(.98)}
+.panel{background:white;border-radius:15px;padding:16px;margin-top:20px}
+.panel h2{font-size:20px;margin:0 0 12px}
+.cart-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eee}
+.cart-row button{padding:4px 9px;background:#fce8e1;color:#b43a16}
+.total{display:flex;justify-content:space-between;font-weight:bold;font-size:18px;margin:15px 0}
+.checkout{width:100%;background:#198754;color:white}
+.note{font-size:12px;color:#777;line-height:1.5;margin-top:12px}
+footer{text-align:center;padding:22px;color:#777;font-size:13px}
+.empty{color:#777;font-size:14px}
+@media(min-width:600px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.photo{height:155px}.hero{padding:32px}.hero h1{font-size:32px}}
 </style>
 </head>
 <body>
 <header>
-  <h2>🛍️ আমারবাজার</h2>
-  <input id="search" placeholder="পণ্য খুঁজুন..."
-    oninput="render()">
+  <div class="top">
+    <div class="brand">Mishor's <span>Shop</span> 🛍️</div>
+    <div class="search">
+      <input id="search" placeholder="পণ্য খুঁজুন..." oninput="render()">
+      <button onclick="document.getElementById('cart').scrollIntoView({behavior:'smooth'})">🛒 <span id="cartCount">0</span></button>
+    </div>
+  </div>
 </header>
 
+<section class="hero">
+  <h1>আপনার পছন্দের কেনাকাটা!</h1>
+  <p>পছন্দের পণ্য বেছে নিন সহজেই। আপনার অনলাইন কেনাকাটা শুরু হোক এখান থেকেই।</p>
+  <button onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">এখনই কেনাকাটা করুন →</button>
+</section>
+
 <main>
-  <h3>জনপ্রিয় পণ্য</h3>
+  <div class="section-title" id="shop">
+    <h2>✨ জনপ্রিয় পণ্য</h2>
+    <span id="count"></span>
+  </div>
   <div class="products" id="products"></div>
 
-  <section id="cart">
-    <h3>🛒 তোমার কার্ট</h3>
-    <div id="items">এখনও কোনো পণ্য নেই।</div>
-    <p>মোট: ৳<b id="total">0</b></p>
-    <button onclick="checkout()">অর্ডার করো</button>
-    <p id="message"></p>
+  <section class="panel" id="cart">
+    <h2>🛒 আপনার কার্ট</h2>
+    <div id="cartItems" class="empty">এখনো কোনো পণ্য যোগ করেননি।</div>
+    <div class="total"><span>মোট</span><span id="total">৳0</span></div>
+    <button class="checkout" onclick="checkout()">অর্ডার করতে এগিয়ে যান</button>
+    <p class="note">এটি একটি প্রাথমিক ডেমো। অর্ডার এখনো দোকানদারের কাছে পাঠানো বা অনলাইনে সংরক্ষণ করা হয় না।</p>
   </section>
 </main>
 
+<footer>© 2026 Mishor's Shop · আপনার কেনাকাটা, আপনার পছন্দ ❤️</footer>
+
 <script>
-const products = [
-  {id:1,name:"হেডফোন",price:550,icon:"🎧"},
-  {id:2,name:"জুতা",price:950,icon:"👟"},
-  {id:3,name:"ঘড়ি",price:700,icon:"⌚"},
-  {id:4,name:"ব্যাগ",price:650,icon:"🎒"}
+const products=[
+ {id:1,name:"স্টাইলিশ ঘড়ি",price:650,emoji:"⌚"},
+ {id:2,name:"হেডফোন",price:850,emoji:"🎧"},
+ {id:3,name:"সুন্দর ব্যাগ",price:750,emoji:"👜"},
+ {id:4,name:"স্পোর্টস জুতা",price:1200,emoji:"👟"},
+ {id:5,name:"সানগ্লাস",price:350,emoji:"🕶️"},
+ {id:6,name:"ব্যাকপ্যাক",price:950,emoji:"🎒"},
+ {id:7,name:"উপহারের বাক্স",price:450,emoji:"🎁"},
+ {id:8,name:"স্মার্ট ফোন",price:8500,emoji:"📱"}
 ];
-let cart = {};
+let cart={};
 
 function render(){
-  const q = document.getElementById("search").value.toLowerCase();
-  document.getElementById("products").innerHTML =
-    products.filter(p=>p.name.toLowerCase().includes(q))
-    .map(p=>`
-      <div class="card">
-        <div class="pic">${p.icon}</div>
-        <h4>${p.name}</h4>
-        <p class="price">৳${p.price}</p>
-        <button onclick="add(${p.id})">কার্টে যোগ</button>
-      </div>`).join("");
-  showCart();
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const list=products.filter(p=>p.name.toLowerCase().includes(q));
+ document.getElementById("count").textContent=list.length+"টি পণ্য";
+ document.getElementById("products").innerHTML=list.map(p=>`
+  <article class="card">
+   <div class="photo">${p.emoji}</div>
+   <div class="info">
+    <div class="name">${p.name}</div>
+    <div class="price">৳${p.price.toLocaleString("en-US")}</div>
+    <button class="add" onclick="add(${p.id})">+ কার্টে যোগ করুন</button>
+   </div>
+  </article>`).join("")||'<p>কোনো পণ্য পাওয়া যায়নি।</p>';
+ showCart();
 }
-
-function add(id){
-  cart[id]=(cart[id]||0)+1;
-  showCart();
+function add(id){cart[id]=(cart[id]||0)+1;showCart()}
+function change(id,delta){
+ cart[id]=(cart[id]||0)+delta;
+ if(cart[id]<=0)delete cart[id];
+ showCart();
 }
-
 function showCart(){
-  const selected=products.filter(p=>cart[p.id]);
-  document.getElementById("items").innerHTML=selected.length
-    ? selected.map(p=>`
-      <p>${p.name} × ${cart[p.id]}
-      — ৳${p.price*cart[p.id]}
-      <button onclick="removeItem(${p.id})">বাদ</button></p>`
-    ).join("")
-    : "এখনও কোনো পণ্য নেই।";
-  document.getElementById("total").textContent=
-    selected.reduce((sum,p)=>sum+p.price*cart[p.id],0);
+ let entries=Object.entries(cart);
+ let count=entries.reduce((s,[id,n])=>s+n,0);
+ let total=entries.reduce((s,[id,n])=>s+products.find(p=>p.id==id).price*n,0);
+ document.getElementById("cartCount").textContent=count;
+ document.getElementById("total").textContent="৳"+total.toLocaleString("en-US");
+ document.getElementById("cartItems").innerHTML=entries.length?entries.map(([id,n])=>{
+  let p=products.find(x=>x.id==id);
+  return `<div class="cart-row"><span>${p.emoji} ${p.name} × ${n}</span><span>৳${(p.price*n).toLocaleString("en-US")} <button onclick="change(${id},-1)">−</button> <button onclick="change(${id},1)">+</button></span></div>`;
+ }).join(""):'<p class="empty">এখনো কোনো পণ্য যোগ করেননি।</p>';
 }
-
-function removeItem(id){
-  delete cart[id];
-  showCart();
-}
-
 function checkout(){
-  if(!Object.keys(cart).length){
-    alert("আগে কার্টে পণ্য যোগ করো!");
-    return;
-  }
-  const name=prompt("পরীক্ষামূলক অর্ডার: তোমার নাম লিখো");
-  if(!name || !name.trim()) return;
-  const address=prompt("ডেমোর জন্য একটি ঠিকানা লিখো");
-  if(!address || !address.trim()) return;
-  const orderId="DEMO-"+Date.now().toString().slice(-6);
-  document.getElementById("message").textContent=
-    "ডেমো অর্ডার তৈরি হয়েছে!\nঅর্ডার নম্বর: "+orderId+
-    "\nনাম: "+name+"\nঠিকানা: "+address+
-    "\nমোট: ৳"+document.getElementById("total").textContent+
-    "\nএটি শুধু পরীক্ষামূলক অর্ডার; কোনো তথ্য সার্ভারে সংরক্ষিত হয়নি।";
+ if(!Object.keys(cart).length){alert("আগে কার্টে একটি পণ্য যোগ করুন।");return}
+ alert("এটি এখন ডেমো কার্ট। বাস্তব অর্ডার নেওয়ার জন্য অর্ডার সংরক্ষণের ব্যবস্থা যোগ করতে হবে।");
 }
 render();
 </script>
