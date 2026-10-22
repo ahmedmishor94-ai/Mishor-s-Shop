@@ -1,39 +1,144 @@
-function checkout() {
-  const items = products.filter(p => cart[p.id]);
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mishor's Shop</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fff8f0;color:#292929}
+header{background:#f36b21;color:white;padding:22px 15px;text-align:center}
+header h1{margin:0 0 8px}
+header p{margin:0}
+main{max-width:1000px;margin:auto;padding:16px}
+h2{margin-top:24px}
+#search{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.product{background:white;padding:12px;border-radius:14px;box-shadow:0 2px 8px #0001}
+.pic{height:95px;display:grid;place-items:center;background:#fff0e5;border-radius:10px;font-size:53px}
+.product h3{font-size:16px;margin:12px 0 6px}
+.price{color:#e85c16;font-weight:bold;margin:8px 0}
+button{border:0;border-radius:9px;padding:11px 8px;background:#f36b21;color:white;font-weight:bold;font-size:14px;cursor:pointer}
+.product button{width:100%}
+.cart{margin-top:25px;background:white;padding:16px;border-radius:14px}
+.cartrow{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #eee}
+.qty button{padding:5px 10px}
+.total{font-size:20px;font-weight:bold;margin:18px 0}
+#checkout{width:100%;background:#128c4a;padding:14px;font-size:16px}
+small{color:#666}
+footer{text-align:center;padding:25px;color:#666}
+@media(min-width:650px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+<h1>🛍️ Mishor's Shop</h1>
+<p>আপনার পছন্দ, আপনার অনলাইন দোকান ❤️</p>
+</header>
 
-  if (items.length === 0) {
-    alert("আগে কার্টে পণ্য যোগ করুন!");
-    return;
-  }
+<main>
+<h2>আমাদের পণ্য</h2>
+<input id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
+<div class="products" id="products"></div>
 
-  const customerName = prompt("আপনার নাম লিখুন:");
-  if (!customerName || !customerName.trim()) return;
+<section class="cart">
+<h2>🛒 আপনার কার্ট</h2>
+<div id="cartItems">এখনো কোনো পণ্য যোগ করেননি।</div>
+<div class="total">মোট: ৳<span id="total">0</span></div>
+<button id="checkout" onclick="checkout()">WhatsApp-এ অর্ডার করুন</button>
+<p><small>অর্ডার পাঠাতে WhatsApp খুলবে। মেসেজ যাচাই করে Send চাপুন।</small></p>
+</section>
+</main>
 
-  const customerPhone = prompt("আপনার ফোন নম্বর লিখুন:");
-  if (!customerPhone || !customerPhone.trim()) return;
+<footer>© 2026 Mishor's Shop ❤️</footer>
 
-  const customerAddress = prompt("ডেলিভারির ঠিকানা লিখুন:");
-  if (!customerAddress || !customerAddress.trim()) return;
+<script>
+const products = [
+{id:1,name:"স্টাইলিশ ঘড়ি",price:650,emoji:"⌚"},
+{id:2,name:"হেডফোন",price:850,emoji:"🎧"},
+{id:3,name:"সুন্দর ব্যাগ",price:750,emoji:"👜"},
+{id:4,name:"স্পোর্টস জুতা",price:1200,emoji:"👟"},
+{id:5,name:"সানগ্লাস",price:350,emoji:"🕶️"},
+{id:6,name:"ব্যাকপ্যাক",price:950,emoji:"🎒"},
+{id:7,name:"উপহারের বাক্স",price:450,emoji:"🎁"},
+{id:8,name:"স্মার্ট ফোন",price:8500,emoji:"📱"}
+];
 
-  let total = 0;
-  let message = "🛍️ Mishor's Shop - নতুন অর্ডার\n\n";
-  message += "নাম: " + customerName.trim() + "\n";
-  message += "ফোন: " + customerPhone.trim() + "\n";
-  message += "ঠিকানা: " + customerAddress.trim() + "\n\n";
-  message += "অর্ডারের তালিকা:\n";
+const cart = {};
 
-  items.forEach(p => {
-    const qty = cart[p.id];
-    const subtotal = p.price * qty;
-    total += subtotal;
-    message += p.name + " × " + qty +
-      " = ৳" + subtotal + "\n";
-  });
-
-  message += "\nমোট: ৳" + total;
-
-  const url = "https://wa.me/8801747036594?text=" +
-    encodeURIComponent(message);
-
-  window.location.href = url;
+function renderProducts(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ document.getElementById("products").innerHTML=products
+ .filter(p=>p.name.toLowerCase().includes(q))
+ .map(p=>`<article class="product">
+ <div class="pic">${p.emoji}</div>
+ <h3>${p.name}</h3>
+ <div class="price">৳${p.price}</div>
+ <button onclick="addToCart(${p.id})">+ কার্টে যোগ করুন</button>
+ </article>`).join("");
 }
+
+function addToCart(id){
+ cart[id]=(cart[id]||0)+1;
+ renderCart();
+}
+
+function changeQty(id,amount){
+ cart[id]=(cart[id]||0)+amount;
+ if(cart[id]<=0) delete cart[id];
+ renderCart();
+}
+
+function renderCart(){
+ let total=0;
+ const items=products.filter(p=>cart[p.id]);
+ document.getElementById("cartItems").innerHTML=items.length
+ ? items.map(p=>{
+   total+=p.price*cart[p.id];
+   return `<div class="cartrow">
+   <div>${p.name}<br>৳${p.price} × ${cart[p.id]}</div>
+   <div class="qty">
+   <button onclick="changeQty(${p.id},-1)">−</button>
+   <button onclick="changeQty(${p.id},1)">+</button>
+   </div></div>`;
+ }).join("")
+ : "এখনো কোনো পণ্য যোগ করেননি।";
+ document.getElementById("total").textContent=total;
+}
+
+function checkout(){
+ const items=products.filter(p=>cart[p.id]);
+ if(!items.length){
+  alert("আগে কার্টে পণ্য যোগ করুন!");
+  return;
+ }
+ const name=prompt("আপনার নাম লিখুন:");
+ if(!name||!name.trim()) return;
+ const phone=prompt("আপনার ফোন নম্বর লিখুন:");
+ if(!phone||!phone.trim()) return;
+ const address=prompt("ডেলিভারির সম্পূর্ণ ঠিকানা লিখুন:");
+ if(!address||!address.trim()) return;
+
+ let total=0;
+ let msg="🛍️ Mishor's Shop - নতুন অর্ডার\n\n";
+ msg+="নাম: "+name.trim()+"\n";
+ msg+="ফোন: "+phone.trim()+"\n";
+ msg+="ঠিকানা: "+address.trim()+"\n\n";
+ msg+="পণ্যের তালিকা:\n";
+
+ items.forEach(p=>{
+  const subtotal=p.price*cart[p.id];
+  total+=subtotal;
+  msg+=p.name+" × "+cart[p.id]+" = ৳"+subtotal+"\n";
+ });
+ msg+="\nমোট মূল্য: ৳"+total;
+
+ const url="https://wa.me/8801747036594?text="+encodeURIComponent(msg);
+ window.location.href=url;
+}
+
+renderProducts();
+renderCart();
+</script>
+</body>
+</html>
