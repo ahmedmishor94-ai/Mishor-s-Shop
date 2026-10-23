@@ -1,85 +1,233 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
- <meta name="google-site-verification" content="9xUFWUVDli-enHXlhfYJiOSJAMh2H5qexRVo_pMaigM" />
 <meta charset="UTF-8">
+<meta name="google-site-verification" content="9xUFWUVDli-enHXlhfYJiOSJAMh2H5qexRVo_pMaigM" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mishor's Shop</title>
+<meta name="theme-color" content="#f97316">
+<meta name="description" content="Mishor's Shop থেকে পছন্দের পণ্য অর্ডার করুন।">
+<title>Mishor's Shop | অনলাইন শপ</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#fff8f0;color:#292929}
-header{background:#f36b21;color:white;padding:22px 15px;text-align:center}
-header h1{margin:0 0 8px}
-header p{margin:0}
-main{max-width:1000px;margin:auto;padding:16px}
-h2{margin-top:24px}
-#search{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px}
-.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.product{background:white;padding:12px;border-radius:14px;box-shadow:0 2px 8px #0001}
-.pic{height:95px;display:grid;place-items:center;background:#fff0e5;border-radius:10px;font-size:53px}
-.product h3{font-size:16px;margin:12px 0 6px}
-.price{color:#e85c16;font-weight:bold;margin:8px 0}
-button{border:0;border-radius:9px;padding:11px 8px;background:#f36b21;color:white;font-weight:bold;font-size:14px;cursor:pointer}
+:root{
+ --orange:#f97316;
+ --dark:#172033;
+ --light:#fff7ed;
+ --green:#128c4a;
+}
+body{
+ margin:0;
+ font-family:Arial,"Noto Sans Bengali",sans-serif;
+ background:#f8fafc;
+ color:var(--dark);
+}
+header{
+ background:linear-gradient(135deg,#ea580c,#fb923c);
+ color:white;
+ padding:20px 16px;
+}
+.topbar{
+ max-width:1100px;
+ margin:auto;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+}
+.logo{font-size:23px;font-weight:800}
+.cartlink{
+ background:white;color:#c2410c;
+ padding:10px 12px;border-radius:12px;
+ text-decoration:none;font-weight:bold;white-space:nowrap;
+}
+.hero{
+ max-width:1100px;margin:20px auto 0;
+ background:#ffffff20;border:1px solid #ffffff45;
+ border-radius:20px;padding:23px 18px;
+}
+.hero h1{font-size:27px;margin:0 0 10px;line-height:1.4}
+.hero p{line-height:1.8;margin:0 0 15px}
+.hero a{
+ display:inline-block;background:white;color:#c2410c;
+ text-decoration:none;padding:11px 16px;border-radius:10px;
+ font-weight:bold;
+}
+main{max-width:1100px;margin:auto;padding:18px 14px}
+.sectionhead{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;flex-wrap:wrap;
+}
+h2{font-size:21px;margin:15px 0}
+.tools{display:grid;grid-template-columns:1fr;gap:10px;margin:15px 0}
+input,select{
+ width:100%;padding:13px;border:1px solid #dbe1e8;
+ border-radius:12px;background:white;font-size:15px;
+}
+.categories{display:flex;gap:8px;overflow-x:auto;padding:3px 0 12px}
+.cat{
+ white-space:nowrap;background:white;color:#374151;
+ border:1px solid #e5e7eb;border-radius:20px;
+ padding:9px 13px;
+}
+.cat.active{background:var(--orange);color:white;border-color:var(--orange)}
+.products{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+}
+.product{
+ min-width:0;background:white;border:1px solid #edf0f4;
+ border-radius:16px;padding:10px;box-shadow:0 4px 15px #1720330a;
+}
+.pic{
+ height:125px;display:flex;align-items:center;justify-content:center;
+ background:var(--light);border-radius:12px;overflow:hidden;
+ font-size:53px;
+}
+.pic img{width:100%;height:100%;object-fit:contain}
+.product h3{font-size:15px;line-height:1.5;min-height:42px;margin:10px 0 4px}
+.price{font-size:18px;color:#ea580c;font-weight:800;margin:8px 0 11px}
+button{
+ cursor:pointer;border:0;border-radius:10px;padding:11px 9px;
+ background:var(--orange);color:white;font-size:14px;font-weight:bold;
+}
 .product button{width:100%}
-.cart{margin-top:25px;background:white;padding:16px;border-radius:14px}
-.cartrow{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #eee}
-.qty button{padding:5px 10px}
-.total{font-size:20px;font-weight:bold;margin:18px 0}
-#checkout{width:100%;background:#128c4a;padding:14px;font-size:16px}
-small{color:#666}
-footer{text-align:center;padding:25px;color:#666}
-@media(min-width:650px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}}
+button:active{transform:scale(.98)}
+.cart{
+ margin-top:28px;background:white;border:1px solid #edf0f4;
+ border-radius:18px;padding:16px;
+}
+.cartrow{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:10px;padding:12px 0;border-bottom:1px solid #edf0f4;
+}
+.itemname{font-weight:bold;line-height:1.6}
+.itemprice{font-size:13px;color:#64748b;margin-top:4px}
+.qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.qty button{padding:6px 11px}
+.totalrow{
+ display:flex;justify-content:space-between;gap:10px;
+ font-size:19px;font-weight:bold;margin:20px 0;
+}
+#checkout{width:100%;background:var(--green);padding:15px;font-size:16px}
+.note{font-size:13px;line-height:1.7;color:#64748b}
+.empty{text-align:center;padding:20px;color:#64748b}
+footer{text-align:center;padding:25px 15px;color:#64748b;font-size:14px}
+@media(min-width:600px){
+ main{padding:24px}
+ .tools{grid-template-columns:1fr 220px}
+ .products{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ .pic{height:155px}
+ .hero h1{font-size:34px}
+}
+@media(min-width:900px){
+ .products{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .hero{padding:32px}
+}
 </style>
 </head>
+
 <body>
 <header>
-<h1>🛍️ Mishor's Shop</h1>
-<p>আপনার পছন্দ, আপনার অনলাইন দোকান ❤️ এখানে পাবেন আপনার পছন্দের অনেক  glossary </p>
+ <div class="topbar">
+  <div class="logo">🛍️ Mishor's Shop</div>
+  <a class="cartlink" href="#cart">🛒 কার্ট (<span id="cartCount">0</span>)</a>
+ </div>
+ <section class="hero">
+  <h1>আপনার পছন্দের কেনাকাটা, এখন আরও সহজ! ❤️</h1>
+  <p>পছন্দের পণ্য বেছে নিন, কার্টে যোগ করুন এবং WhatsApp-এ অর্ডার পাঠান।</p>
+  <a href="#shop">🛍️ কেনাকাটা শুরু করুন</a>
+ </section>
 </header>
 
 <main>
-<h2>আমাদের স্টকের পণ্য </h2>
-<input id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
-<div class="products" id="products"></div>
+ <section id="shop">
+  <div class="sectionhead">
+   <h2>✨ আমাদের পণ্য</h2>
+   <span id="productCount" class="note"></span>
+  </div>
 
-<section class="cart">
-<h2>🛒 আপনার কার্ট</h2>
-<div id="cartItems">এখনো কোনো পণ্য যোগ করেননি।</div>
-<div class="total">মোট: ৳<span id="total">0</span></div>
-<button id="checkout" onclick="checkout()">WhatsApp-এ অর্ডার করুন</button>
-<p><small>অর্ডার পাঠাতে WhatsApp খুলবে। মেসেজ যাচাই করে Send চাপুন।</small></p>
-</section>
+  <div class="tools">
+   <input id="search" type="search" placeholder="🔎 পণ্যের নাম লিখে খুঁজুন..." aria-label="পণ্য খুঁজুন">
+   <select id="sort" aria-label="পণ্য সাজান">
+    <option value="default">সাধারণ ক্রম</option>
+    <option value="low">দাম: কম থেকে বেশি</option>
+    <option value="high">দাম: বেশি থেকে কম</option>
+    <option value="az">নাম অনুযায়ী</option>
+   </select>
+  </div>
+
+  <div class="categories" id="categories">
+   <button class="cat active" data-category="সব">সব পণ্য</button>
+   <button class="cat" data-category="ফ্যাশন">ফ্যাশন</button>
+   <button class="cat" data-category="ইলেকট্রনিক্স">ইলেকট্রনিক্স</button>
+   <button class="cat" data-category="জুতা">জুতা</button>
+   <button class="cat" data-category="উপহার">উপহার</button>
+  </div>
+
+  <div class="products" id="products"></div>
+ </section>
+
+ <section class="cart" id="cart">
+  <h2>🛒 আপনার শপিং কার্ট</h2>
+  <div id="cartItems" class="empty">এখনো কোনো পণ্য যোগ করেননি।</div>
+  <div class="totalrow">
+   <span>মোট মূল্য</span>
+   <span>৳<span id="total">0</span></span>
+  </div>
+  <button id="checkout" onclick="checkout()">WhatsApp-এ অর্ডার করুন →</button>
+  <p class="note">অর্ডার নিশ্চিত করতে WhatsApp খুললে মেসেজটি যাচাই করে Send চাপুন। ডেলিভারি চার্জ থাকলে তা আলাদাভাবে নিশ্চিত করুন।</p>
+ </section>
 </main>
 
-<footer>© 2026 Mishor's Shop ❤️</footer>
+<footer>
+ © 2026 Mishor's Shop ❤️<br>
+ আপনার কেনাকাটার জন্য ধন্যবাদ!
+</footer>
 
 <script>
 const products = [
-{id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚"},
-{id:2,name:"হেডফোন",price:500,emoji:"🎧"},
-{id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜"},
-{id:4,name:"স্পোর্টস জুতা",price:600,emoji:"👟"},
-{id:5,name:"সানগ্লাস",price:200,emoji:"🕶️"},
-{id:6,name:"ব্যাকপ্যাক",price:100,emoji:"🎒"},
-{id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁"},
-{id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱"}
+ {id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚",category:"ফ্যাশন"},
+ {id:2,name:"হেডফোন",price:500,emoji:"🎧",category:"ইলেকট্রনিক্স"},
+ {id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜",category:"ফ্যাশন",image:"images/realistic%20beg.jpg"},
+ {id:4,name:"স্পোর্টস জুতা",price:600,emoji:"👟",category:"জুতা"},
+ {id:5,name:"সানগ্লাস",price:200,emoji:"🕶️",category:"ফ্যাশন"},
+ {id:6,name:"ব্যাকপ্যাক",price:100,emoji:"🎒",category:"ফ্যাশন"},
+ {id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁",category:"উপহার"},
+ {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"ইলেকট্রনিক্স"}
 ];
 
 const cart = {};
+let activeCategory = "সব";
 
 function renderProducts(){
  const q=document.getElementById("search").value.trim().toLowerCase();
- document.getElementById("products").innerHTML=products
- .filter(p=>p.name.toLowerCase().includes(q))
- .map(p=>`<article class="product">
-<div class="pic">${p.id===3
-  ? `<img src="images/realistic%20beg.jpg" alt="${p.name}" style="width:100%;height:95px;object-fit:contain;">`
-  : p.emoji}</div>
- <h3>${p.name}</h3>
- <div class="price">৳${p.price}</div>
- <button onclick="addToCart(${p.id})">+ কার্টে যোগ করুন</button>
- </article>`).join("");
+ const sort=document.getElementById("sort").value;
+
+ let list=products.filter(p=>
+  p.name.toLowerCase().includes(q) &&
+  (activeCategory==="সব" || p.category===activeCategory)
+ );
+
+ if(sort==="low") list.sort((a,b)=>a.price-b.price);
+ if(sort==="high") list.sort((a,b)=>b.price-a.price);
+ if(sort==="az") list.sort((a,b)=>a.name.localeCompare(b.name,"bn"));
+
+ document.getElementById("productCount").textContent=list.length+"টি পণ্য";
+
+ document.getElementById("products").innerHTML=list.length
+ ? list.map(p=>`
+  <article class="product">
+   <div class="pic">
+    ${p.image
+      ? `<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`
+      : p.emoji}
+   </div>
+   <h3>${p.name}</h3>
+   <div class="price">৳${p.price.toLocaleString("en-US")}</div>
+   <button onclick="addToCart(${p.id})">＋ কার্টে যোগ করুন</button>
+  </article>
+ `).join("")
+ : '<div class="empty" style="grid-column:1/-1">দুঃখিত, কোনো পণ্য পাওয়া যায়নি।</div>';
 }
 
 function addToCart(id){
@@ -95,31 +243,47 @@ function changeQty(id,amount){
 
 function renderCart(){
  let total=0;
- const items=products.filter(p=>cart[p.id]);
+ let count=0;
+ const items=products.filter(p=>(cart[p.id]||0)>0);
+
  document.getElementById("cartItems").innerHTML=items.length
  ? items.map(p=>{
-   total+=p.price*cart[p.id];
+   const qty=cart[p.id];
+   const subtotal=p.price*qty;
+   total+=subtotal;
+   count+=qty;
    return `<div class="cartrow">
-   <div>${p.name}<br>৳${p.price} × ${cart[p.id]}</div>
-   <div class="qty">
-   <button onclick="changeQty(${p.id},-1)">−</button>
-   <button onclick="changeQty(${p.id},1)">+</button>
-   </div></div>`;
+    <div>
+     <div class="itemname">${p.name}</div>
+     <div class="itemprice">৳${p.price.toLocaleString("en-US")} × ${qty} = ৳${subtotal.toLocaleString("en-US")}</div>
+    </div>
+    <div class="qty">
+     <button aria-label="${p.name} কমান" onclick="changeQty(${p.id},-1)">−</button>
+     <span>${qty}</span>
+     <button aria-label="${p.name} বাড়ান" onclick="changeQty(${p.id},1)">+</button>
+    </div>
+   </div>`;
  }).join("")
- : "এখনো কোনো পণ্য যোগ করেননি।";
- document.getElementById("total").textContent=total;
+ : '<div class="empty">এখনো কোনো পণ্য যোগ করেননি।</div>';
+
+ document.getElementById("total").textContent=total.toLocaleString("en-US");
+ document.getElementById("cartCount").textContent=count;
 }
 
 function checkout(){
- const items=products.filter(p=>cart[p.id]);
+ const items=products.filter(p=>(cart[p.id]||0)>0);
+
  if(!items.length){
   alert("আগে কার্টে পণ্য যোগ করুন!");
   return;
  }
+
  const name=prompt("আপনার নাম লিখুন:");
  if(!name||!name.trim()) return;
+
  const phone=prompt("আপনার ফোন নম্বর লিখুন:");
  if(!phone||!phone.trim()) return;
+
  const address=prompt("ডেলিভারির সম্পূর্ণ ঠিকানা লিখুন:");
  if(!address||!address.trim()) return;
 
@@ -135,11 +299,24 @@ function checkout(){
   total+=subtotal;
   msg+=p.name+" × "+cart[p.id]+" = ৳"+subtotal+"\n";
  });
- msg+="\nমোট মূল্য: ৳"+total;
+
+ msg+="\nমোট পণ্যমূল্য: ৳"+total;
+ msg+="\n\nডেলিভারি চার্জ: পরে নিশ্চিত করতে হবে";
 
  const url="https://wa.me/8801747036594?text="+encodeURIComponent(msg);
  window.location.href=url;
 }
+
+document.getElementById("search").addEventListener("input",renderProducts);
+document.getElementById("sort").addEventListener("change",renderProducts);
+
+document.getElementById("categories").addEventListener("click",function(e){
+ const btn=e.target.closest("button[data-category]");
+ if(!btn) return;
+ activeCategory=btn.dataset.category;
+ document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b===btn));
+ renderProducts();
+});
 
 renderProducts();
 renderCart();
