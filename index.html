@@ -8,44 +8,30 @@
 <title>Mishor's Shop | Online Store</title>
 
 <style>
-:root{
- --navy:#101828;--orange:#fbbf24;--green:#128c4a;
- --bg:#f3f5f9;--text:#182230;--muted:#667085;
- --line:#e4e7ec;--white:#fff;
-}
+:root{--navy:#101828;--orange:#fbbf24;--green:#128c4a;--bg:#f3f5f9;--text:#182230;--muted:#667085;--line:#e4e7ec}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:12px}
-body{margin:0;background:var(--bg);color:var(--text);
- font-family:Arial,"Noto Sans Bengali",sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans Bengali",sans-serif}
 button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:10px;
- padding:12px;font-weight:700}
+button{cursor:pointer;border:0;border-radius:10px;padding:12px;font-weight:700}
 button:disabled{opacity:.55;cursor:not-allowed}
 header{background:var(--navy);color:white;padding:16px}
-.topbar{max-width:1100px;margin:auto;display:flex;
- justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{font-size:23px;font-weight:900}
 a{color:inherit}
-.cartlink{background:var(--orange);color:var(--navy);
- padding:11px 14px;border-radius:9px;text-decoration:none;font-weight:800}
-.hero{max-width:1100px;margin:16px auto 0;background:#202f46;
- border-radius:18px;padding:28px 20px;color:white}
+.cartlink{background:var(--orange);color:var(--navy);padding:11px 14px;border-radius:9px;text-decoration:none;font-weight:800}
+.hero{max-width:1100px;margin:16px auto 0;background:#202f46;border-radius:18px;padding:28px 20px;color:white}
 .hero h1{font-size:clamp(25px,5vw,40px);line-height:1.4;margin:0 0 10px}
 .hero p{line-height:1.8;color:#e2e8f0}
 .primary{background:var(--orange);color:var(--navy)}
 .dark{background:var(--navy);color:white}
 .green{background:var(--green);color:white}
 main{max-width:1100px;margin:auto;padding:16px 13px}
-.panel{background:white;border:1px solid var(--line);
- border-radius:16px;padding:16px;margin:18px 0}
+.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}
 h2{font-size:21px;margin:8px 0 16px}
 h3{line-height:1.5}
-input,select,textarea{width:100%;min-height:45px;
- border:1px solid #d0d5dd;border-radius:10px;padding:12px;
- background:white;color:var(--text)}
-input:focus,textarea:focus,select:focus{
- outline:2px solid #fbbf24;outline-offset:1px}
-.grid{display:grid;grid-template-columns:1fr;gap:10px}
+input,select,textarea{width:100%;min-height:45px;border:1px solid #d0d5dd;border-radius:10px;padding:12px;background:white;color:var(--text)}
+input:focus,textarea:focus,select:focus{outline:2px solid #fbbf24;outline-offset:1px}
 .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .row>*{min-width:0}
 .row .grow{flex:1}
@@ -54,11 +40,8 @@ input:focus,textarea:focus,select:focus{
 .cat{white-space:nowrap;background:white;border:1px solid var(--line)}
 .cat.active{background:var(--navy);color:white}
 .products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.product{background:white;border:1px solid var(--line);
- border-radius:15px;padding:10px;min-width:0;overflow:hidden}
-.pic{height:135px;background:#f2f4f7;border-radius:10px;
- display:flex;align-items:center;justify-content:center;
- font-size:46px;overflow:hidden}
+.product{background:white;border:1px solid var(--line);border-radius:15px;padding:10px;min-width:0;overflow:hidden}
+.pic{height:135px;background:#f2f4f7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden}
 .pic img{width:100%;height:100%;object-fit:contain}
 .product h3{font-size:15px;min-height:48px;margin:9px 0 5px}
 .price{font-size:19px;font-weight:900;color:#b45309;margin:8px 0 12px}
@@ -67,12 +50,10 @@ input:focus,textarea:focus,select:focus{
 .note,.muted{font-size:13px;line-height:1.7;color:var(--muted)}
 .status{font-size:13px;line-height:1.7;color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:20px}
-.cartrow{display:flex;align-items:center;justify-content:space-between;
- gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cartrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .qty{display:flex;align-items:center;gap:8px}
 .qty button{background:var(--navy);color:white;padding:8px 12px}
-.totalrow{display:flex;justify-content:space-between;
- font-weight:900;font-size:20px;margin:20px 0}
+.totalrow{display:flex;justify-content:space-between;font-weight:900;font-size:20px;margin:20px 0}
 #checkout{width:100%}
 .authbox{display:grid;gap:10px}
 .chat-layout{display:grid;grid-template-columns:1fr;gap:12px}
@@ -81,11 +62,8 @@ input:focus,textarea:focus,select:focus{
 .chat-person.active{background:#dbeafe}
 .chat-area{border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .chat-head{background:#f9fafb;padding:12px;border-bottom:1px solid var(--line)}
-.messages{height:300px;overflow-y:auto;padding:12px;display:flex;
- flex-direction:column;gap:10px;background:#f8fafc}
-.bubble{max-width:88%;padding:10px 12px;border-radius:13px;
- background:white;border:1px solid var(--line);overflow-wrap:anywhere;
- white-space:pre-wrap;line-height:1.6}
+.messages{height:300px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#f8fafc}
+.bubble{max-width:88%;padding:10px 12px;border-radius:13px;background:white;border:1px solid var(--line);overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.6}
 .bubble.mine{align-self:flex-end;background:#dcfce7;border-color:#bbf7d0}
 .bubble small{display:block;margin-top:5px;color:var(--muted);font-size:11px}
 .chat-compose{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px}
@@ -101,10 +79,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
  .chat-list{max-height:390px}
  .messages{height:390px}
 }
-@media(min-width:900px){
- .products{grid-template-columns:repeat(4,minmax(0,1fr))}
- .hero{padding:36px}
-}
+@media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:36px}}
 </style>
 </head>
 <body>
@@ -138,14 +113,14 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
  </div>
  <div id="categories" class="categories">
   <button class="cat active" data-category="সব">সব পণ্য</button>
-  <button class="cat" data-category="Fashion">👗 Fashion</button>
-  <button class="cat" data-category="Sports">⚽ Sports</button>
-  <button class="cat" data-category="Electronics">🎧 Electronics</button>
-  <button class="cat" data-category="Gift">🎁 Gift</button>
-  <button class="cat" data-category="Necessary Products">🧴 Necessary</button>
-  <button class="cat" data-category="Shoes">👟 Shoes</button>
-  <button class="cat" data-category="Beauty & Personal Care">💄 Beauty</button>
-  <button class="cat" data-category="Home & Living">🏠 Home</button>
+  <button class="cat" data-category="Fashion">👗 পোশাক ও ফ্যাশন</button>
+  <button class="cat" data-category="Sports">⚽ খেলাধুলা</button>
+  <button class="cat" data-category="Electronics">🎧 ইলেকট্রনিকস</button>
+  <button class="cat" data-category="Gift">🎁 উপহার</button>
+  <button class="cat" data-category="Necessary Products">🧴 প্রয়োজনীয় পণ্য</button>
+  <button class="cat" data-category="Shoes">👟 জুতা</button>
+  <button class="cat" data-category="Beauty & Personal Care">💄 বিউটি</button>
+  <button class="cat" data-category="Home & Living">🏠 ঘর ও রান্নাঘর</button>
  </div>
  <p id="firebaseStatus" class="status">পণ্য লোড হচ্ছে...</p>
  <div id="products" class="products"></div>
@@ -164,8 +139,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
  <p id="authStatus" class="status">Firebase অ্যাকাউন্ট যাচাই হচ্ছে...</p>
  <div id="authForms" class="authbox">
   <input id="authEmail" type="email" autocomplete="email" placeholder="ইমেইল ঠিকানা">
-  <input id="authPassword" type="password" autocomplete="current-password"
-   minlength="6" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
+  <input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
   <div class="row">
    <button id="loginBtn" class="dark grow">লগইন</button>
    <button id="registerBtn" class="primary grow">নতুন অ্যাকাউন্ট</button>
@@ -191,12 +165,9 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
   </aside>
   <div class="chat-area">
    <div class="chat-head" id="chatHead">দোকানের সঙ্গে কথোপকথন</div>
-   <div class="messages" id="messages">
-    <p class="empty">চ্যাট খুললে মেসেজ এখানে দেখা যাবে।</p>
-   </div>
+   <div class="messages" id="messages"><p class="empty">চ্যাট খুললে মেসেজ এখানে দেখা যাবে।</p></div>
    <form id="chatForm" class="chat-compose">
-    <input id="messageInput" maxlength="1500" autocomplete="off"
-     placeholder="আপনার মেসেজ লিখুন..." aria-label="মেসেজ">
+    <input id="messageInput" maxlength="1500" autocomplete="off" placeholder="আপনার মেসেজ লিখুন..." aria-label="মেসেজ">
     <button class="green" id="sendBtn" type="submit">পাঠান</button>
    </form>
   </div>
@@ -208,7 +179,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
 <footer>© 2026 Mishor's Shop ❤️<br>আপনার কেনাকাটার জন্য ধন্যবাদ!</footer>
 
 <script>
-const defaultProducts=[
+const originalProducts=[
  {id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚",category:"Fashion"},
  {id:2,name:"হেডফোন",price:500,emoji:"🎧",category:"Electronics"},
  {id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜",category:"Fashion",image:"images/realistic%20beg.jpg"},
@@ -218,6 +189,116 @@ const defaultProducts=[
  {id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁",category:"Gift"},
  {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"Electronics"}
 ];
+
+/* ৮টি বিভাগে ২৫টি করে = ২০০টি নতুন নমুনা পণ্য */
+const sampleGroups=[
+{
+ category:"Fashion",emoji:"👕",base:180,step:45,
+ items:[
+ "কটন টি-শার্ট","পোলো টি-শার্ট","প্রিন্টেড টি-শার্ট","ওভারসাইজ টি-শার্ট","ফুল স্লিভ টি-শার্ট",
+ "ক্যাজুয়াল শার্ট","ফরমাল শার্ট","ডেনিম শার্ট","চেক শার্ট","লিনেন শার্ট",
+ "স্লিম ফিট জিন্স","স্ট্রেইট জিন্স","ক্যাজুয়াল প্যান্ট","ফরমাল ট্রাউজার","কার্গো প্যান্ট",
+ "কটন পাঞ্জাবি","এমব্রয়ডারি পাঞ্জাবি","ক্যাজুয়াল কুর্তা","ডেনিম জ্যাকেট","ক্যাজুয়াল হুডি",
+ "কটন শাড়ি","প্রিন্টেড শাড়ি","থ্রি-পিস ড্রেস","কুর্তি","লং ড্রেস"
+ ]
+},
+{
+ category:"Fashion",emoji:"👗",base:250,step:55,
+ items:[
+ "লেডিস টি-শার্ট","লেডিস টপস","ক্যাজুয়াল টিউনিক","কটন কামিজ","এমব্রয়ডারি কামিজ",
+ "প্রিন্টেড থ্রি-পিস","আনস্টিচড থ্রি-পিস","কটন সালোয়ার","পালাজো প্যান্ট","লেগিংস",
+ "ম্যাক্সি ড্রেস","পার্টি ড্রেস","ফ্লোরাল ড্রেস","ডেনিম জিন্স লেডিস","ডেনিম স্কার্ট",
+ "কটন হিজাব","জার্সি হিজাব","প্রিন্টেড হিজাব","বোরকা","আবায়া",
+ "বাচ্চাদের টি-শার্ট","বাচ্চাদের শার্ট","বাচ্চাদের ফ্রক","বাচ্চাদের পাঞ্জাবি","বাচ্চাদের পায়জামা"
+ ]
+},
+{
+ category:"Shoes",emoji:"👟",base:350,step:90,
+ items:[
+ "ক্যাজুয়াল স্নিকার্স","রানিং স্নিকার্স","স্পোর্টস জুতা","ক্যানভাস জুতা","লোফার জুতা",
+ "ফরমাল জুতা","লেদার লুক জুতা","স্লিপ-অন জুতা","হাই-টপ স্নিকার্স","ওয়াকিং শু",
+ "মেনস স্যান্ডেল","মেনস স্লাইডার","ফ্লিপ-ফ্লপ","লেডিস ফ্ল্যাট","লেডিস স্যান্ডেল",
+ "লেডিস হিল","ওয়েজ স্যান্ডেল","ব্যালেরিনা জুতা","বাচ্চাদের স্নিকার্স","বাচ্চাদের স্যান্ডেল",
+ "স্কুল জুতা","ফুটবল বুট","ট্রেনিং শু","রাবার স্যান্ডেল","ঘরের স্লিপার"
+ ]
+},
+{
+ category:"Electronics",emoji:"🎧",base:250,step:180,
+ items:[
+ "ওয়্যার্ড ইয়ারফোন","ব্লুটুথ ইয়ারবাড","ওয়্যারলেস হেডফোন","গেমিং হেডসেট","মিনি স্পিকার",
+ "ব্লুটুথ স্পিকার","মোবাইল চার্জার","ফাস্ট চার্জার","USB-C কেবল","লাইটনিং কেবল",
+ "পাওয়ার ব্যাংক","মোবাইল স্ট্যান্ড","ফোন হোল্ডার","ফোন ট্রাইপড","রিং লাইট",
+ "স্মার্টওয়াচ","ফিটনেস ব্যান্ড","কম্পিউটার মাউস","ওয়্যারলেস মাউস","কীবোর্ড",
+ "USB হাব","মেমোরি কার্ড রিডার","ওয়েবক্যাম","মিনি ফ্যান","LED ডেস্ক ল্যাম্প"
+ ]
+},
+{
+ category:"Sports",emoji:"⚽",base:150,step:100,
+ items:[
+ "ফুটবল","ক্রিকেট বল","টেনিস বল","ব্যাডমিন্টন র‍্যাকেট","ব্যাডমিন্টন শাটল",
+ "ক্রিকেট ব্যাট","ক্রিকেট স্টাম্প","ফুটবল পাম্প","জাম্প রোপ","হ্যান্ড গ্রিপ",
+ "যোগা ম্যাট","রেজিস্ট্যান্স ব্যান্ড","স্পোর্টস বোতল","স্পোর্টস ক্যাপ","স্পোর্টস মোজা",
+ "জিম গ্লাভস","কবজি সাপোর্ট","হাঁটু সাপোর্ট","ফুটবল জার্সি","ক্রিকেট জার্সি",
+ "বাস্কেটবল","ভলিবল","টেবিল টেনিস বল","স্কিপিং রোপ","স্পোর্টস তোয়ালে"
+ ]
+},
+{
+ category:"Beauty & Personal Care",emoji:"💄",base:100,step:65,
+ items:[
+ "লিপ বাম","লিপস্টিক","লিপ গ্লস","ফেসওয়াশ","ফেস ময়েশ্চারাইজার",
+ "সানস্ক্রিন","ফেস সিরাম","ফেস মাস্ক","ক্লিনজিং ব্রাশ","মেকআপ ব্রাশ সেট",
+ "কমপ্যাক্ট পাউডার","আইলাইনার","মাসকারা","নেইল পলিশ","নেইল কাটার",
+ "চুলের চিরুনি","হেয়ার ব্রাশ","হেয়ার ব্যান্ড","হেয়ার ক্লিপ সেট","হেয়ার তোয়ালে",
+ "মেকআপ ব্যাগ","ট্রাভেল মিরর","বডি লোশন","হ্যান্ড ক্রিম","টয়লেটরি ব্যাগ"
+ ]
+},
+{
+ category:"Home & Living",emoji:"🏠",base:100,step:75,
+ items:[
+ "কুশন কভার","বিছানার চাদর","বালিশের কভার","হালকা কম্বল","দরজার ম্যাট",
+ "দেয়াল ঘড়ি","টেবিল ঘড়ি","ডেস্ক অর্গানাইজার","স্টোরেজ বক্স","কাপড় রাখার ব্যাগ",
+ "পানির বোতল","ট্রাভেল মগ","চায়ের কাপ সেট","প্লেট সেট","খাবারের কন্টেইনার",
+ "লাঞ্চ বক্স","মশলার কৌটা","রান্নাঘরের চামচ সেট","সবজি কাটার","ডিশ ওয়াশ ব্রাশ",
+ "কাপড় শুকানোর ক্লিপ","লন্ড্রি ব্যাগ","LED নাইট লাইট","ফটো ফ্রেম","ফুলদানি"
+ ]
+},
+{
+ category:"Necessary Products",emoji:"🧴",base:80,step:55,
+ items:[
+ "ছাতা","রেইনকোট","পুনর্ব্যবহারযোগ্য শপিং ব্যাগ","মানিব্যাগ","কার্ড হোল্ডার",
+ "কী-রিং","ট্রাভেল পাউচ","পাসপোর্ট কভার","আইডি কার্ড হোল্ডার","নোটবুক",
+ "কলম সেট","পেন্সিল বক্স","পানির ফ্লাস্ক","টিফিন বক্স","মাইক্রোফাইবার কাপড়",
+ "জুতার ব্যাগ","কাপড়ের হ্যাঙ্গার","ট্রাভেল পিলো","আই মাস্ক","ছোট সেলাই কিট",
+ "কাপড়ের মাস্ক","কেবল অর্গানাইজার","ড্রয়ার অর্গানাইজার","ফোল্ডেবল ব্যাগ","ছোট স্টোরেজ পাউচ"
+ ]
+},
+{
+ category:"Gift",emoji:"🎁",base:100,step:85,
+ items:[
+ "জন্মদিনের গিফট বক্স","গিফট ব্যাগ","গ্রিটিং কার্ড","ফটো অ্যালবাম","ফটো ফ্রেম গিফট",
+ "টেডি বিয়ার","প্লাশ খেলনা","ডেকোরেটিভ লাইট","কৃত্রিম ফুল","ফুলের তোড়া",
+ "কাপল মগ","কাস্টম স্টাইল মগ","কী-রিং গিফট","গিফট পেন সেট","ডায়েরি গিফট সেট",
+ "গিফট ওয়ালেট","পারফিউম গিফট বক্স","জুয়েলারি বক্স","ছোট শোপিস","টেবিল ডেকোর",
+ "উপহারের রিবন সেট","গিফট র‍্যাপ পেপার","চকলেট বক্স","উৎসবের ডেকোর সেট","সারপ্রাইজ গিফট বক্স"
+ ]
+}
+];
+
+const sampleProducts=[];
+let sampleId=1001;
+sampleGroups.forEach((group,g)=>{
+ group.items.forEach((name,i)=>{
+  sampleProducts.push({
+   id:"sample_"+sampleId++,
+   name,
+   price:group.base+((i*group.step+g*37)% (group.step*12)),
+   emoji:group.emoji,
+   category:group.category
+  });
+ });
+});
+
+const defaultProducts=[...originalProducts,...sampleProducts];
 const CATEGORY_MAP={
  "ফ্যাশন":"Fashion","fashion":"Fashion","sports":"Sports",
  "ইলেকট্রনিক্স":"Electronics","electronics":"Electronics",
@@ -321,12 +402,12 @@ window.setFirebaseProducts=function(remote){
  const defaults=new Set(defaultProducts.map(p=>String(p.id)));
  products=[...defaultProducts,...remote.filter(p=>!defaults.has(String(p.id)))];
  document.getElementById("firebaseStatus").textContent=
-  remote.length?"Firebase থেকে পণ্য লোড হয়েছে।":"ডিফল্ট পণ্য দেখানো হচ্ছে।";
+  remote.length?"নমুনা ও Firebase পণ্য লোড হয়েছে।":"নমুনা পণ্য দেখানো হচ্ছে।";
  renderProducts();renderCart();
 };
 window.setFirebaseError=function(){
  document.getElementById("firebaseStatus").textContent=
- "Firebase পণ্য লোড হয়নি; ডিফল্ট পণ্য দেখানো হচ্ছে।";
+ "Firebase পণ্য লোড হয়নি; নমুনা পণ্য দেখানো হচ্ছে।";
 };
 renderProducts();renderCart();
 </script>
@@ -342,7 +423,6 @@ import {
  query,orderBy,onSnapshot,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-/* ধাপ ৩-এ YOUR_ADMIN_UID বদলাবে */
 const ADMIN_UID="A2kBB273NcSzQ2naJF2PBrue47k2";
 
 const firebaseConfig={
@@ -364,12 +444,12 @@ const $=id=>document.getElementById(id);
 const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
 
 function setStatus(text){$("chatStatus").textContent=text;}
-function clearListener(){
- if(stopMessages){stopMessages();stopMessages=null;}
-}
 function showChat(){
  $("chatPanel").classList.remove("hidden");
  $("chatPanel").scrollIntoView({behavior:"smooth"});
+}
+function clearListener(){
+ if(stopMessages){stopMessages();stopMessages=null;}
 }
 function showMessage(msg,mine,time){
  const bubble=document.createElement("div");
@@ -454,16 +534,14 @@ async function sendMessage(text){
 $("registerBtn").addEventListener("click",async()=>{
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
  if(!email||password.length<6){alert("সঠিক ইমেইল ও কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দাও।");return;}
- try{
-  await createUserWithEmailAndPassword(auth,email,password);
- }catch(e){alert("রেজিস্ট্রেশন হয়নি: "+e.message);}
+ try{await createUserWithEmailAndPassword(auth,email,password);}
+ catch(e){alert("রেজিস্ট্রেশন হয়নি: "+e.message);}
 });
 $("loginBtn").addEventListener("click",async()=>{
  const email=$("authEmail").value.trim(),password=$("authPassword").value;
  if(!email||!password){alert("ইমেইল ও পাসওয়ার্ড দাও।");return;}
- try{
-  await signInWithEmailAndPassword(auth,email,password);
- }catch(e){alert("লগইন হয়নি: "+e.message);}
+ try{await signInWithEmailAndPassword(auth,email,password);}
+ catch(e){alert("লগইন হয়নি: "+e.message);}
 });
 $("logoutBtn").addEventListener("click",()=>signOut(auth));
 $("openChat").addEventListener("click",async()=>{
@@ -517,4 +595,4 @@ try{
 }
 </script>
 </body>
-</html>
+ </html>
