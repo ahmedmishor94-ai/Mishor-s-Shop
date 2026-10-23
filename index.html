@@ -82,6 +82,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
 @media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:36px}}
 </style>
 </head>
+
 <body>
 <header>
  <div class="topbar">
@@ -190,7 +191,7 @@ const originalProducts=[
  {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"Electronics"}
 ];
 
-/* ৮টি বিভাগে ২৫টি করে = ২০০টি নতুন নমুনা পণ্য */
+/* নমুনা পণ্য: ৯টি গ্রুপে ২৫টি করে = ২২৫টি নতুন পণ্য */
 const sampleGroups=[
 {
  category:"Fashion",emoji:"👕",base:180,step:45,
@@ -291,7 +292,7 @@ sampleGroups.forEach((group,g)=>{
   sampleProducts.push({
    id:"sample_"+sampleId++,
    name,
-   price:group.base+((i*group.step+g*37)% (group.step*12)),
+   price:group.base+((i*group.step+g*37)%(group.step*12)),
    emoji:group.emoji,
    category:group.category
   });
@@ -299,6 +300,7 @@ sampleGroups.forEach((group,g)=>{
 });
 
 const defaultProducts=[...originalProducts,...sampleProducts];
+
 const CATEGORY_MAP={
  "ফ্যাশন":"Fashion","fashion":"Fashion","sports":"Sports",
  "ইলেকট্রনিক্স":"Electronics","electronics":"Electronics",
@@ -307,109 +309,162 @@ const CATEGORY_MAP={
  "beauty & personal care":"Beauty & Personal Care",
  "home & living":"Home & Living"
 };
+
 function normalizeCategory(v){
  const s=String(v||"").trim();
  return CATEGORY_MAP[s]||CATEGORY_MAP[s.toLowerCase()]||s;
 }
+
 function esc(v){
  return String(v??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[c]));
 }
-function money(v){return Number(v).toLocaleString("en-US")}
+
+function money(v){return Number(v).toLocaleString("en-US");}
+
+/* বিভাগের ছবি: GitHub-এর images ফোল্ডারে একই নামে ছবি রাখতে হবে */
+const categoryImages={
+ "Fashion":"images/fashion.jpg",
+ "Shoes":"images/shoes.jpg",
+ "Electronics":"images/electronics.jpg",
+ "Sports":"images/sports.jpg",
+ "Beauty & Personal Care":"images/beauty.jpg",
+ "Home & Living":"images/home.jpg",
+ "Necessary Products":"images/necessary.jpg",
+ "Gift":"images/gift.jpg"
+};
+
 let products=[...defaultProducts],activeCategory="সব";
 const cart={};
 
 function renderProducts(){
  const q=document.getElementById("search").value.trim().toLowerCase();
  const sort=document.getElementById("sort").value;
+
  let list=products.filter(p=>
   String(p.name).toLowerCase().includes(q)&&
   (activeCategory==="সব"||normalizeCategory(p.category)===activeCategory)
  );
+
  if(sort==="low")list.sort((a,b)=>a.price-b.price);
  if(sort==="high")list.sort((a,b)=>b.price-a.price);
  if(sort==="az")list.sort((a,b)=>String(a.name).localeCompare(String(b.name),"bn"));
+
  document.getElementById("productCount").textContent=list.length+"টি পণ্য";
+
  document.getElementById("products").innerHTML=list.length?list.map(p=>{
   const image=String(p.image||"");
   const valid=/^https:\/\//i.test(image)||/^images\/[a-zA-Z0-9._%/-]+$/.test(image);
-  const visual=valid
-   ?'<img src="'+esc(image)+'" alt="'+esc(p.name)+'" onerror="this.style.display=\'none\'">'
+  const fallbackImage=categoryImages[normalizeCategory(p.category)]||"";
+  const imageToShow=valid?image:fallbackImage;
+
+  const visual=imageToShow
+   ?'<img src="'+esc(imageToShow)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentElement.textContent=\'📦\';">'
    :'<span>'+esc(p.emoji||"📦")+'</span>';
+
   return '<article class="product"><div class="pic">'+visual+'</div>'+
    '<h3>'+esc(p.name)+'</h3><div class="price">৳'+money(p.price)+'</div>'+
    '<div class="product-actions"><button class="primary" data-add="'+esc(p.id)+'">＋ কার্টে যোগ</button>'+
    '<button class="dark" data-buy="'+esc(p.id)+'">এখনই কিনুন →</button></div></article>';
  }).join(""):'<p class="empty">কোনো পণ্য পাওয়া যায়নি।</p>';
 }
+
 function addToCart(id){
  const p=products.find(x=>String(x.id)===String(id));
  if(!p)return;
- cart[id]=(cart[id]||0)+1;renderCart();
+ cart[id]=(cart[id]||0)+1;
+ renderCart();
 }
+
 function changeQty(id,n){
  cart[id]=(cart[id]||0)+n;
  if(cart[id]<=0)delete cart[id];
  renderCart();
 }
+
 function renderCart(){
  let total=0,count=0;
  const items=products.filter(p=>(cart[p.id]||0)>0);
+
  document.getElementById("cartItems").innerHTML=items.length?items.map(p=>{
-  const qty=cart[p.id],sub=p.price*qty;total+=sub;count+=qty;
+  const qty=cart[p.id],sub=p.price*qty;
+  total+=sub;count+=qty;
   return '<div class="cartrow"><div><b>'+esc(p.name)+'</b>'+
    '<div class="note">৳'+money(p.price)+' × '+qty+' = ৳'+money(sub)+'</div></div>'+
    '<div class="qty"><button data-change="-1" data-id="'+esc(p.id)+'">−</button>'+
    '<span>'+qty+'</span><button data-change="1" data-id="'+esc(p.id)+'">+</button></div></div>';
  }).join(""):'<p class="empty">কার্ট খালি।</p>';
+
  document.getElementById("total").textContent=money(total);
  document.getElementById("cartCount").textContent=count;
 }
+
 document.getElementById("products").addEventListener("click",e=>{
- const add=e.target.closest("[data-add]"),buy=e.target.closest("[data-buy]");
+ const add=e.target.closest("[data-add]");
+ const buy=e.target.closest("[data-buy]");
  if(add)addToCart(add.dataset.add);
- if(buy){addToCart(buy.dataset.buy);document.getElementById("cart").scrollIntoView({behavior:"smooth"});}
+ if(buy){
+  addToCart(buy.dataset.buy);
+  document.getElementById("cart").scrollIntoView({behavior:"smooth"});
+ }
 });
+
 document.getElementById("cartItems").addEventListener("click",e=>{
  const b=e.target.closest("[data-change]");
  if(b)changeQty(b.dataset.id,Number(b.dataset.change));
 });
+
 document.getElementById("search").addEventListener("input",renderProducts);
 document.getElementById("sort").addEventListener("change",renderProducts);
+
 document.getElementById("categories").addEventListener("click",e=>{
- const b=e.target.closest("[data-category]");if(!b)return;
+ const b=e.target.closest("[data-category]");
+ if(!b)return;
  activeCategory=b.dataset.category;
  document.querySelectorAll(".cat").forEach(x=>x.classList.toggle("active",x===b));
  renderProducts();
 });
+
 document.getElementById("checkout").addEventListener("click",()=>{
  const items=products.filter(p=>(cart[p.id]||0)>0);
  if(!items.length){alert("আগে কার্টে পণ্য যোগ করুন!");return;}
+
  const name=prompt("আপনার নাম লিখুন:");
  if(!name?.trim())return;
  const phone=prompt("আপনার ফোন নম্বর লিখুন:");
  if(!phone?.trim())return;
  const address=prompt("ডেলিভারির সম্পূর্ণ ঠিকানা লিখুন:");
  if(!address?.trim())return;
+
  let total=0,msg="🛍️ Mishor's Shop - নতুন অর্ডার\n\n";
  msg+="নাম: "+name.trim()+"\nফোন: "+phone.trim()+"\nঠিকানা: "+address.trim()+"\n\nপণ্য:\n";
- items.forEach(p=>{total+=p.price*cart[p.id];msg+=p.name+" × "+cart[p.id]+" = ৳"+p.price*cart[p.id]+"\n";});
+
+ items.forEach(p=>{
+  total+=p.price*cart[p.id];
+  msg+=p.name+" × "+cart[p.id]+" = ৳"+p.price*cart[p.id]+"\n";
+ });
+
  msg+="\nমোট পণ্যমূল্য: ৳"+total+"\nডেলিভারি চার্জ: পরে নিশ্চিত করতে হবে";
  location.href="https://wa.me/8801747036594?text="+encodeURIComponent(msg);
 });
+
 window.setFirebaseProducts=function(remote){
  const defaults=new Set(defaultProducts.map(p=>String(p.id)));
  products=[...defaultProducts,...remote.filter(p=>!defaults.has(String(p.id)))];
  document.getElementById("firebaseStatus").textContent=
   remote.length?"নমুনা ও Firebase পণ্য লোড হয়েছে।":"নমুনা পণ্য দেখানো হচ্ছে।";
- renderProducts();renderCart();
+ renderProducts();
+ renderCart();
 };
+
 window.setFirebaseError=function(){
  document.getElementById("firebaseStatus").textContent=
  "Firebase পণ্য লোড হয়নি; নমুনা পণ্য দেখানো হচ্ছে।";
 };
-renderProducts();renderCart();
+
+renderProducts();
+renderCart();
 </script>
 
 <script type="module">
@@ -444,13 +499,16 @@ const $=id=>document.getElementById(id);
 const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
 
 function setStatus(text){$("chatStatus").textContent=text;}
+
 function showChat(){
  $("chatPanel").classList.remove("hidden");
  $("chatPanel").scrollIntoView({behavior:"smooth"});
 }
+
 function clearListener(){
  if(stopMessages){stopMessages();stopMessages=null;}
 }
+
 function showMessage(msg,mine,time){
  const bubble=document.createElement("div");
  bubble.className="bubble"+(mine?" mine":"");
@@ -461,20 +519,26 @@ function showMessage(msg,mine,time){
  bubble.append(body,small);
  $("messages").appendChild(bubble);
 }
+
 function listenMessages(uid){
  clearListener();
  selectedUID=uid;
  $("messages").replaceChildren();
  $("chatHead").textContent=isAdmin()?"ক্রেতার সঙ্গে চ্যাট":"Mishor's Shop-এর সঙ্গে চ্যাট";
  setStatus("মেসেজ লোড হচ্ছে...");
+
  const path=collection(db,"conversations",uid,"messages");
  const q=query(path,orderBy("createdAt","asc"));
+
  stopMessages=onSnapshot(q,snap=>{
   $("messages").replaceChildren();
   snap.forEach(item=>{
    const m=item.data();
-   showMessage(String(m.text||""),m.senderUid===currentUser.uid,
-    m.createdAt?.toDate?.().toLocaleString("bn-BD")||"");
+   showMessage(
+    String(m.text||""),
+    m.senderUid===currentUser.uid,
+    m.createdAt?.toDate?.().toLocaleString("bn-BD")||""
+   );
   });
   setStatus("চ্যাট সংযুক্ত।");
   $("messages").scrollTop=$("messages").scrollHeight;
@@ -483,26 +547,36 @@ function listenMessages(uid){
   setStatus("চ্যাট লোড হয়নি। Firestore Security Rules পরীক্ষা করো।");
  });
 }
+
 async function openCustomerChat(){
  if(!currentUser)return;
  selectedUID=currentUser.uid;
+
  try{
   await setDoc(doc(db,"conversations",currentUser.uid),{
-   ownerUid:currentUser.uid,updatedAt:serverTimestamp()
+   ownerUid:currentUser.uid,
+   updatedAt:serverTimestamp()
   },{merge:true});
+
   showChat();
   $("inbox").classList.add("hidden");
   listenMessages(currentUser.uid);
  }catch(err){
-  console.error(err);setStatus("চ্যাট খোলা যায়নি। Security Rules পরীক্ষা করো।");
+  console.error(err);
+  setStatus("চ্যাট খোলা যায়নি। Security Rules পরীক্ষা করো।");
  }
 }
+
 function listenInbox(){
  if(stopInbox){stopInbox();stopInbox=null;}
  if(!isAdmin())return;
+
  $("inbox").classList.remove("hidden");
+
  stopInbox=onSnapshot(collection(db,"conversations"),snap=>{
-  const list=$("conversationList");list.replaceChildren();
+  const list=$("conversationList");
+  list.replaceChildren();
+
   snap.forEach(item=>{
    const b=document.createElement("button");
    b.className="chat-person"+(selectedUID===item.id?" active":"");
@@ -510,84 +584,132 @@ function listenInbox(){
    b.addEventListener("click",()=>listenMessages(item.id));
    list.appendChild(b);
   });
+
   if(!snap.size)list.innerHTML='<p class="note">এখনো কোনো চ্যাট নেই।</p>';
  },err=>{
-  console.error(err);setStatus("ইনবক্স লোড হয়নি। Admin UID ও Security Rules পরীক্ষা করো।");
+  console.error(err);
+  setStatus("ইনবক্স লোড হয়নি। Admin UID ও Security Rules পরীক্ষা করো।");
  });
 }
+
 async function sendMessage(text){
  if(!currentUser||!selectedUID)return;
+
  const value=text.trim();
  if(!value||value.length>1500)return;
+
  $("sendBtn").disabled=true;
+
  try{
   await addDoc(collection(db,"conversations",selectedUID,"messages"),{
-   text:value,senderUid:currentUser.uid,createdAt:serverTimestamp()
+   text:value,
+   senderUid:currentUser.uid,
+   createdAt:serverTimestamp()
   });
   $("messageInput").value="";
  }catch(err){
   console.error(err);
   setStatus("মেসেজ পাঠানো যায়নি। লগইন ও Security Rules পরীক্ষা করো।");
- }finally{$("sendBtn").disabled=false;}
+ }finally{
+  $("sendBtn").disabled=false;
+ }
 }
 
 $("registerBtn").addEventListener("click",async()=>{
- const email=$("authEmail").value.trim(),password=$("authPassword").value;
- if(!email||password.length<6){alert("সঠিক ইমেইল ও কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দাও।");return;}
- try{await createUserWithEmailAndPassword(auth,email,password);}
- catch(e){alert("রেজিস্ট্রেশন হয়নি: "+e.message);}
+ const email=$("authEmail").value.trim();
+ const password=$("authPassword").value;
+
+ if(!email||password.length<6){
+  alert("সঠিক ইমেইল ও কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দাও।");
+  return;
+ }
+
+ try{
+  await createUserWithEmailAndPassword(auth,email,password);
+ }catch(e){
+  alert("রেজিস্ট্রেশন হয়নি: "+e.message);
+ }
 });
+
 $("loginBtn").addEventListener("click",async()=>{
- const email=$("authEmail").value.trim(),password=$("authPassword").value;
- if(!email||!password){alert("ইমেইল ও পাসওয়ার্ড দাও।");return;}
- try{await signInWithEmailAndPassword(auth,email,password);}
- catch(e){alert("লগইন হয়নি: "+e.message);}
+ const email=$("authEmail").value.trim();
+ const password=$("authPassword").value;
+
+ if(!email||!password){
+  alert("ইমেইল ও পাসওয়ার্ড দাও।");
+  return;
+ }
+
+ try{
+  await signInWithEmailAndPassword(auth,email,password);
+ }catch(e){
+  alert("লগইন হয়নি: "+e.message);
+ }
 });
+
 $("logoutBtn").addEventListener("click",()=>signOut(auth));
+
 $("openChat").addEventListener("click",async()=>{
  if(isAdmin()){
-  showChat();listenInbox();
+  showChat();
+  listenInbox();
   setStatus("ইনবক্স থেকে একজন ক্রেতা বেছে নাও।");
- }else await openCustomerChat();
+ }else{
+  await openCustomerChat();
+ }
 });
+
 $("chatForm").addEventListener("submit",e=>{
- e.preventDefault();sendMessage($("messageInput").value);
+ e.preventDefault();
+ sendMessage($("messageInput").value);
 });
 
 onAuthStateChanged(auth,user=>{
  clearListener();
  if(stopInbox){stopInbox();stopInbox=null;}
- currentUser=user;selectedUID=null;
+
+ currentUser=user;
+ selectedUID=null;
  $("messages").replaceChildren();
  $("chatPanel").classList.add("hidden");
+
  if(!user){
   $("authForms").classList.remove("hidden");
   $("signedIn").classList.add("hidden");
   $("authStatus").textContent="মেসেজ করতে লগইন করো অথবা নতুন অ্যাকাউন্ট খোলো।";
   return;
  }
+
  $("authForms").classList.add("hidden");
  $("signedIn").classList.remove("hidden");
  $("authStatus").textContent="অ্যাকাউন্ট সংযুক্ত।";
  $("userInfo").textContent="লগইন: "+user.email;
  $("openChat").textContent=isAdmin()?"📥 ক্রেতাদের ইনবক্স":"💬 দোকানকে মেসেজ করো";
+
  if(isAdmin()){
-  showChat();listenInbox();
+  showChat();
+  listenInbox();
   setStatus("ইনবক্স থেকে ক্রেতা নির্বাচন করো।");
  }
 });
 
 try{
  const snap=await getDocs(collection(db,"products"));
+
  const remote=snap.docs.map(d=>{
-  const x=d.data(),price=Number(x.price);
+  const x=d.data();
+  const price=Number(x.price);
+
   return {
-   id:"fb_"+d.id,name:String(x.name||"নামহীন পণ্য"),
+   id:"fb_"+d.id,
+   name:String(x.name||"নামহীন পণ্য"),
    price:Number.isFinite(price)&&price>=0?price:0,
    category:normalizeCategory(x.category||"অন্যান্য"),
-   emoji:String(x.emoji||"📦"),image:String(x.image||"")
+   emoji:String(x.emoji||"📦"),
+   image:String(x.image||"")
   };
  });
+
  window.setFirebaseProducts(remote);
 }catch(e){
  console.error("Product loading failed",e);
@@ -595,4 +717,4 @@ try{
 }
 </script>
 </body>
- </html>
+</html>
