@@ -320,6 +320,25 @@ document.getElementById("categories").addEventListener("click",function(e){
 
 renderProducts();
 renderCart();
+</script><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+    authDomain: "mishors-shop-admin.firebaseapp.com",
+    projectId: "mishors-shop-admin",
+    storageBucket: "mishors-shop-admin.firebasestorage.app",
+    messagingSenderId: "828816512879",
+    appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  console.log("Firebase connected!");
 </script>
 </body>
 </html>
