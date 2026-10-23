@@ -27,7 +27,7 @@ h2{font-size:21px;margin:15px 0}
 .tools{display:grid;grid-template-columns:1fr;gap:10px;margin:15px 0}
 input,select{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:8px;background:white;font-size:15px;min-height:46px}
 input:focus,select:focus{outline:2px solid #fbbf24;outline-offset:1px}
-.categories{display:flex;gap:8px;overflow-x:auto;padding:3px 0 12px}
+.categories{display:flex;gap:8px;overflow-x:auto;padding:3px 0 12px;scrollbar-width:thin}
 button{cursor:pointer;border:0;border-radius:8px;padding:11px 12px;font-size:14px;font-weight:bold;transition:filter .15s,transform .15s}
 .cat{white-space:nowrap;background:white;color:#374151;border:1px solid #d1d5db;padding:10px 14px}
 .cat.active{background:var(--navy);color:white;border-color:var(--navy)}
@@ -50,8 +50,8 @@ button:active{transform:scale(.98)}
 .totalrow{display:flex;justify-content:space-between;gap:10px;font-size:19px;font-weight:bold;margin:20px 0}
 #checkout{width:100%;background:var(--green);color:white;padding:15px;font-size:16px}
 .note{font-size:13px;line-height:1.7;color:#64748b}
-.empty{text-align:center;padding:20px;color:#64748b}
 .status{margin:10px 0;color:#64748b;font-size:13px;line-height:1.6}
+.empty{text-align:center;padding:20px;color:#64748b}
 footer{text-align:center;padding:25px 15px;color:#64748b;font-size:14px}
 @media(min-width:600px){
  main{padding:24px}
@@ -61,15 +61,18 @@ footer{text-align:center;padding:25px 15px;color:#64748b;font-size:14px}
  .hero h1{font-size:34px}
  .product-actions{grid-template-columns:1fr 1fr}
 }
-@media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:32px}}
+@media(min-width:900px){
+ .products{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .hero{padding:32px}
+}
 @media(hover:hover){
  .product:hover{box-shadow:0 6px 18px #17203316;transform:translateY(-2px)}
  .product button:hover,.hero a:hover{filter:brightness(.96)}
 }
 </style>
 </head>
-
 <body>
+
 <header>
  <div class="topbar">
   <div class="logo">🛍️ Mishor's Shop</div>
@@ -83,56 +86,80 @@ footer{text-align:center;padding:25px 15px;color:#64748b;font-size:14px}
 </header>
 
 <main>
- <section id="shop">
-  <div class="sectionhead">
-   <h2>✨ আমাদের পণ্য</h2>
-   <span id="productCount" class="note"></span>
-  </div>
+<section id="shop">
+ <div class="sectionhead">
+  <h2>✨ আমাদের পণ্য</h2>
+  <span id="productCount" class="note"></span>
+ </div>
 
-  <div class="tools">
-   <input id="search" type="search" placeholder="🔎 পণ্যের নাম লিখে খুঁজুন..." aria-label="পণ্য খুঁজুন">
-   <select id="sort" aria-label="পণ্য সাজান">
-    <option value="default">সাধারণ ক্রম</option>
-    <option value="low">দাম: কম থেকে বেশি</option>
-    <option value="high">দাম: বেশি থেকে কম</option>
-    <option value="az">নাম অনুযায়ী</option>
-   </select>
-  </div>
+ <div class="tools">
+  <input id="search" type="search" placeholder="🔎 পণ্যের নাম লিখে খুঁজুন..." aria-label="পণ্য খুঁজুন">
+  <select id="sort" aria-label="পণ্য সাজান">
+   <option value="default">সাধারণ ক্রম</option>
+   <option value="low">দাম: কম থেকে বেশি</option>
+   <option value="high">দাম: বেশি থেকে কম</option>
+   <option value="az">নাম অনুযায়ী</option>
+  </select>
+ </div>
 
-  <div class="categories" id="categories">
-   <button class="cat active" data-category="সব">সব পণ্য</button>
-   <button class="cat" data-category="ফ্যাশন">ফ্যাশন</button>
-   <button class="cat" data-category="ইলেকট্রনিক্স">ইলেকট্রনিক্স</button>
-   <button class="cat" data-category="জুতা">জুতা</button>
-   <button class="cat" data-category="উপহার">উপহার</button>
-  </div>
+ <div class="categories" id="categories">
+  <button class="cat active" data-category="সব">সব পণ্য</button>
+  <button class="cat" data-category="Fashion">👗 Fashion</button>
+  <button class="cat" data-category="Sports">⚽ Sports</button>
+  <button class="cat" data-category="Electronics">🎧 Electronics</button>
+  <button class="cat" data-category="Gift">🎁 Gift</button>
+  <button class="cat" data-category="Necessary Products">🧴 Necessary Products</button>
+  <button class="cat" data-category="Shoes">👟 Shoes</button>
+  <button class="cat" data-category="Beauty & Personal Care">💄 Beauty & Personal Care</button>
+  <button class="cat" data-category="Home & Living">🏠 Home & Living</button>
+ </div>
 
-  <p id="firebaseStatus" class="status">পণ্য প্রস্তুত হচ্ছে...</p>
-  <div class="products" id="products"></div>
- </section>
+ <p id="firebaseStatus" class="status">পণ্য প্রস্তুত হচ্ছে...</p>
+ <div class="products" id="products"></div>
+</section>
 
- <section class="cart" id="cart">
-  <h2>🛒 আপনার শপিং কার্ট</h2>
-  <div id="cartItems" class="empty">এখনো কোনো পণ্য যোগ করেননি।</div>
-  <div class="totalrow"><span>মোট মূল্য</span><span>৳<span id="total">0</span></span></div>
-  <button id="checkout">WhatsApp-এ অর্ডার করুন →</button>
-  <p class="note">WhatsApp খুললে অর্ডারের তথ্য যাচাই করে Send চাপুন। ডেলিভারি চার্জ আলাদাভাবে নিশ্চিত করুন।</p>
- </section>
+<section class="cart" id="cart">
+ <h2>🛒 আপনার শপিং কার্ট</h2>
+ <div id="cartItems" class="empty">এখনো কোনো পণ্য যোগ করেননি।</div>
+ <div class="totalrow"><span>মোট মূল্য</span><span>৳<span id="total">0</span></span></div>
+ <button id="checkout">WhatsApp-এ অর্ডার করুন →</button>
+ <p class="note">WhatsApp খুললে অর্ডারের তথ্য যাচাই করে Send চাপুন। ডেলিভারি চার্জ আলাদাভাবে নিশ্চিত করুন।</p>
+</section>
 </main>
 
 <footer>© 2026 Mishor's Shop ❤️<br>আপনার কেনাকাটার জন্য ধন্যবাদ!</footer>
 
 <script>
 const defaultProducts = [
- {id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚",category:"ফ্যাশন"},
- {id:2,name:"হেডফোন",price:500,emoji:"🎧",category:"ইলেকট্রনিক্স"},
- {id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜",category:"ফ্যাশন",image:"images/realistic%20beg.jpg"},
- {id:4,name:"স্পোর্টস জুতা",price:600,emoji:"👟",category:"জুতা"},
- {id:5,name:"সানগ্লাস",price:200,emoji:"🕶️",category:"ফ্যাশন"},
- {id:6,name:"ব্যাকপ্যাক",price:100,emoji:"🎒",category:"ফ্যাশন"},
- {id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁",category:"উপহার"},
- {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"ইলেকট্রনিক্স"}
+ {id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚",category:"Fashion"},
+ {id:2,name:"হেডফোন",price:500,emoji:"🎧",category:"Electronics"},
+ {id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜",category:"Fashion",image:"images/realistic%20beg.jpg"},
+ {id:4,name:"স্পোর্টস জুতা",price:600,emoji:"👟",category:"Shoes"},
+ {id:5,name:"সানগ্লাস",price:200,emoji:"🕶️",category:"Fashion"},
+ {id:6,name:"ব্যাকপ্যাক",price:100,emoji:"🎒",category:"Fashion"},
+ {id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁",category:"Gift"},
+ {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"Electronics"}
 ];
+
+const CATEGORY_MAP = {
+ "ফ্যাশন":"Fashion",
+ "fashion":"Fashion",
+ "sports":"Sports",
+ "ইলেকট্রনিক্স":"Electronics",
+ "electronics":"Electronics",
+ "উপহার":"Gift",
+ "gift":"Gift",
+ "জুতা":"Shoes",
+ "shoes":"Shoes",
+ "necessary products":"Necessary Products",
+ "beauty & personal care":"Beauty & Personal Care",
+ "home & living":"Home & Living"
+};
+
+function normalizeCategory(value){
+ const raw=String(value||"").trim();
+ return CATEGORY_MAP[raw] || CATEGORY_MAP[raw.toLowerCase()] || raw;
+}
 
 let products=[...defaultProducts];
 const cart={};
@@ -148,10 +175,12 @@ function money(value){return Number(value).toLocaleString("en-US")}
 function renderProducts(){
  const q=document.getElementById("search").value.trim().toLowerCase();
  const sort=document.getElementById("sort").value;
+
  let list=products.filter(p=>
   p.name.toLowerCase().includes(q)&&
-  (activeCategory==="সব"||p.category===activeCategory)
+  (activeCategory==="সব"||normalizeCategory(p.category)===activeCategory)
  );
+
  if(sort==="low")list.sort((a,b)=>a.price-b.price);
  if(sort==="high")list.sort((a,b)=>b.price-a.price);
  if(sort==="az")list.sort((a,b)=>a.name.localeCompare(b.name,"bn"));
@@ -163,9 +192,11 @@ function renderProducts(){
   const name=escapeHTML(p.name);
   const emoji=escapeHTML(p.emoji||"📦");
   const image=String(p.image||"");
-  const imageHTML=image&&(/^https:\/\//.test(image)||/^images\//.test(image))
+  const safeImage=/^https:\/\//i.test(image)||/^images\/[a-zA-Z0-9._%/-]+$/.test(image);
+  const imageHTML=safeImage
    ?`<img src="${escapeHTML(image)}" alt="${name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none">${emoji}</span>`
    :emoji;
+
   return `<article class="product">
    <div class="pic">${imageHTML}</div>
    <h3>${name}</h3>
@@ -176,7 +207,7 @@ function renderProducts(){
    </div>
   </article>`;
  }).join("")
- :'<div class="empty" style="grid-column:1/-1">দুঃখিত, কোনো পণ্য পাওয়া যায়নি।</div>';
+ :'<div class="empty" style="grid-column:1/-1">দুঃখিত, এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি।</div>';
 }
 
 function addToCart(id){
@@ -195,10 +226,12 @@ function changeQty(id,amount){
 function renderCart(){
  let total=0,count=0;
  const items=products.filter(p=>(cart[p.id]||0)>0);
+
  document.getElementById("cartItems").innerHTML=items.length
  ?items.map(p=>{
   const qty=cart[p.id],subtotal=p.price*qty;
   total+=subtotal;count+=qty;
+
   return `<div class="cartrow">
    <div><div class="itemname">${escapeHTML(p.name)}</div>
    <div class="itemprice">৳${money(p.price)} × ${qty} = ৳${money(subtotal)}</div></div>
@@ -243,6 +276,7 @@ document.getElementById("sort").addEventListener("change",renderProducts);
 document.getElementById("categories").addEventListener("click",e=>{
  const btn=e.target.closest("button[data-category]");
  if(!btn)return;
+
  activeCategory=btn.dataset.category;
  document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b===btn));
  renderProducts();
@@ -254,31 +288,41 @@ function checkout(){
 
  const name=prompt("আপনার নাম লিখুন:");
  if(!name||!name.trim())return;
+
  const phone=prompt("আপনার ফোন নম্বর লিখুন:");
  if(!phone||!phone.trim())return;
+
  const address=prompt("ডেলিভারির সম্পূর্ণ ঠিকানা লিখুন:");
  if(!address||!address.trim())return;
 
  let total=0;
  let msg="🛍️ Mishor's Shop - নতুন অর্ডার\n\n";
  msg+="নাম: "+name.trim()+"\nফোন: "+phone.trim()+"\nঠিকানা: "+address.trim()+"\n\nপণ্যের তালিকা:\n";
+
  items.forEach(p=>{
   const subtotal=p.price*cart[p.id];
   total+=subtotal;
   msg+=p.name+" × "+cart[p.id]+" = ৳"+subtotal+"\n";
  });
+
  msg+="\nমোট পণ্যমূল্য: ৳"+total;
  msg+="\n\nডেলিভারি চার্জ: পরে নিশ্চিত করতে হবে";
+
  window.location.href="https://wa.me/8801747036594?text="+encodeURIComponent(msg);
 }
+
 document.getElementById("checkout").addEventListener("click",checkout);
 
 window.setFirebaseProducts=function(remoteProducts){
  const existingIds=new Set(defaultProducts.map(p=>String(p.id)));
  const added=remoteProducts.filter(p=>!existingIds.has(String(p.id)));
+
  products=[...defaultProducts,...added];
  document.getElementById("firebaseStatus").textContent=
-  added.length?"Firebase থেকে "+added.length+"টি নতুন পণ্য লোড হয়েছে।":"দোকানের পণ্য প্রস্তুত।";
+  added.length
+  ?"Firebase থেকে "+added.length+"টি নতুন পণ্য লোড হয়েছে।"
+  :"দোকানের পণ্য প্রস্তুত।";
+
  renderProducts();
  renderCart();
 };
@@ -309,18 +353,21 @@ try{
  const app=initializeApp(firebaseConfig);
  const db=getFirestore(app);
  const snapshot=await getDocs(collection(db,"products"));
+
  const remoteProducts=snapshot.docs.map(doc=>{
   const data=doc.data();
   const price=Number(data.price);
+
   return {
    id:"fb_"+doc.id,
    name:String(data.name||"নামহীন পণ্য"),
    price:Number.isFinite(price)&&price>=0?price:0,
-   category:String(data.category||"অন্যান্য"),
+   category:normalizeCategory(data.category||"অন্যান্য"),
    emoji:String(data.emoji||"📦"),
    image:String(data.image||"")
   };
  }).filter(p=>p.name&&p.price>=0);
+
  window.setFirebaseProducts(remoteProducts);
 }catch(error){
  console.error("Firebase product loading failed:",error);
