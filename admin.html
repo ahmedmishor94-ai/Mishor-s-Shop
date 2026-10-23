@@ -3,46 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mishor's Shop — Admin Login</title>
+  <title>Mishor's Shop Admin</title>
   <style>
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
+      margin: 0; padding: 20px;
       font-family: Arial, sans-serif;
-      background: #fff7ed;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      color: #172033;
+      background: #fff7ed; color: #172033;
     }
     .box {
-      width: calc(100% - 48px);
-      max-width: 360px;
-      background: white;
-      padding: 24px;
-      border-radius: 18px;
-      box-shadow: 0 5px 25px #0001;
+      max-width: 520px; margin: 20px auto;
+      padding: 22px; background: white;
+      border-radius: 16px; box-shadow: 0 4px 20px #0001;
     }
     h2 { color: #ea580c; }
-    input, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 13px;
-      margin-top: 12px;
-      border-radius: 10px;
-      font-size: 16px;
+    input, select, button {
+      width: 100%; padding: 13px; margin: 7px 0;
+      border-radius: 9px; font-size: 16px;
     }
-    input { border: 1px solid #ddd; }
+    input, select { border: 1px solid #ddd; }
     button {
-      border: 0;
-      background: #f97316;
-      color: white;
-      font-weight: bold;
+      border: 0; background: #f97316;
+      color: white; font-weight: bold;
     }
+    .secondary { background: #475569; }
+    .item {
+      border: 1px solid #eee; padding: 12px;
+      border-radius: 10px; margin-top: 10px;
+      overflow-wrap: anywhere;
+    }
+    .small { font-size: 13px; color: #64748b; }
+    #panel { display: none; }
     #message { overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
-  <div class="box">
+  <section class="box">
     <h2>🛍️ Mishor's Shop</h2>
     <h3>Admin Login</h3>
     <form id="loginForm">
@@ -51,14 +47,39 @@
       <button type="submit">লগইন</button>
     </form>
     <p id="message" role="status"></p>
-  </div>
+    <button id="logout" class="secondary" hidden>লগআউট</button>
+  </section>
+
+  <section class="box" id="panel">
+    <h2>📦 পণ্য পরিচালনা</h2>
+    <form id="productForm">
+      <input id="name" placeholder="পণ্যের নাম" required maxlength="100">
+      <input id="price" type="number" placeholder="দাম (টাকা)" min="1" max="10000000" required>
+      <select id="category" required>
+        <option value="ফ্যাশন">ফ্যাশন</option>
+        <option value="ইলেকট্রনিক্স">ইলেকট্রনিক্স</option>
+        <option value="জুতা">জুতা</option>
+        <option value="উপহার">উপহার</option>
+      </select>
+      <input id="emoji" placeholder="ইমোজি (যেমন 🎒)" maxlength="10">
+      <input id="image" type="url" placeholder="ছবির লিংক (ঐচ্ছিক)">
+      <button type="submit">পণ্য Firebase-এ যোগ করুন</button>
+    </form>
+    <p id="productMessage" role="status"></p>
+    <h3>সংরক্ষিত পণ্য</h3>
+    <div id="productList">পণ্য লোড হচ্ছে...</div>
+    <p class="small">এই পেজে পণ্য যোগ হবে। মূল দোকানে দেখানোর সংযোগ পরের ধাপে করতে হবে।</p>
+  </section>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
     import {
-      getAuth,
-      signInWithEmailAndPassword
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, getDocs,
+      query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
@@ -71,23 +92,123 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    const adminUID = "A2kBB273NcSzQ2naJF2PBrue47k2";
+    const form = document.getElementById("productForm");
+    const message = document.getElementById("message");
+    const productMessage = document.getElementById("productMessage");
+    const panel = document.getElementById("panel");
+    const loginForm = document.getElementById("loginForm");
+    const logoutButton = document.getElementById("logout");
+
+    loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const message = document.getElementById("message");
       message.textContent = "লগইন হচ্ছে...";
-
       try {
-        await signInWithEmailAndPassword(
+        const result = await signInWithEmailAndPassword(
           auth,
           document.getElementById("email").value.trim(),
           document.getElementById("password").value
         );
-        message.textContent = "লগইন সফল! পরের ধাপে Admin Panel তৈরি করব।";
+        if (result.user.uid !== adminUID) {
+          await signOut(auth);
+          throw new Error("এই অ্যাকাউন্ট Admin নয়।");
+        }
+        message.textContent = "লগইন সফল!";
       } catch (error) {
-        message.textContent = "লগইন হয়নি। ইমেইল, পাসওয়ার্ড ও Firebase সেটিংস পরীক্ষা করো।";
+        message.textContent = error.message === "এই অ্যাকাউন্ট Admin নয়।"
+          ? error.message
+          : "লগইন হয়নি। ইমেইল, পাসওয়ার্ড ও Firebase সেটিংস পরীক্ষা করো।";
       }
     });
+
+    onAuthStateChanged(auth, async (user) => {
+      const isAdmin = !!user && user.uid === adminUID;
+      panel.style.display = isAdmin ? "block" : "none";
+      loginForm.style.display = isAdmin ? "none" : "block";
+      logoutButton.hidden = !isAdmin;
+
+      if (user && !isAdmin) {
+        await signOut(auth);
+        message.textContent = "এই অ্যাকাউন্টের Admin অনুমতি নেই।";
+      }
+      if (isAdmin) await loadProducts();
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      await signOut(auth);
+      message.textContent = "লগআউট হয়েছে।";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!auth.currentUser || auth.currentUser.uid !== adminUID) {
+        productMessage.textContent = "আগে Admin হিসেবে লগইন করো।";
+        return;
+      }
+
+      const name = document.getElementById("name").value.trim();
+      const price = Number(document.getElementById("price").value);
+      const image = document.getElementById("image").value.trim();
+
+      if (!name || !Number.isSafeInteger(price) || price < 1) {
+        productMessage.textContent = "পণ্যের নাম ও সঠিক দাম দাও।";
+        return;
+      }
+      if (image && !image.startsWith("https://")) {
+        productMessage.textContent = "ছবির লিংক https:// দিয়ে শুরু হতে হবে।";
+        return;
+      }
+
+      productMessage.textContent = "পণ্য সংরক্ষণ হচ্ছে...";
+      try {
+        await addDoc(collection(db, "products"), {
+          name,
+          price,
+          category: document.getElementById("category").value,
+          emoji: document.getElementById("emoji").value.trim() || "📦",
+          image,
+          createdAt: serverTimestamp()
+        });
+        form.reset();
+        productMessage.textContent = "পণ্য Firebase-এ সংরক্ষিত হয়েছে!";
+        await loadProducts();
+      } catch (error) {
+        productMessage.textContent =
+          "সংরক্ষণ হয়নি। Firebase Rules ও ইন্টারনেট পরীক্ষা করো।";
+      }
+    });
+
+    async function loadProducts() {
+      const list = document.getElementById("productList");
+      list.textContent = "পণ্য লোড হচ্ছে...";
+      try {
+        const result = await getDocs(
+          query(collection(db, "products"), orderBy("createdAt", "desc"))
+        );
+        list.replaceChildren();
+
+        if (result.empty) {
+          list.textContent = "এখনো কোনো পণ্য যোগ করা হয়নি।";
+          return;
+        }
+
+        result.forEach((docSnap) => {
+          const p = docSnap.data();
+          const item = document.createElement("div");
+          item.className = "item";
+          const title = document.createElement("strong");
+          title.textContent = (p.emoji || "📦") + " " + p.name;
+          const details = document.createElement("p");
+          details.textContent = "৳" + p.price + " • " + p.category;
+          item.append(title, details);
+          list.append(item);
+        });
+      } catch (error) {
+        list.textContent = "পণ্য লোড হয়নি। Rules ও ইন্টারনেট পরীক্ষা করো।";
+      }
+    }
   </script>
 </body>
 </html>
