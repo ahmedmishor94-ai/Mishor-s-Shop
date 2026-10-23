@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mishor's Shop — Admin Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff7ed;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      color: #172033;
+    }
+    .box {
+      width: calc(100% - 48px);
+      max-width: 360px;
+      background: white;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 5px 25px #0001;
+    }
+    h2 { color: #ea580c; }
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin-top: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    input { border: 1px solid #ddd; }
+    button {
+      border: 0;
+      background: #f97316;
+      color: white;
+      font-weight: bold;
+    }
+    #message { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🛍️ Mishor's Shop</h2>
+    <h3>Admin Login</h3>
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Admin email" required>
+      <input id="password" type="password" placeholder="Password" required>
+      <button type="submit">লগইন</button>
+    </form>
+    <p id="message" role="status"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+      authDomain: "mishors-shop-admin.firebaseapp.com",
+      projectId: "mishors-shop-admin",
+      storageBucket: "mishors-shop-admin.firebasestorage.app",
+      messagingSenderId: "828816512879",
+      appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.getElementById("message");
+      message.textContent = "লগইন হচ্ছে...";
+
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("email").value.trim(),
+          document.getElementById("password").value
+        );
+        message.textContent = "লগইন সফল! পরের ধাপে Admin Panel তৈরি করব।";
+      } catch (error) {
+        message.textContent = "লগইন হয়নি। ইমেইল, পাসওয়ার্ড ও Firebase সেটিংস পরীক্ষা করো।";
+      }
+    });
+  </script>
+</body>
+</html>
