@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Mishor's Shop | Admin Messages</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#142033}
+header{background:#101827;color:white;padding:16px}header strong{font-size:20px}header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:1100px;margin:18px auto;padding:0 12px}.card{background:white;border:1px solid #e2e8f0;border-radius:15px;padding:15px;margin-bottom:14px}
+h2{margin:0 0 12px;font-size:20px}label{display:block;font-size:13px;margin:10px 0 5px}
+input,textarea,button{font:inherit}input,textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px}
+button{border:0;border-radius:10px;padding:11px 14px;background:#087f5b;color:white;font-weight:bold}button.secondary{background:#e2e8f0;color:#142033}
+button:disabled{opacity:.55}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.muted{font-size:13px;color:#64748b;line-height:1.6}
+#adminPanel{display:none}.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:14px}
+.conversation-list{display:flex;flex-direction:column;gap:8px;max-height:65vh;overflow:auto}
+.conversation{width:100%;text-align:left;background:#f8fafc;color:#142033;border:1px solid #e2e8f0;padding:12px;border-radius:10px}
+.conversation.active{border-color:#087f5b;background:#ecfdf5}
+.conversation small{display:block;color:#64748b;margin-top:5px;font-weight:normal;overflow-wrap:anywhere}
+.messages{height:48vh;min-height:250px;max-height:550px;overflow:auto;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px}
+.msg{max-width:88%;padding:10px 12px;border-radius:13px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.mine{margin-left:auto;background:#d1fae5}.theirs{margin-right:auto;background:white;border:1px solid #e2e8f0}
+.meta{font-size:11px;color:#64748b;margin-top:4px}.composer{display:flex;gap:8px;margin-top:10px}
+.composer textarea{resize:vertical;min-height:48px;max-height:120px}.composer button{align-self:stretch}
+#status{white-space:pre-wrap}.empty{padding:20px;color:#64748b;text-align:center}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.conversation-list{max-height:240px}.messages{height:40vh}}
+</style>
+</head>
+<body>
+<header><strong>Mishor's Shop · Admin Inbox</strong><p>কাস্টমারদের ওয়েব মেসেজ পড়ুন ও উত্তর দিন</p></header>
+<main>
+<section class="card" id="loginPanel">
+<h2>Admin লগইন</h2>
+<p class="muted">Mishor's Shop-এর বিদ্যমান Admin Firebase Auth ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করুন। Admin UID যাচাই করা হবে।</p>
+<label for="email">Admin ইমেইল</label><input id="email" type="email" autocomplete="username" placeholder="Admin ইমেইল">
+<label for="password">পাসওয়ার্ড</label><input id="password" type="password" autocomplete="current-password" placeholder="পাসওয়ার্ড">
+<div class="actions"><button id="loginBtn">লগইন</button></div><p class="muted" id="loginStatus" role="status"></p>
+</section>
+<section id="adminPanel">
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+<div><h2 style="margin-bottom:4px">কাস্টমার মেসেজ</h2><div class="muted" id="adminEmail"></div></div>
+<button class="secondary" id="logoutBtn">লগআউট</button>
+</div>
+<div class="layout">
+<section class="card"><h2>ইনবক্স</h2><p class="muted" id="listStatus">কনভারসেশন লোড হচ্ছে...</p><div class="conversation-list" id="conversationList"></div></section>
+<section class="card"><h2 id="chatTitle">একটি কাস্টমার বেছে নিন</h2><p class="muted" id="chatStatus">বাম পাশের তালিকা থেকে কাস্টমার বেছে নিন।</p>
+<div class="messages" id="messages"><div class="empty">এখনো কোনো চ্যাট খোলা হয়নি।</div></div>
+<form class="composer" id="replyForm"><textarea id="replyInput" maxlength="2000" placeholder="কাস্টমারকে উত্তর লিখুন..." required disabled></textarea><button id="replyBtn" disabled>উত্তর পাঠান</button></form>
+</section>
+</div>
+</section>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,onSnapshot,query,orderBy,addDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+ authDomain:"mishors-shop-admin.firebaseapp.com",
+ projectId:"mishors-shop-admin",
+ storageBucket:"mishors-shop-admin.firebasestorage.app",
+ messagingSenderId:"828816512879",
+ appId:"1:828816512879:web:3e297717db9b391f09fa9a"
+};
+const ADMIN_UID="A2kBB273NcSzQ2naJF2PBrue47k2";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+let stopList=null,stopMessages=null,selectedUid=null,conversations=new Map(),sending=false;
+function safeText(v){return String(v??"")}
+function errText(e){
+ const c=e?.code||"";
+ if(c.includes("permission-denied"))return "Firebase Rules অনুমতি দেয়নি। নিচের নির্দেশনা অনুযায়ী Rules বসান।";
+ if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found"))return "ইমেইল বা পাসওয়ার্ড ঠিক হয়নি।";
+ return "সমস্যা হয়েছে: "+(e?.message||c||"আবার চেষ্টা করুন");
+}
+function formatTime(ts){try{return ts?.toDate?ts.toDate().toLocaleString("bn-BD"):"সময় পাওয়া যায়নি"}catch{return ""}}
+$("loginBtn").addEventListener("click",async()=>{
+ const email=$("email").value.trim(),password=$("password").value;
+ if(!email||!password){$("loginStatus").textContent="ইমেইল ও পাসওয়ার্ড লিখুন।";return}
+ $("loginStatus").textContent="লগইন হচ্ছে...";
+ try{await signInWithEmailAndPassword(auth,email,password);$("loginStatus").textContent=""}
+ catch(e){$("loginStatus").textContent=errText(e)}
+});
+$("logoutBtn").addEventListener("click",()=>signOut(auth).catch(e=>$("chatStatus").textContent=errText(e)));
+onAuthStateChanged(auth,async user=>{
+ if(stopList){stopList();stopList=null}
+ if(stopMessages){stopMessages();stopMessages=null}
+ selectedUid=null;conversations.clear();
+ $("loginPanel").style.display="none";$("adminPanel").style.display="none";
+ if(!user){$("loginPanel").style.display="block";return}
+ if(user.uid!==ADMIN_UID){
+  $("loginPanel").style.display="block";
+  $("loginStatus").textContent="এই অ্যাকাউন্টটি অনুমোদিত Admin নয়।";
+  await signOut(auth);return;
+ }
+ $("adminPanel").style.display="block";$("adminEmail").textContent=user.email||"Admin";
+ $("listStatus").textContent="ইনবক্স লোড হচ্ছে...";
+ try{
+  const q=query(collection(db,"conversations"),orderBy("updatedAt","desc"));
+  stopList=onSnapshot(q,snap=>{
+   conversations.clear();snap.forEach(d=>conversations.set(d.id,{id:d.id,...d.data()}));
+   renderConversationList();
+  },e=>$("listStatus").textContent=errText(e));
+ }catch(e){$("listStatus").textContent=errText(e)}
+});
+function renderConversationList(){
+ const holder=$("conversationList");holder.replaceChildren();
+ if(!conversations.size){$("listStatus").textContent="এখনো কোনো কাস্টমার মেসেজ করেনি।";return}
+ $("listStatus").textContent=`${conversations.size}টি কাস্টমার চ্যাট`;
+ const sorted=[...conversations.values()].sort((a,b)=>(b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0));
+ sorted.forEach(c=>{
+  const b=document.createElement("button");b.className="conversation"+(selectedUid===c.id?" active":"");
+  const title=document.createElement("strong");title.textContent=c.email||c.id;
+  const last=document.createElement("small");last.textContent=safeText(c.lastMessage||"এখনো মেসেজ নেই").slice(0,100);
+  const time=document.createElement("small");time.textContent=formatTime(c.updatedAt);
+  b.append(title,last,time);b.addEventListener("click",()=>selectConversation(c.id));holder.appendChild(b);
+ });
+}
+async function selectConversation(uid){
+ selectedUid=uid;renderConversationList();
+ const c=conversations.get(uid);
+ $("chatTitle").textContent=c?.email||"কাস্টমার চ্যাট";
+ $("chatStatus").textContent="মেসেজ লোড হচ্ছে...";
+ $("replyInput").disabled=false;$("replyBtn").disabled=false;
+ if(stopMessages){stopMessages();stopMessages=null}
+ try{
+  const q=query(collection(db,"conversations",uid,"messages"),orderBy("createdAt","asc"));
+  stopMessages=onSnapshot(q,snap=>renderMessages(snap),e=>$("chatStatus").textContent=errText(e));
+ }catch(e){$("chatStatus").textContent=errText(e)}
+}
+function renderMessages(snap){
+ const box=$("messages");box.replaceChildren();
+ if(snap.empty){const p=document.createElement("div");p.className="empty";p.textContent="কাস্টমার এখনো মেসেজ করেনি।";box.appendChild(p);return}
+ snap.forEach(d=>{
+  const m=d.data(),mine=m.senderRole==="admin";
+  const wrap=document.createElement("div");wrap.className="msg "+(mine?"mine":"theirs");
+  const label=document.createElement("strong");label.textContent=mine?"আপনি (Admin)":"কাস্টমার";
+  const body=document.createElement("div");body.textContent=safeText(m.text);
+  const time=document.createElement("div");time.className="meta";time.textContent=formatTime(m.createdAt);
+  wrap.append(label,body,time);box.appendChild(wrap);
+ });
+ box.scrollTop=box.scrollHeight;$("chatStatus").textContent="চ্যাট চালু আছে।";
+}
+$("replyForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(sending)return;
+ const user=auth.currentUser,text=$("replyInput").value.trim(),uid=selectedUid;
+ if(!user||user.uid!==ADMIN_UID){$("chatStatus").textContent="Admin লগইন প্রয়োজন।";return}
+ if(!uid){$("chatStatus").textContent="আগে একটি কাস্টমার বেছে নিন।";return}
+ if(!text)return;
+ sending=true;$("replyBtn").disabled=true;
+ try{
+  await addDoc(collection(db,"conversations",uid,"messages"),{text,senderUid:user.uid,senderRole:"admin",createdAt:serverTimestamp()});
+  await setDoc(doc(db,"conversations",uid),{updatedAt:serverTimestamp(),lastMessage:text},{merge:true});
+  $("replyInput").value="";$("chatStatus").textContent="উত্তর পাঠানো হয়েছে।";
+ }catch(e){$("chatStatus").textContent=errText(e)}
+ finally{sending=false;$("replyBtn").disabled=false}
+});
+</script>
+</body>
+  </html>
