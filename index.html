@@ -2,719 +2,641 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101828">
-<meta name="description" content="Mishor's Shop — অনলাইন কেনাকাটা ও সরাসরি মেসেজিং">
-<title>Mishor's Shop | Online Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="Mishor's Shop — ফ্যাশন, ইলেকট্রনিক্স, জুতা ও প্রয়োজনীয় পণ্য অনলাইনে অর্ডার করুন।">
+<title>Mishor's Shop | Online Shopping</title>
 
 <style>
-:root{--navy:#101828;--orange:#fbbf24;--green:#128c4a;--bg:#f3f5f9;--text:#182230;--muted:#667085;--line:#e4e7ec}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:12px}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans Bengali",sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:10px;padding:12px;font-weight:700}
-button:disabled{opacity:.55;cursor:not-allowed}
-header{background:var(--navy);color:white;padding:16px}
-.topbar{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{font-size:23px;font-weight:900}
-a{color:inherit}
-.cartlink{background:var(--orange);color:var(--navy);padding:11px 14px;border-radius:9px;text-decoration:none;font-weight:800}
-.hero{max-width:1100px;margin:16px auto 0;background:#202f46;border-radius:18px;padding:28px 20px;color:white}
-.hero h1{font-size:clamp(25px,5vw,40px);line-height:1.4;margin:0 0 10px}
-.hero p{line-height:1.8;color:#e2e8f0}
-.primary{background:var(--orange);color:var(--navy)}
-.dark{background:var(--navy);color:white}
-.green{background:var(--green);color:white}
-main{max-width:1100px;margin:auto;padding:16px 13px}
-.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin:18px 0}
-h2{font-size:21px;margin:8px 0 16px}
-h3{line-height:1.5}
-input,select,textarea{width:100%;min-height:45px;border:1px solid #d0d5dd;border-radius:10px;padding:12px;background:white;color:var(--text)}
-input:focus,textarea:focus,select:focus{outline:2px solid #fbbf24;outline-offset:1px}
-.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.row>*{min-width:0}
-.row .grow{flex:1}
-.tools{display:grid;grid-template-columns:1fr;gap:10px;margin:12px 0}
-.categories{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px}
-.cat{white-space:nowrap;background:white;border:1px solid var(--line)}
-.cat.active{background:var(--navy);color:white}
-.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.product{background:white;border:1px solid var(--line);border-radius:15px;padding:10px;min-width:0;overflow:hidden}
-.pic{height:135px;background:#f2f4f7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden}
-.pic img{width:100%;height:100%;object-fit:contain}
-.product h3{font-size:15px;min-height:48px;margin:9px 0 5px}
-.price{font-size:19px;font-weight:900;color:#b45309;margin:8px 0 12px}
-.product-actions{display:grid;gap:7px}
-.product-actions button{width:100%;font-size:13px}
-.note,.muted{font-size:13px;line-height:1.7;color:var(--muted)}
-.status{font-size:13px;line-height:1.7;color:var(--muted)}
-.empty{text-align:center;color:var(--muted);padding:20px}
-.cartrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
-.qty{display:flex;align-items:center;gap:8px}
-.qty button{background:var(--navy);color:white;padding:8px 12px}
-.totalrow{display:flex;justify-content:space-between;font-weight:900;font-size:20px;margin:20px 0}
-#checkout{width:100%}
-.authbox{display:grid;gap:10px}
-.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}
-.chat-list{display:grid;gap:7px;max-height:220px;overflow:auto}
-.chat-person{background:#f2f4f7;text-align:left;overflow-wrap:anywhere}
-.chat-person.active{background:#dbeafe}
-.chat-area{border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.chat-head{background:#f9fafb;padding:12px;border-bottom:1px solid var(--line)}
-.messages{height:300px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#f8fafc}
-.bubble{max-width:88%;padding:10px 12px;border-radius:13px;background:white;border:1px solid var(--line);overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.6}
-.bubble.mine{align-self:flex-end;background:#dcfce7;border-color:#bbf7d0}
-.bubble small{display:block;margin-top:5px;color:var(--muted);font-size:11px}
-.chat-compose{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px}
-footer{text-align:center;padding:24px;color:var(--muted);font-size:13px}
-.hidden{display:none!important}
-@media(min-width:600px){
- main{padding:22px}
- .tools{grid-template-columns:1fr 220px}
- .products{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
- .pic{height:170px}
- .product-actions{grid-template-columns:1fr 1fr}
- .chat-layout{grid-template-columns:220px 1fr}
- .chat-list{max-height:390px}
- .messages{height:390px}
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --dark:#101827;
+  --muted:#64748b;
+  --primary:#087f5b;
+  --primary-dark:#066548;
+  --border:#e2e8f0;
+  --orange:#f59e0b;
 }
-@media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:36px}}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{
+  background:var(--dark);
+  color:white;
+  padding:17px 16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 3px 15px #0002;
+}
+.topbar{
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.brand{font-size:22px;font-weight:800}
+.brand span{color:#55e6a5}
+.tagline{font-size:12px;color:#cbd5e1;margin-top:4px}
+.cart-top{
+  border:0;
+  border-radius:12px;
+  background:var(--primary);
+  color:white;
+  padding:11px 13px;
+  font-weight:bold;
+}
+main{max-width:1200px;margin:auto;padding:16px}
+.hero{
+  background:linear-gradient(120deg,#102d26,#087f5b);
+  color:white;
+  padding:28px 22px;
+  border-radius:20px;
+  margin:8px 0 20px;
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:16px;
+  align-items:center;
+  overflow:hidden;
+}
+.hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 12px}
+.hero p{line-height:1.7;color:#e2f8ef;margin:0 0 18px}
+.hero img{
+  width:100%;
+  max-height:220px;
+  object-fit:cover;
+  border-radius:15px;
+}
+.hero-btn{
+  background:white;color:#075c43;border:0;
+  border-radius:10px;padding:12px 16px;font-weight:bold;
+}
+.trust{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:22px;
+}
+.trust div{
+  background:white;border:1px solid var(--border);
+  padding:13px 8px;border-radius:12px;text-align:center;
+  font-size:13px;font-weight:bold;
+}
+.section-title{
+  font-size:22px;margin:22px 0 13px;
+}
+.search-row{display:flex;gap:9px;margin-bottom:14px}
+.search-row input{
+  width:100%;min-width:0;border:1px solid var(--border);
+  border-radius:12px;padding:13px;background:white;
+}
+.search-row select{
+  border:1px solid var(--border);border-radius:12px;
+  padding:10px;background:white;max-width:145px;
+}
+.categories{
+  display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;
+}
+.cat-btn{
+  white-space:nowrap;border:1px solid var(--border);
+  background:white;border-radius:30px;padding:9px 14px;
+}
+.cat-btn.active{background:var(--dark);color:white}
+.status{font-size:13px;color:var(--muted);margin:6px 0 12px}
+.products{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+.product{
+  background:white;border:1px solid var(--border);
+  border-radius:15px;overflow:hidden;min-width:0;
+  box-shadow:0 3px 12px #0f172a08;
+  display:flex;flex-direction:column;
+}
+.product-photo{
+  width:100%;height:190px;object-fit:cover;
+  background:#edf2f7;display:block;
+}
+.product-info{padding:12px;display:flex;flex-direction:column;flex:1}
+.product-name{font-size:15px;font-weight:bold;line-height:1.5;margin-bottom:7px}
+.category-label{font-size:11px;color:var(--muted);margin-bottom:8px}
+.price{font-size:19px;font-weight:800;color:var(--primary);margin:0 0 12px}
+.add-btn{
+  width:100%;margin-top:auto;border:0;border-radius:9px;
+  background:var(--primary);color:white;padding:11px 8px;font-weight:bold;
+}
+.add-btn:hover,.checkout-btn:hover{background:var(--primary-dark)}
+.empty{
+  padding:25px;text-align:center;background:white;border-radius:12px;
+  color:var(--muted);grid-column:1/-1;
+}
+.cart-section{
+  margin-top:30px;background:white;border:1px solid var(--border);
+  padding:17px;border-radius:16px;
+}
+.cart-line{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:12px 0;border-bottom:1px solid var(--border);
+}
+.cart-line-name{font-size:14px;line-height:1.5}
+.qty-controls{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.qty-controls button{
+  width:29px;height:29px;border:1px solid var(--border);
+  background:#f8fafc;border-radius:7px;
+}
+.remove-btn{color:#b91c1c}
+.cart-total{font-size:21px;font-weight:800;margin:18px 0}
+.checkout-btn{
+  width:100%;border:0;border-radius:10px;padding:14px;
+  color:white;background:var(--primary);font-weight:bold;
+}
+.clear-btn{
+  width:100%;border:1px solid var(--border);border-radius:10px;
+  padding:11px;background:white;margin-top:8px;
+}
+.notice{
+  font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px;
+}
+footer{
+  text-align:center;background:var(--dark);color:#cbd5e1;
+  padding:25px 15px;margin-top:30px;font-size:13px;line-height:1.8;
+}
+.whatsapp-float{
+  position:fixed;right:16px;bottom:17px;z-index:20;
+  background:#25d366;color:white;text-decoration:none;
+  border-radius:50px;padding:13px 16px;font-weight:bold;
+  box-shadow:0 4px 15px #0003;
+}
+@media(max-width:900px){
+  .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .product-photo{height:170px}
+}
+@media(max-width:600px){
+  main{padding:11px}
+  header{padding:13px 11px}
+  .brand{font-size:18px}
+  .cart-top{padding:10px;font-size:13px}
+  .hero{grid-template-columns:1fr;padding:22px 16px}
+  .hero img{height:150px}
+  .trust{gap:6px}
+  .trust div{font-size:11px;padding:11px 4px}
+  .products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .product-photo{height:145px}
+  .product-info{padding:9px}
+  .product-name{font-size:14px}
+  .price{font-size:17px}
+  .add-btn{font-size:12px}
+  .search-row select{max-width:125px;font-size:12px}
+  .cart-section{padding:12px}
+}
 </style>
 </head>
 
 <body>
 <header>
- <div class="topbar">
-  <div class="logo">🛍️ Mishor's Shop</div>
-  <a class="cartlink" href="#cart">🛒 কার্ট (<span id="cartCount">0</span>)</a>
- </div>
- <section class="hero">
-  <h1>স্মার্ট কেনাকাটা, আরও সহজ ❤️</h1>
-  <p>পছন্দের পণ্য খুঁজে নাও, কার্টে রাখো, অর্ডার করো।
-  প্রয়োজনে দোকানের সঙ্গে সরাসরি মেসেজে কথা বলো।</p>
-  <a class="cartlink" href="#shop">কেনাকাটা শুরু করুন →</a>
- </section>
+  <div class="topbar">
+    <div>
+      <div class="brand">Mishor's <span>Shop</span></div>
+      <div class="tagline">আপনার অনলাইন শপিং সঙ্গী</div>
+    </div>
+    <button class="cart-top" onclick="goToCart()">
+      🛒 কার্ট (<span id="cartCount">0</span>)
+    </button>
+  </div>
 </header>
 
 <main>
-<section id="shop" class="panel">
- <div class="row">
-  <h2 class="grow">✨ আমাদের পণ্য</h2>
-  <span class="note" id="productCount"></span>
- </div>
- <div class="tools">
-  <input id="search" type="search" placeholder="🔎 পণ্য খুঁজুন...">
-  <select id="sort">
-   <option value="default">সাধারণ ক্রম</option>
-   <option value="low">দাম কম থেকে বেশি</option>
-   <option value="high">দাম বেশি থেকে কম</option>
-   <option value="az">নাম অনুযায়ী</option>
-  </select>
- </div>
- <div id="categories" class="categories">
-  <button class="cat active" data-category="সব">সব পণ্য</button>
-  <button class="cat" data-category="Fashion">👗 পোশাক ও ফ্যাশন</button>
-  <button class="cat" data-category="Sports">⚽ খেলাধুলা</button>
-  <button class="cat" data-category="Electronics">🎧 ইলেকট্রনিকস</button>
-  <button class="cat" data-category="Gift">🎁 উপহার</button>
-  <button class="cat" data-category="Necessary Products">🧴 প্রয়োজনীয় পণ্য</button>
-  <button class="cat" data-category="Shoes">👟 জুতা</button>
-  <button class="cat" data-category="Beauty & Personal Care">💄 বিউটি</button>
-  <button class="cat" data-category="Home & Living">🏠 ঘর ও রান্নাঘর</button>
- </div>
- <p id="firebaseStatus" class="status">পণ্য লোড হচ্ছে...</p>
- <div id="products" class="products"></div>
-</section>
+  <section class="hero">
+    <div>
+      <h1>আপনার পছন্দের পণ্য, এক জায়গায়</h1>
+      <p>ফ্যাশন, ইলেকট্রনিক্স, জুতা ও আরও অনেক পণ্য দেখুন। পছন্দ হলে কার্টে যোগ করে WhatsApp-এ অর্ডার করুন।</p>
+      <button class="hero-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+        🛍️ পণ্য দেখুন
+      </button>
+    </div>
+    <img
+      src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80"
+      alt="Shopping store"
+      onerror="this.style.display='none'">
+  </section>
 
-<section id="cart" class="panel">
- <h2>🛒 শপিং কার্ট</h2>
- <div id="cartItems" class="empty">কার্ট খালি।</div>
- <div class="totalrow"><span>মোট পণ্যমূল্য</span><span>৳<span id="total">0</span></span></div>
- <button id="checkout" class="green">WhatsApp-এ অর্ডার করুন →</button>
- <p class="note">ডেলিভারি চার্জ পরে নিশ্চিত করা হবে। WhatsApp খুললে Send চাপতে হবে।</p>
-</section>
+  <section class="trust">
+    <div>📦 সহজ অর্ডার</div>
+    <div>💬 WhatsApp যোগাযোগ</div>
+    <div>📱 মোবাইল উপযোগী</div>
+  </section>
 
-<section id="account" class="panel">
- <h2>👤 অ্যাকাউন্ট ও মেসেজিং</h2>
- <p id="authStatus" class="status">Firebase অ্যাকাউন্ট যাচাই হচ্ছে...</p>
- <div id="authForms" class="authbox">
-  <input id="authEmail" type="email" autocomplete="email" placeholder="ইমেইল ঠিকানা">
-  <input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
-  <div class="row">
-   <button id="loginBtn" class="dark grow">লগইন</button>
-   <button id="registerBtn" class="primary grow">নতুন অ্যাকাউন্ট</button>
-  </div>
-  <p class="note">নিজের অ্যাকাউন্ট ব্যবহার করো। পাসওয়ার্ড কাউকে দেবে না।</p>
- </div>
- <div id="signedIn" class="hidden">
-  <p id="userInfo" class="muted"></p>
-  <div class="row">
-   <button id="openChat" class="primary grow">💬 দোকানকে মেসেজ করো</button>
-   <button id="logoutBtn" class="dark">লগআউট</button>
-  </div>
- </div>
-</section>
+  <section id="shop">
+    <h2 class="section-title">আমাদের পণ্য</h2>
+    <div class="search-row">
+      <input id="searchInput" type="search" placeholder="🔎 পণ্যের নাম লিখুন..." oninput="renderProducts()">
+      <select id="sortSelect" onchange="renderProducts()">
+        <option value="default">সাজানো</option>
+        <option value="low">দাম: কম আগে</option>
+        <option value="high">দাম: বেশি আগে</option>
+        <option value="name">নাম অনুযায়ী</option>
+      </select>
+    </div>
 
-<section id="chatPanel" class="panel hidden">
- <h2>💬 মেসেজিং সেন্টার</h2>
- <p id="chatStatus" class="status">চ্যাট প্রস্তুত হচ্ছে...</p>
- <div class="chat-layout">
-  <aside id="inbox" class="hidden">
-   <h3>ক্রেতাদের চ্যাট</h3>
-   <div id="conversationList" class="chat-list"></div>
-  </aside>
-  <div class="chat-area">
-   <div class="chat-head" id="chatHead">দোকানের সঙ্গে কথোপকথন</div>
-   <div class="messages" id="messages"><p class="empty">চ্যাট খুললে মেসেজ এখানে দেখা যাবে।</p></div>
-   <form id="chatForm" class="chat-compose">
-    <input id="messageInput" maxlength="1500" autocomplete="off" placeholder="আপনার মেসেজ লিখুন..." aria-label="মেসেজ">
-    <button class="green" id="sendBtn" type="submit">পাঠান</button>
-   </form>
-  </div>
- </div>
- <p class="note">ব্যক্তিগত তথ্য বা পাসওয়ার্ড মেসেজে পাঠিও না।</p>
-</section>
+    <div class="categories" id="categories"></div>
+    <div class="status" id="firebaseStatus">পণ্য লোড হচ্ছে...</div>
+    <div class="products" id="products"></div>
+  </section>
+
+  <section class="cart-section" id="cart">
+    <h2 class="section-title" style="margin-top:0">🛒 আপনার কার্ট</h2>
+    <div id="cartItems">এখনো কোনো পণ্য যোগ করা হয়নি।</div>
+    <div class="cart-total">মোট: ৳<span id="cartTotal">0</span></div>
+    <button class="checkout-btn" onclick="checkout()">WhatsApp-এ অর্ডার করুন</button>
+    <button class="clear-btn" onclick="clearCart()">কার্ট খালি করুন</button>
+    <p class="notice">
+      অর্ডার পাঠানোর পর WhatsApp-এ মেসেজটি দেখে Send চাপুন। ডেলিভারি চার্জ ও পেমেন্টের নিয়ম বিক্রেতার সঙ্গে নিশ্চিত করুন।
+    </p>
+  </section>
 </main>
 
-<footer>© 2026 Mishor's Shop ❤️<br>আপনার কেনাকাটার জন্য ধন্যবাদ!</footer>
+<footer>
+  <strong>Mishor's Shop</strong><br>
+  অনলাইন শপিং, সহজ অর্ডার<br>
+  অর্ডার ও পণ্য সম্পর্কে জানতে WhatsApp-এ যোগাযোগ করুন।
+</footer>
 
-<script>
-const originalProducts=[
- {id:1,name:"স্টাইলিশ ঘড়ি",price:300,emoji:"⌚",category:"Fashion"},
- {id:2,name:"হেডফোন",price:500,emoji:"🎧",category:"Electronics"},
- {id:3,name:"সুন্দর ব্যাগ",price:350,emoji:"👜",category:"Fashion",image:"images/realistic%20beg.jpg"},
- {id:4,name:"স্পোর্টস জুতা",price:600,emoji:"👟",category:"Shoes"},
- {id:5,name:"সানগ্লাস",price:200,emoji:"🕶️",category:"Fashion"},
- {id:6,name:"ব্যাকপ্যাক",price:100,emoji:"🎒",category:"Fashion"},
- {id:7,name:"উপহারের বাক্স",price:50,emoji:"🎁",category:"Gift"},
- {id:8,name:"স্মার্ট ফোন",price:10000,emoji:"📱",category:"Electronics"}
+<a class="whatsapp-float"
+   href="https://wa.me/8801747036594"
+   target="_blank" rel="noopener">WhatsApp</a>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {
+  getFirestore, collection, onSnapshot
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+/* তোমার বর্তমান Firebase প্রজেক্টের কনফিগ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+  authDomain: "mishors-shop-admin.firebaseapp.com",
+  projectId: "mishors-shop-admin",
+  storageBucket: "mishors-shop-admin.firebasestorage.app",
+  messagingSenderId: "828816512879",
+  appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
+const WHATSAPP_NUMBER = "8801747036594";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/*
+  ডেমো পণ্যের ছবি Unsplash থেকে।
+  Admin Panel থেকে যোগ করা পণ্যের ছবির HTTPS URL-ও ব্যবহার হবে।
+*/
+const defaultProducts = [
+  {
+    id:"demo_1", name:"স্টাইলিশ ঘড়ি", price:300,
+    category:"Fashion", emoji:"⌚",
+    image:"https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_2", name:"ওয়্যারলেস হেডফোন", price:500,
+    category:"Electronics", emoji:"🎧",
+    image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_3", name:"ফ্যাশন ব্যাগ", price:350,
+    category:"Fashion", emoji:"👜",
+    image:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_4", name:"স্পোর্টস জুতা", price:600,
+    category:"Shoes", emoji:"👟",
+    image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_5", name:"সানগ্লাস", price:200,
+    category:"Fashion", emoji:"🕶️",
+    image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_6", name:"ব্যাকপ্যাক", price:450,
+    category:"Fashion", emoji:"🎒",
+    image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_7", name:"উপহারের বাক্স", price:250,
+    category:"Gift", emoji:"🎁",
+    image:"https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_8", name:"স্মার্টফোন", price:10000,
+    category:"Electronics", emoji:"📱",
+    image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_9", name:"স্কিন কেয়ার পণ্য", price:400,
+    category:"Beauty & Personal Care", emoji:"🧴",
+    image:"https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_10", name:"ঘরের সাজসজ্জা", price:550,
+    category:"Home & Living", emoji:"🏠",
+    image:"https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_11", name:"স্পোর্টস বল", price:350,
+    category:"Sports", emoji:"⚽",
+    image:"https://images.unsplash.com/photo-1614632537423-1e6c2e7e0b1c?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    id:"demo_12", name:"প্রয়োজনীয় সামগ্রী", price:150,
+    category:"Necessary Products", emoji:"🛍️",
+    image:"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80"
+  }
 ];
 
-/* নমুনা পণ্য: ৯টি গ্রুপে ২৫টি করে = ২২৫টি নতুন পণ্য */
-const sampleGroups=[
-{
- category:"Fashion",emoji:"👕",base:180,step:45,
- items:[
- "কটন টি-শার্ট","পোলো টি-শার্ট","প্রিন্টেড টি-শার্ট","ওভারসাইজ টি-শার্ট","ফুল স্লিভ টি-শার্ট",
- "ক্যাজুয়াল শার্ট","ফরমাল শার্ট","ডেনিম শার্ট","চেক শার্ট","লিনেন শার্ট",
- "স্লিম ফিট জিন্স","স্ট্রেইট জিন্স","ক্যাজুয়াল প্যান্ট","ফরমাল ট্রাউজার","কার্গো প্যান্ট",
- "কটন পাঞ্জাবি","এমব্রয়ডারি পাঞ্জাবি","ক্যাজুয়াল কুর্তা","ডেনিম জ্যাকেট","ক্যাজুয়াল হুডি",
- "কটন শাড়ি","প্রিন্টেড শাড়ি","থ্রি-পিস ড্রেস","কুর্তি","লং ড্রেস"
- ]
-},
-{
- category:"Fashion",emoji:"👗",base:250,step:55,
- items:[
- "লেডিস টি-শার্ট","লেডিস টপস","ক্যাজুয়াল টিউনিক","কটন কামিজ","এমব্রয়ডারি কামিজ",
- "প্রিন্টেড থ্রি-পিস","আনস্টিচড থ্রি-পিস","কটন সালোয়ার","পালাজো প্যান্ট","লেগিংস",
- "ম্যাক্সি ড্রেস","পার্টি ড্রেস","ফ্লোরাল ড্রেস","ডেনিম জিন্স লেডিস","ডেনিম স্কার্ট",
- "কটন হিজাব","জার্সি হিজাব","প্রিন্টেড হিজাব","বোরকা","আবায়া",
- "বাচ্চাদের টি-শার্ট","বাচ্চাদের শার্ট","বাচ্চাদের ফ্রক","বাচ্চাদের পাঞ্জাবি","বাচ্চাদের পায়জামা"
- ]
-},
-{
- category:"Shoes",emoji:"👟",base:350,step:90,
- items:[
- "ক্যাজুয়াল স্নিকার্স","রানিং স্নিকার্স","স্পোর্টস জুতা","ক্যানভাস জুতা","লোফার জুতা",
- "ফরমাল জুতা","লেদার লুক জুতা","স্লিপ-অন জুতা","হাই-টপ স্নিকার্স","ওয়াকিং শু",
- "মেনস স্যান্ডেল","মেনস স্লাইডার","ফ্লিপ-ফ্লপ","লেডিস ফ্ল্যাট","লেডিস স্যান্ডেল",
- "লেডিস হিল","ওয়েজ স্যান্ডেল","ব্যালেরিনা জুতা","বাচ্চাদের স্নিকার্স","বাচ্চাদের স্যান্ডেল",
- "স্কুল জুতা","ফুটবল বুট","ট্রেনিং শু","রাবার স্যান্ডেল","ঘরের স্লিপার"
- ]
-},
-{
- category:"Electronics",emoji:"🎧",base:250,step:180,
- items:[
- "ওয়্যার্ড ইয়ারফোন","ব্লুটুথ ইয়ারবাড","ওয়্যারলেস হেডফোন","গেমিং হেডসেট","মিনি স্পিকার",
- "ব্লুটুথ স্পিকার","মোবাইল চার্জার","ফাস্ট চার্জার","USB-C কেবল","লাইটনিং কেবল",
- "পাওয়ার ব্যাংক","মোবাইল স্ট্যান্ড","ফোন হোল্ডার","ফোন ট্রাইপড","রিং লাইট",
- "স্মার্টওয়াচ","ফিটনেস ব্যান্ড","কম্পিউটার মাউস","ওয়্যারলেস মাউস","কীবোর্ড",
- "USB হাব","মেমোরি কার্ড রিডার","ওয়েবক্যাম","মিনি ফ্যান","LED ডেস্ক ল্যাম্প"
- ]
-},
-{
- category:"Sports",emoji:"⚽",base:150,step:100,
- items:[
- "ফুটবল","ক্রিকেট বল","টেনিস বল","ব্যাডমিন্টন র‍্যাকেট","ব্যাডমিন্টন শাটল",
- "ক্রিকেট ব্যাট","ক্রিকেট স্টাম্প","ফুটবল পাম্প","জাম্প রোপ","হ্যান্ড গ্রিপ",
- "যোগা ম্যাট","রেজিস্ট্যান্স ব্যান্ড","স্পোর্টস বোতল","স্পোর্টস ক্যাপ","স্পোর্টস মোজা",
- "জিম গ্লাভস","কবজি সাপোর্ট","হাঁটু সাপোর্ট","ফুটবল জার্সি","ক্রিকেট জার্সি",
- "বাস্কেটবল","ভলিবল","টেবিল টেনিস বল","স্কিপিং রোপ","স্পোর্টস তোয়ালে"
- ]
-},
-{
- category:"Beauty & Personal Care",emoji:"💄",base:100,step:65,
- items:[
- "লিপ বাম","লিপস্টিক","লিপ গ্লস","ফেসওয়াশ","ফেস ময়েশ্চারাইজার",
- "সানস্ক্রিন","ফেস সিরাম","ফেস মাস্ক","ক্লিনজিং ব্রাশ","মেকআপ ব্রাশ সেট",
- "কমপ্যাক্ট পাউডার","আইলাইনার","মাসকারা","নেইল পলিশ","নেইল কাটার",
- "চুলের চিরুনি","হেয়ার ব্রাশ","হেয়ার ব্যান্ড","হেয়ার ক্লিপ সেট","হেয়ার তোয়ালে",
- "মেকআপ ব্যাগ","ট্রাভেল মিরর","বডি লোশন","হ্যান্ড ক্রিম","টয়লেটরি ব্যাগ"
- ]
-},
-{
- category:"Home & Living",emoji:"🏠",base:100,step:75,
- items:[
- "কুশন কভার","বিছানার চাদর","বালিশের কভার","হালকা কম্বল","দরজার ম্যাট",
- "দেয়াল ঘড়ি","টেবিল ঘড়ি","ডেস্ক অর্গানাইজার","স্টোরেজ বক্স","কাপড় রাখার ব্যাগ",
- "পানির বোতল","ট্রাভেল মগ","চায়ের কাপ সেট","প্লেট সেট","খাবারের কন্টেইনার",
- "লাঞ্চ বক্স","মশলার কৌটা","রান্নাঘরের চামচ সেট","সবজি কাটার","ডিশ ওয়াশ ব্রাশ",
- "কাপড় শুকানোর ক্লিপ","লন্ড্রি ব্যাগ","LED নাইট লাইট","ফটো ফ্রেম","ফুলদানি"
- ]
-},
-{
- category:"Necessary Products",emoji:"🧴",base:80,step:55,
- items:[
- "ছাতা","রেইনকোট","পুনর্ব্যবহারযোগ্য শপিং ব্যাগ","মানিব্যাগ","কার্ড হোল্ডার",
- "কী-রিং","ট্রাভেল পাউচ","পাসপোর্ট কভার","আইডি কার্ড হোল্ডার","নোটবুক",
- "কলম সেট","পেন্সিল বক্স","পানির ফ্লাস্ক","টিফিন বক্স","মাইক্রোফাইবার কাপড়",
- "জুতার ব্যাগ","কাপড়ের হ্যাঙ্গার","ট্রাভেল পিলো","আই মাস্ক","ছোট সেলাই কিট",
- "কাপড়ের মাস্ক","কেবল অর্গানাইজার","ড্রয়ার অর্গানাইজার","ফোল্ডেবল ব্যাগ","ছোট স্টোরেজ পাউচ"
- ]
-},
-{
- category:"Gift",emoji:"🎁",base:100,step:85,
- items:[
- "জন্মদিনের গিফট বক্স","গিফট ব্যাগ","গ্রিটিং কার্ড","ফটো অ্যালবাম","ফটো ফ্রেম গিফট",
- "টেডি বিয়ার","প্লাশ খেলনা","ডেকোরেটিভ লাইট","কৃত্রিম ফুল","ফুলের তোড়া",
- "কাপল মগ","কাস্টম স্টাইল মগ","কী-রিং গিফট","গিফট পেন সেট","ডায়েরি গিফট সেট",
- "গিফট ওয়ালেট","পারফিউম গিফট বক্স","জুয়েলারি বক্স","ছোট শোপিস","টেবিল ডেকোর",
- "উপহারের রিবন সেট","গিফট র‍্যাপ পেপার","চকলেট বক্স","উৎসবের ডেকোর সেট","সারপ্রাইজ গিফট বক্স"
- ]
+const categoryList = [
+  {value:"All", label:"সব পণ্য"},
+  {value:"Fashion", label:"👗 ফ্যাশন"},
+  {value:"Electronics", label:"📱 ইলেকট্রনিক্স"},
+  {value:"Shoes", label:"👟 জুতা"},
+  {value:"Sports", label:"⚽ স্পোর্টস"},
+  {value:"Beauty & Personal Care", label:"🧴 বিউটি"},
+  {value:"Home & Living", label:"🏠 ঘর সাজানো"},
+  {value:"Necessary Products", label:"🛍️ প্রয়োজনীয়"},
+  {value:"Gift", label:"🎁 উপহার"}
+];
+
+let products = [...defaultProducts];
+let cart = {};
+let activeCategory = "All";
+let firebaseReady = false;
+
+function safeText(value){
+  return String(value ?? "");
 }
-];
 
-const sampleProducts=[];
-let sampleId=1001;
-sampleGroups.forEach((group,g)=>{
- group.items.forEach((name,i)=>{
-  sampleProducts.push({
-   id:"sample_"+sampleId++,
-   name,
-   price:group.base+((i*group.step+g*37)%(group.step*12)),
-   emoji:group.emoji,
-   category:group.category
+function normalizeCategory(value){
+  const v = safeText(value).trim();
+  const lower = v.toLowerCase();
+
+  const aliases = {
+    "fashion":"Fashion",
+    "ফ্যাশন":"Fashion",
+    "পোশাক ও ফ্যাশন":"Fashion",
+    "electronics":"Electronics",
+    "ইলেকট্রনিক্স":"Electronics",
+    "shoes":"Shoes",
+    "জুতা":"Shoes",
+    "sports":"Sports",
+    "স্পোর্টস":"Sports",
+    "beauty & personal care":"Beauty & Personal Care",
+    "beauty":"Beauty & Personal Care",
+    "বিউটি":"Beauty & Personal Care",
+    "home & living":"Home & Living",
+    "home":"Home & Living",
+    "ঘর সাজানো":"Home & Living",
+    "necessary products":"Necessary Products",
+    "necessary":"Necessary Products",
+    "প্রয়োজনীয় পণ্য":"Necessary Products",
+    "gift":"Gift",
+    "উপহার":"Gift"
+  };
+
+  return aliases[lower] || aliases[v] || v || "Fashion";
+}
+
+function money(value){
+  const n = Number(value);
+  return Number.isFinite(n) ? n.toLocaleString("en-US") : "0";
+}
+
+function escapeHTML(value){
+  return safeText(value).replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[ch]);
+}
+
+function renderCategories(){
+  const holder = document.getElementById("categories");
+  holder.innerHTML = categoryList.map(c => `
+    <button class="cat-btn ${activeCategory===c.value?"active":""}"
+      data-category="${escapeHTML(c.value)}">
+      ${escapeHTML(c.label)}
+    </button>
+  `).join("");
+
+  holder.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.category;
+      renderCategories();
+      renderProducts();
+    });
   });
- });
-});
-
-const defaultProducts=[...originalProducts,...sampleProducts];
-
-const CATEGORY_MAP={
- "ফ্যাশন":"Fashion","fashion":"Fashion","sports":"Sports",
- "ইলেকট্রনিক্স":"Electronics","electronics":"Electronics",
- "উপহার":"Gift","gift":"Gift","জুতা":"Shoes","shoes":"Shoes",
- "necessary products":"Necessary Products",
- "beauty & personal care":"Beauty & Personal Care",
- "home & living":"Home & Living"
-};
-
-function normalizeCategory(v){
- const s=String(v||"").trim();
- return CATEGORY_MAP[s]||CATEGORY_MAP[s.toLowerCase()]||s;
 }
-
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- }[c]));
-}
-
-function money(v){return Number(v).toLocaleString("en-US");}
-
-/* বিভাগের ছবি: GitHub-এর images ফোল্ডারে একই নামে ছবি রাখতে হবে */
-const categoryImages={
- "Fashion":"images/fashion.jpg",
- "Shoes":"images/shoes.jpg",
- "Electronics":"images/electronics.jpg",
- "Sports":"images/sports.jpg",
- "Beauty & Personal Care":"images/beauty.jpg",
- "Home & Living":"images/home.jpg",
- "Necessary Products":"images/necessary.jpg",
- "Gift":"images/gift.jpg"
-};
-
-let products=[...defaultProducts],activeCategory="সব";
-const cart={};
 
 function renderProducts(){
- const q=document.getElementById("search").value.trim().toLowerCase();
- const sort=document.getElementById("sort").value;
+  const search = document.getElementById("searchInput").value.trim().toLowerCase();
+  const sort = document.getElementById("sortSelect").value;
+  let shown = products.filter(p => {
+    const name = safeText(p.name).toLowerCase();
+    const category = normalizeCategory(p.category);
+    return (!search || name.includes(search)) &&
+      (activeCategory==="All" || category===activeCategory);
+  });
 
- let list=products.filter(p=>
-  String(p.name).toLowerCase().includes(q)&&
-  (activeCategory==="সব"||normalizeCategory(p.category)===activeCategory)
- );
+  if(sort==="low") shown.sort((a,b)=>Number(a.price)-Number(b.price));
+  if(sort==="high") shown.sort((a,b)=>Number(b.price)-Number(a.price));
+  if(sort==="name") shown.sort((a,b)=>safeText(a.name).localeCompare(safeText(b.name),"bn"));
 
- if(sort==="low")list.sort((a,b)=>a.price-b.price);
- if(sort==="high")list.sort((a,b)=>b.price-a.price);
- if(sort==="az")list.sort((a,b)=>String(a.name).localeCompare(String(b.name),"bn"));
+  const holder = document.getElementById("products");
 
- document.getElementById("productCount").textContent=list.length+"টি পণ্য";
+  if(!shown.length){
+    holder.innerHTML = '<div class="empty">এই নামে কোনো পণ্য পাওয়া যায়নি।</div>';
+    return;
+  }
 
- document.getElementById("products").innerHTML=list.length?list.map(p=>{
-  const image=String(p.image||"");
-  const valid=/^https:\/\//i.test(image)||/^images\/[a-zA-Z0-9._%/-]+$/.test(image);
-  const fallbackImage=categoryImages[normalizeCategory(p.category)]||"";
-  const imageToShow=valid?image:fallbackImage;
+  holder.innerHTML = shown.map(p => {
+    const image = safeText(p.image);
+    const isHTTPS = /^https:\/\//i.test(image);
+    const safeImage = isHTTPS ? image : "";
+    const id = safeText(p.id);
 
-  const visual=imageToShow
-   ?'<img src="'+esc(imageToShow)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentElement.textContent=\'📦\';">'
-   :'<span>'+esc(p.emoji||"📦")+'</span>';
+    return `
+      <article class="product">
+        <img class="product-photo"
+          src="${escapeHTML(safeImage)}"
+          alt="${escapeHTML(p.name)}"
+          loading="lazy"
+          onerror="this.onerror=null;this.src='https://placehold.co/600x450/f1f5f9/475569?text=Product+Photo';">
+        <div class="product-info">
+          <div class="product-name">${escapeHTML(p.name)}</div>
+          <div class="category-label">${escapeHTML(normalizeCategory(p.category))}</div>
+          <div class="price">৳${money(p.price)}</div>
+          <button class="add-btn" data-add="${escapeHTML(id)}">＋ কার্টে যোগ করুন</button>
+        </div>
+      </article>
+    `;
+  }).join("");
 
-  return '<article class="product"><div class="pic">'+visual+'</div>'+
-   '<h3>'+esc(p.name)+'</h3><div class="price">৳'+money(p.price)+'</div>'+
-   '<div class="product-actions"><button class="primary" data-add="'+esc(p.id)+'">＋ কার্টে যোগ</button>'+
-   '<button class="dark" data-buy="'+esc(p.id)+'">এখনই কিনুন →</button></div></article>';
- }).join(""):'<p class="empty">কোনো পণ্য পাওয়া যায়নি।</p>';
+  holder.querySelectorAll("[data-add]").forEach(btn => {
+    btn.addEventListener("click", () => addToCart(btn.dataset.add));
+  });
 }
 
 function addToCart(id){
- const p=products.find(x=>String(x.id)===String(id));
- if(!p)return;
- cart[id]=(cart[id]||0)+1;
- renderCart();
+  const product = products.find(p => String(p.id)===String(id));
+  if(!product) return;
+
+  const key = String(product.id);
+  if(!cart[key]) cart[key] = {...product, qty:0};
+  cart[key].qty++;
+  renderCart();
 }
 
-function changeQty(id,n){
- cart[id]=(cart[id]||0)+n;
- if(cart[id]<=0)delete cart[id];
- renderCart();
+function changeQty(id, delta){
+  const key = String(id);
+  if(!cart[key]) return;
+  cart[key].qty += delta;
+  if(cart[key].qty<=0) delete cart[key];
+  renderCart();
+}
+
+function removeItem(id){
+  delete cart[String(id)];
+  renderCart();
+}
+
+function clearCart(){
+  cart = {};
+  renderCart();
 }
 
 function renderCart(){
- let total=0,count=0;
- const items=products.filter(p=>(cart[p.id]||0)>0);
+  const items = Object.values(cart);
+  const count = items.reduce((sum,p)=>sum+p.qty,0);
+  const total = items.reduce((sum,p)=>sum+(Number(p.price)||0)*p.qty,0);
 
- document.getElementById("cartItems").innerHTML=items.length?items.map(p=>{
-  const qty=cart[p.id],sub=p.price*qty;
-  total+=sub;count+=qty;
-  return '<div class="cartrow"><div><b>'+esc(p.name)+'</b>'+
-   '<div class="note">৳'+money(p.price)+' × '+qty+' = ৳'+money(sub)+'</div></div>'+
-   '<div class="qty"><button data-change="-1" data-id="'+esc(p.id)+'">−</button>'+
-   '<span>'+qty+'</span><button data-change="1" data-id="'+esc(p.id)+'">+</button></div></div>';
- }).join(""):'<p class="empty">কার্ট খালি।</p>';
+  document.getElementById("cartCount").textContent = count;
+  document.getElementById("cartTotal").textContent = money(total);
 
- document.getElementById("total").textContent=money(total);
- document.getElementById("cartCount").textContent=count;
+  const holder = document.getElementById("cartItems");
+  if(!items.length){
+    holder.innerHTML = '<p class="notice">এখনো কোনো পণ্য যোগ করা হয়নি। পছন্দের পণ্য থেকে “কার্টে যোগ করুন” চাপুন।</p>';
+    return;
+  }
+
+  holder.innerHTML = items.map(p => `
+    <div class="cart-line">
+      <div class="cart-line-name">
+        <strong>${escapeHTML(p.name)}</strong><br>
+        ৳${money(p.price)} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}
+      </div>
+      <div class="qty-controls">
+        <button data-minus="${escapeHTML(p.id)}" aria-label="একটি কমান">−</button>
+        <strong>${p.qty}</strong>
+        <button data-plus="${escapeHTML(p.id)}" aria-label="একটি বাড়ান">＋</button>
+        <button class="remove-btn" data-remove="${escapeHTML(p.id)}" aria-label="পণ্য সরান">×</button>
+      </div>
+    </div>
+  `).join("");
+
+  holder.querySelectorAll("[data-minus]").forEach(b=>
+    b.addEventListener("click",()=>changeQty(b.dataset.minus,-1)));
+  holder.querySelectorAll("[data-plus]").forEach(b=>
+    b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));
+  holder.querySelectorAll("[data-remove]").forEach(b=>
+    b.addEventListener("click",()=>removeItem(b.dataset.remove)));
 }
 
-document.getElementById("products").addEventListener("click",e=>{
- const add=e.target.closest("[data-add]");
- const buy=e.target.closest("[data-buy]");
- if(add)addToCart(add.dataset.add);
- if(buy){
-  addToCart(buy.dataset.buy);
+function goToCart(){
   document.getElementById("cart").scrollIntoView({behavior:"smooth"});
- }
-});
-
-document.getElementById("cartItems").addEventListener("click",e=>{
- const b=e.target.closest("[data-change]");
- if(b)changeQty(b.dataset.id,Number(b.dataset.change));
-});
-
-document.getElementById("search").addEventListener("input",renderProducts);
-document.getElementById("sort").addEventListener("change",renderProducts);
-
-document.getElementById("categories").addEventListener("click",e=>{
- const b=e.target.closest("[data-category]");
- if(!b)return;
- activeCategory=b.dataset.category;
- document.querySelectorAll(".cat").forEach(x=>x.classList.toggle("active",x===b));
- renderProducts();
-});
-
-document.getElementById("checkout").addEventListener("click",()=>{
- const items=products.filter(p=>(cart[p.id]||0)>0);
- if(!items.length){alert("আগে কার্টে পণ্য যোগ করুন!");return;}
-
- const name=prompt("আপনার নাম লিখুন:");
- if(!name?.trim())return;
- const phone=prompt("আপনার ফোন নম্বর লিখুন:");
- if(!phone?.trim())return;
- const address=prompt("ডেলিভারির সম্পূর্ণ ঠিকানা লিখুন:");
- if(!address?.trim())return;
-
- let total=0,msg="🛍️ Mishor's Shop - নতুন অর্ডার\n\n";
- msg+="নাম: "+name.trim()+"\nফোন: "+phone.trim()+"\nঠিকানা: "+address.trim()+"\n\nপণ্য:\n";
-
- items.forEach(p=>{
-  total+=p.price*cart[p.id];
-  msg+=p.name+" × "+cart[p.id]+" = ৳"+p.price*cart[p.id]+"\n";
- });
-
- msg+="\nমোট পণ্যমূল্য: ৳"+total+"\nডেলিভারি চার্জ: পরে নিশ্চিত করতে হবে";
- location.href="https://wa.me/8801747036594?text="+encodeURIComponent(msg);
-});
-
-window.setFirebaseProducts=function(remote){
- const defaults=new Set(defaultProducts.map(p=>String(p.id)));
- products=[...defaultProducts,...remote.filter(p=>!defaults.has(String(p.id)))];
- document.getElementById("firebaseStatus").textContent=
-  remote.length?"নমুনা ও Firebase পণ্য লোড হয়েছে।":"নমুনা পণ্য দেখানো হচ্ছে।";
- renderProducts();
- renderCart();
-};
-
-window.setFirebaseError=function(){
- document.getElementById("firebaseStatus").textContent=
- "Firebase পণ্য লোড হয়নি; নমুনা পণ্য দেখানো হচ্ছে।";
-};
-
-renderProducts();
-renderCart();
-</script>
-
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-import {
- getAuth,onAuthStateChanged,createUserWithEmailAndPassword,
- signInWithEmailAndPassword,signOut
-} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
-import {
- getFirestore,collection,getDocs,doc,setDoc,addDoc,
- query,orderBy,onSnapshot,serverTimestamp
-} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
-
-const ADMIN_UID="A2kBB273NcSzQ2naJF2PBrue47k2";
-
-const firebaseConfig={
- apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
- authDomain:"mishors-shop-admin.firebaseapp.com",
- projectId:"mishors-shop-admin",
- storageBucket:"mishors-shop-admin.firebasestorage.app",
- messagingSenderId:"828816512879",
- appId:"1:828816512879:web:3e297717db9b391f09fa9a"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-let currentUser=null,selectedUID=null;
-let stopMessages=null,stopInbox=null;
-const $=id=>document.getElementById(id);
-const isAdmin=()=>!!currentUser&&currentUser.uid===ADMIN_UID;
-
-function setStatus(text){$("chatStatus").textContent=text;}
-
-function showChat(){
- $("chatPanel").classList.remove("hidden");
- $("chatPanel").scrollIntoView({behavior:"smooth"});
 }
 
-function clearListener(){
- if(stopMessages){stopMessages();stopMessages=null;}
+function checkout(){
+  const items = Object.values(cart);
+  if(!items.length){
+    alert("ভাই, আগে কার্টে অন্তত একটি পণ্য যোগ করুন।");
+    return;
+  }
+
+  const total = items.reduce((sum,p)=>sum+(Number(p.price)||0)*p.qty,0);
+  let message = "🛍️ *Mishor's Shop - নতুন অর্ডার*%0A";
+  message = "🛍️ *Mishor's Shop - নতুন অর্ডার*%0A%0A";
+  message += items.map((p,i)=>
+    `${i+1}. ${p.name} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}`
+  ).join("%0A");
+
+  message += `%0A%0A*মোট পণ্যের দাম: ৳${money(total)}*`;
+  message += "%0A%0Aনাম: ";
+  message += "%0Aঠিকানা: ";
+  message += "%0Aমোবাইল নম্বর: ";
+  message += "%0A%0Aডেলিভারি চার্জ ও পেমেন্টের নিয়ম নিশ্চিত করুন।";
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    decodeURIComponent(message.replace(/%0A/g,"\n"))
+  )}`;
+
+  window.open(url,"_blank");
 }
 
-function showMessage(msg,mine,time){
- const bubble=document.createElement("div");
- bubble.className="bubble"+(mine?" mine":"");
- const body=document.createElement("div");
- body.textContent=msg;
- const small=document.createElement("small");
- small.textContent=time||"";
- bubble.append(body,small);
- $("messages").appendChild(bubble);
-}
+window.goToCart = goToCart;
+window.checkout = checkout;
+window.clearCart = clearCart;
 
-function listenMessages(uid){
- clearListener();
- selectedUID=uid;
- $("messages").replaceChildren();
- $("chatHead").textContent=isAdmin()?"ক্রেতার সঙ্গে চ্যাট":"Mishor's Shop-এর সঙ্গে চ্যাট";
- setStatus("মেসেজ লোড হচ্ছে...");
-
- const path=collection(db,"conversations",uid,"messages");
- const q=query(path,orderBy("createdAt","asc"));
-
- stopMessages=onSnapshot(q,snap=>{
-  $("messages").replaceChildren();
-  snap.forEach(item=>{
-   const m=item.data();
-   showMessage(
-    String(m.text||""),
-    m.senderUid===currentUser.uid,
-    m.createdAt?.toDate?.().toLocaleString("bn-BD")||""
-   );
-  });
-  setStatus("চ্যাট সংযুক্ত।");
-  $("messages").scrollTop=$("messages").scrollHeight;
- },err=>{
-  console.error(err);
-  setStatus("চ্যাট লোড হয়নি। Firestore Security Rules পরীক্ষা করো।");
- });
-}
-
-async function openCustomerChat(){
- if(!currentUser)return;
- selectedUID=currentUser.uid;
-
- try{
-  await setDoc(doc(db,"conversations",currentUser.uid),{
-   ownerUid:currentUser.uid,
-   updatedAt:serverTimestamp()
-  },{merge:true});
-
-  showChat();
-  $("inbox").classList.add("hidden");
-  listenMessages(currentUser.uid);
- }catch(err){
-  console.error(err);
-  setStatus("চ্যাট খোলা যায়নি। Security Rules পরীক্ষা করো।");
- }
-}
-
-function listenInbox(){
- if(stopInbox){stopInbox();stopInbox=null;}
- if(!isAdmin())return;
-
- $("inbox").classList.remove("hidden");
-
- stopInbox=onSnapshot(collection(db,"conversations"),snap=>{
-  const list=$("conversationList");
-  list.replaceChildren();
-
-  snap.forEach(item=>{
-   const b=document.createElement("button");
-   b.className="chat-person"+(selectedUID===item.id?" active":"");
-   b.textContent="ক্রেতা: "+item.id;
-   b.addEventListener("click",()=>listenMessages(item.id));
-   list.appendChild(b);
-  });
-
-  if(!snap.size)list.innerHTML='<p class="note">এখনো কোনো চ্যাট নেই।</p>';
- },err=>{
-  console.error(err);
-  setStatus("ইনবক্স লোড হয়নি। Admin UID ও Security Rules পরীক্ষা করো।");
- });
-}
-
-async function sendMessage(text){
- if(!currentUser||!selectedUID)return;
-
- const value=text.trim();
- if(!value||value.length>1500)return;
-
- $("sendBtn").disabled=true;
-
- try{
-  await addDoc(collection(db,"conversations",selectedUID,"messages"),{
-   text:value,
-   senderUid:currentUser.uid,
-   createdAt:serverTimestamp()
-  });
-  $("messageInput").value="";
- }catch(err){
-  console.error(err);
-  setStatus("মেসেজ পাঠানো যায়নি। লগইন ও Security Rules পরীক্ষা করো।");
- }finally{
-  $("sendBtn").disabled=false;
- }
-}
-
-$("registerBtn").addEventListener("click",async()=>{
- const email=$("authEmail").value.trim();
- const password=$("authPassword").value;
-
- if(!email||password.length<6){
-  alert("সঠিক ইমেইল ও কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দাও।");
-  return;
- }
-
- try{
-  await createUserWithEmailAndPassword(auth,email,password);
- }catch(e){
-  alert("রেজিস্ট্রেশন হয়নি: "+e.message);
- }
-});
-
-$("loginBtn").addEventListener("click",async()=>{
- const email=$("authEmail").value.trim();
- const password=$("authPassword").value;
-
- if(!email||!password){
-  alert("ইমেইল ও পাসওয়ার্ড দাও।");
-  return;
- }
-
- try{
-  await signInWithEmailAndPassword(auth,email,password);
- }catch(e){
-  alert("লগইন হয়নি: "+e.message);
- }
-});
-
-$("logoutBtn").addEventListener("click",()=>signOut(auth));
-
-$("openChat").addEventListener("click",async()=>{
- if(isAdmin()){
-  showChat();
-  listenInbox();
-  setStatus("ইনবক্স থেকে একজন ক্রেতা বেছে নাও।");
- }else{
-  await openCustomerChat();
- }
-});
-
-$("chatForm").addEventListener("submit",e=>{
- e.preventDefault();
- sendMessage($("messageInput").value);
-});
-
-onAuthStateChanged(auth,user=>{
- clearListener();
- if(stopInbox){stopInbox();stopInbox=null;}
-
- currentUser=user;
- selectedUID=null;
- $("messages").replaceChildren();
- $("chatPanel").classList.add("hidden");
-
- if(!user){
-  $("authForms").classList.remove("hidden");
-  $("signedIn").classList.add("hidden");
-  $("authStatus").textContent="মেসেজ করতে লগইন করো অথবা নতুন অ্যাকাউন্ট খোলো।";
-  return;
- }
-
- $("authForms").classList.add("hidden");
- $("signedIn").classList.remove("hidden");
- $("authStatus").textContent="অ্যাকাউন্ট সংযুক্ত।";
- $("userInfo").textContent="লগইন: "+user.email;
- $("openChat").textContent=isAdmin()?"📥 ক্রেতাদের ইনবক্স":"💬 দোকানকে মেসেজ করো";
-
- if(isAdmin()){
-  showChat();
-  listenInbox();
-  setStatus("ইনবক্স থেকে ক্রেতা নির্বাচন করো।");
- }
-});
-
+/* Firebase products collection থেকে Admin Panel-এর পণ্য লোড */
 try{
- const snap=await getDocs(collection(db,"products"));
+  onSnapshot(collection(db,"products"), snapshot => {
+    const remoteProducts = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id:"fb_"+doc.id,
+        name:safeText(data.name || "নতুন পণ্য"),
+        price:Number(data.price)||0,
+        category:normalizeCategory(data.category),
+        emoji:safeText(data.emoji || "🛍️"),
+        image:safeText(data.image || "")
+      };
+    });
 
- const remote=snap.docs.map(d=>{
-  const x=d.data();
-  const price=Number(x.price);
+    /*
+      ডেমো পণ্যের পাশাপাশি Firebase-এর পণ্য দেখানো হবে।
+      Firebase পণ্য ডেমো পণ্যের সঙ্গে স্বয়ংক্রিয়ভাবে মিশে যাবে।
+    */
+    products = [...defaultProducts, ...remoteProducts];
+    firebaseReady = true;
+    document.getElementById("firebaseStatus").textContent =
+      remoteProducts.length
+        ? `Firebase থেকে ${remoteProducts.length}টি পণ্য লোড হয়েছে।`
+        : "ডেমো পণ্য দেখানো হচ্ছে। Admin Panel থেকে যোগ করা পণ্য এখানে দেখা যাবে।";
 
-  return {
-   id:"fb_"+d.id,
-   name:String(x.name||"নামহীন পণ্য"),
-   price:Number.isFinite(price)&&price>=0?price:0,
-   category:normalizeCategory(x.category||"অন্যান্য"),
-   emoji:String(x.emoji||"📦"),
-   image:String(x.image||"")
-  };
- });
-
- window.setFirebaseProducts(remote);
-}catch(e){
- console.error("Product loading failed",e);
- window.setFirebaseError();
+    renderProducts();
+  }, error => {
+    console.error("Firebase products error:", error);
+    document.getElementById("firebaseStatus").textContent =
+      "Firebase পণ্য লোড হয়নি। ডেমো পণ্য দেখানো হচ্ছে।";
+    products = [...defaultProducts];
+    renderProducts();
+  });
+}catch(error){
+  console.error(error);
+  document.getElementById("firebaseStatus").textContent =
+    "Firebase সংযোগে সমস্যা। ডেমো পণ্য দেখানো হচ্ছে।";
+  products = [...defaultProducts];
+  renderProducts();
 }
+
+renderCategories();
+renderCart();
+renderProducts();
 </script>
 </body>
-</html>
+ </html>
