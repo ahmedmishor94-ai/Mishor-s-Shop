@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Mishor's Shop | Customer Chat</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#142033}
+header{background:#101827;color:white;padding:16px}header strong{font-size:20px}header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:760px;margin:18px auto;padding:0 12px}.card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 12px;font-size:20px}label{display:block;font-size:13px;margin:10px 0 5px}
+input,textarea,button{font:inherit}input,textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px;background:white}
+button{border:0;border-radius:10px;padding:12px 14px;background:#087f5b;color:white;font-weight:bold}
+button.secondary{background:#e2e8f0;color:#142033}button:disabled{opacity:.55}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.muted{font-size:13px;color:#64748b;line-height:1.6}
+#chatPanel{display:none}.messages{height:42vh;min-height:260px;max-height:500px;overflow:auto;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px}
+.msg{max-width:88%;padding:10px 12px;border-radius:13px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.mine{margin-left:auto;background:#d1fae5}.theirs{margin-right:auto;background:white;border:1px solid #e2e8f0}
+.meta{font-size:11px;color:#64748b;margin-top:4px}
+.composer{display:flex;gap:8px;margin-top:10px}.composer textarea{resize:vertical;min-height:48px;max-height:120px}
+.composer button{align-self:stretch}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#status{white-space:pre-wrap}.notice{background:#fffbeb;border:1px solid #fde68a;padding:10px;border-radius:10px;font-size:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<header><strong>Mishor's Shop · মেসেজ</strong><p>Admin-এর সঙ্গে ওয়েবসাইটেই কথা বলুন</p></header>
+<main>
+<section class="card" id="authPanel">
+<h2>কাস্টমার লগইন / অ্যাকাউন্ট তৈরি</h2>
+<p class="muted">নিজের ইমেইল ও পাসওয়ার্ড ব্যবহার করুন। পাসওয়ার্ড কাউকে পাঠাবেন না।</p>
+<label for="email">ইমেইল</label><input id="email" type="email" autocomplete="email" placeholder="আপনার ইমেইল" required>
+<label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="পাসওয়ার্ড" required>
+<div class="actions"><button id="signupBtn">নতুন অ্যাকাউন্ট তৈরি</button><button class="secondary" id="loginBtn">লগইন</button></div>
+<p class="muted" id="authStatus" role="status"></p>
+</section>
+
+<section class="card" id="chatPanel">
+<div class="topline"><div><h2 style="margin-bottom:4px">Admin-এর সঙ্গে চ্যাট</h2><div class="muted" id="signedInAs"></div></div><button class="secondary" id="logoutBtn">লগআউট</button></div>
+<p class="notice">ব্যক্তিগত তথ্য, পাসওয়ার্ড বা ব্যাংক/কার্ডের গোপন তথ্য চ্যাটে পাঠাবেন না।</p>
+<p class="muted" id="chatStatus" role="status">চ্যাট লোড হচ্ছে...</p>
+<div class="messages" id="messages" aria-live="polite"></div>
+<form id="sendForm" class="composer">
+<textarea id="messageInput" maxlength="2000" placeholder="আপনার মেসেজ লিখুন..." required></textarea>
+<button id="sendBtn" type="submit">পাঠান</button>
+</form>
+</section>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {getFirestore,doc,setDoc,getDoc,collection,addDoc,query,orderBy,onSnapshot,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+ authDomain:"mishors-shop-admin.firebaseapp.com",
+ projectId:"mishors-shop-admin",
+ storageBucket:"mishors-shop-admin.firebasestorage.app",
+ messagingSenderId:"828816512879",
+ appId:"1:828816512879:web:3e297717db9b391f09fa9a"
+};
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+const $=id=>document.getElementById(id);
+let stopMessages=null, sending=false;
+function authMessage(s){$("authStatus").textContent=s}
+function chatMessage(s){$("chatStatus").textContent=s}
+$("signupBtn").addEventListener("click",async()=>{
+ const email=$("email").value.trim(), password=$("password").value;
+ if(!email||password.length<6){authMessage("সঠিক ইমেইল দিন এবং অন্তত ৬ অক্ষরের পাসওয়ার্ড দিন।");return}
+ authMessage("অ্যাকাউন্ট তৈরি হচ্ছে...");
+ try{await createUserWithEmailAndPassword(auth,email,password);authMessage("")}
+ catch(e){authMessage(errorText(e))}
+});
+$("loginBtn").addEventListener("click",async()=>{
+ const email=$("email").value.trim(), password=$("password").value;
+ if(!email||!password){authMessage("ইমেইল ও পাসওয়ার্ড লিখুন।");return}
+ authMessage("লগইন হচ্ছে...");
+ try{await signInWithEmailAndPassword(auth,email,password);authMessage("")}
+ catch(e){authMessage(errorText(e))}
+});
+$("logoutBtn").addEventListener("click",()=>signOut(auth).catch(e=>chatMessage(errorText(e))));
+function errorText(e){
+ const code=e?.code||"";
+ if(code.includes("email-already-in-use"))return "এই ইমেইলে অ্যাকাউন্ট আছে। লগইন করুন।";
+ if(code.includes("invalid-email"))return "ইমেইল ঠিকভাবে লিখুন।";
+ if(code.includes("weak-password"))return "আরও শক্তিশালী পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর)।";
+ if(code.includes("invalid-credential")||code.includes("wrong-password")||code.includes("user-not-found"))return "ইমেইল বা পাসওয়ার্ড ঠিক হয়নি।";
+ if(code.includes("operation-not-allowed"))return "Firebase Authentication-এ Email/Password চালু করুন।";
+ if(code.includes("permission-denied"))return "Firebase Firestore Rules পরীক্ষা করতে হবে।";
+ return "সমস্যা হয়েছে: "+(e?.message||code||"আবার চেষ্টা করুন");
+}
+function safeText(v){return String(v??"")}
+function formatTime(ts){try{return ts?.toDate?ts.toDate().toLocaleString("bn-BD"):"এখন"}catch{return "এখন"}}
+function showMessages(snap,uid){
+ const box=$("messages");
+ box.replaceChildren();
+ if(snap.empty){const p=document.createElement("p");p.className="muted";p.textContent="এখনো কোনো মেসেজ নেই। প্রথম মেসেজটি পাঠান।";box.appendChild(p);return}
+ snap.forEach(d=>{
+  const m=d.data(), mine=m.senderUid===uid;
+  const wrap=document.createElement("div");wrap.className="msg "+(mine?"mine":"theirs");
+  const label=document.createElement("strong");label.textContent=mine?"আপনি":(m.senderRole==="admin"?"Mishor's Shop Admin":"কাস্টমার");
+  const body=document.createElement("div");body.textContent=safeText(m.text);
+  const time=document.createElement("div");time.className="meta";time.textContent=formatTime(m.createdAt);
+  wrap.append(label,body,time);box.appendChild(wrap);
+ });
+ box.scrollTop=box.scrollHeight;
+}
+onAuthStateChanged(auth,async user=>{
+ if(stopMessages){stopMessages();stopMessages=null}
+ $("authPanel").style.display=user?"none":"block";
+ $("chatPanel").style.display=user?"block":"none";
+ if(!user)return;
+ $("signedInAs").textContent=user.email||"লগইন করা কাস্টমার";
+ chatMessage("চ্যাট প্রস্তুত হচ্ছে...");
+ try{
+  const convRef=doc(db,"conversations",user.uid);
+  const existing=await getDoc(convRef);
+  if(!existing.exists()){
+   await setDoc(convRef,{ownerUid:user.uid,email:user.email||"",createdAt:serverTimestamp(),updatedAt:serverTimestamp(),lastMessage:""});
+  }
+  const q=query(collection(db,"conversations",user.uid,"messages"),orderBy("createdAt","asc"));
+  stopMessages=onSnapshot(q,snap=>{showMessages(snap,user.uid);chatMessage("চ্যাট চালু আছে।")},e=>chatMessage(errorText(e)));
+ }catch(e){chatMessage(errorText(e))}
+});
+$("sendForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(sending)return;
+ const user=auth.currentUser,text=$("messageInput").value.trim();
+ if(!user){chatMessage("আগে লগইন করুন।");return}
+ if(!text){chatMessage("মেসেজ লিখুন।");return}
+ sending=true;$("sendBtn").disabled=true;
+ try{
+  const convRef=doc(db,"conversations",user.uid);
+  await addDoc(collection(db,"conversations",user.uid,"messages"),{
+   text, senderUid:user.uid, senderRole:"customer", createdAt:serverTimestamp()
+  });
+  await setDoc(convRef,{ownerUid:user.uid,email:user.email||"",updatedAt:serverTimestamp(),lastMessage:text},{merge:true});
+  $("messageInput").value="";chatMessage("মেসেজ পাঠানো হয়েছে।");
+ }catch(e){chatMessage(errorText(e))}
+ finally{sending=false;$("sendBtn").disabled=false}
+});
+</script>
+</body>
+  </html>
