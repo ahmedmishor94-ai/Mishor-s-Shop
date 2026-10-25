@@ -764,5 +764,120 @@ renderProducts();
                                   </script>
 </body>
 </html>
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item">
+    <span>🏠</span>
+    <small>হোম</small>
+  </a>
+
+  <a href="#explore" class="nav-item">
+    <span>🔎</span>
+    <small>এক্সপ্লোর</small>
+  </a>
+
+  <a href="#products" class="nav-item">
+    <span>🛍️</span>
+    <small>দোকান</small>
+  </a>
+
+  <a href="admin-message.html" class="nav-item">
+    <span>💬</span>
+    <small>চ্যাট</small>
+  </a>
+
+  <a href="account.html" class="nav-item">
+    <span>👤</span>
+    <small>অ্যাকাউন্ট</small>
+  </a>
+
+  <button class="nav-item more-button"
+          onclick="toggleMoreMenu()">
+    <span>☰</span>
+    <small>More</small>
+  </button>
+</nav>
+
+<!-- More Menu -->
+<div id="moreMenu" class="more-menu" hidden>
+  <a href="seller-approvals.html">
+    ✅ Seller Approval
+  </a>
+
+  <a href="admin-message.html">
+    ✉️ Admin Message
+  </a>
+
+  <a href="admin-chat.html">
+    💬 Admin Chat
+  </a>
+</div>
+
+<style>
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: white;
+  border-top: 1px solid #ddd;
+  padding: 8px 0;
+  z-index: 999;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #444;
+  text-decoration: none;
+  font-size: 19px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-item small {
+  font-size: 10px;
+}
+
+.more-menu {
+  position: fixed;
+  right: 10px;
+  bottom: 75px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px #0002;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.more-menu a {
+  display: block;
+  padding: 12px;
+  color: #333;
+  text-decoration: none;
+}
+
+.more-menu a:hover {
+  background: #fff0e6;
+}
+
+body {
+  padding-bottom: 75px;
+}
+</style>
+
+<script>
+function toggleMoreMenu() {
+  const menu = document.getElementById("moreMenu");
+  menu.hidden = !menu.hidden;
+}
+</script>
 </body>
  </html>
