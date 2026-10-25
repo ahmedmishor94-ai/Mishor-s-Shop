@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f97316">
+  <title>বিক্রেতা ড্যাশবোর্ড | Mishor's Shop</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      padding: 22px 16px;
+    }
+    header h2 { margin: 0 0 7px; }
+    header p { margin: 0; }
+    main {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 0 14px 30px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px #0000000c;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 13px 0 7px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+      background: white;
+    }
+    textarea { min-height: 95px; resize: vertical; }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 16px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .primary {
+      width: 100%;
+      background: #f97316;
+      color: white;
+      margin-top: 16px;
+    }
+    .secondary { background: #eee; color: #222; }
+    .danger { background: #fee2e2; color: #991b1b; }
+    .notice {
+      padding: 12px;
+      border-radius: 9px;
+      background: #fff7ed;
+      color: #9a3412;
+      line-height: 1.6;
+    }
+    .product {
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+    .product img {
+      width: 100%;
+      max-height: 210px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #f8f8f8;
+    }
+    .muted { color: #666; font-size: 14px; }
+    .hidden { display: none; }
+    #message { line-height: 1.6; overflow-wrap: anywhere; }
+  </style>
+</head>
+
+<body>
+<header>
+  <h2>🛍️ Mishor's Shop</h2>
+  <p>বিক্রেতা ড্যাশবোর্ড</p>
+</header>
+
+<main>
+  <div class="card">
+    <h3>আপনার অ্যাকাউন্ট</h3>
+    <p id="accountInfo">Firebase-এর সঙ্গে সংযোগ করা হচ্ছে...</p>
+    <p id="membershipInfo" class="notice">
+      সদস্যপদের তথ্য যাচাই করা হচ্ছে।
+    </p>
+    <button id="loginBtn" class="secondary hidden">লগইন করুন</button>
+    <button id="logoutBtn" class="secondary hidden">লগআউট</button>
+  </div>
+
+  <div id="formCard" class="card hidden">
+    <h3>➕ নতুন পণ্য যোগ করুন</h3>
+    <p class="muted">
+      জমা দেওয়া পণ্য অ্যাডমিন অনুমোদন না করা পর্যন্ত প্রকাশিত হবে না।
+    </p>
+
+    <form id="productForm">
+      <label for="productName">পণ্যের নাম *</label>
+      <input id="productName" maxlength="100" required
+             placeholder="যেমন: সুন্দর একটি শার্ট">
+
+      <label for="price">দাম (টাকা) *</label>
+      <input id="price" type="number" min="1" max="10000000"
+             step="1" required placeholder="যেমন: 500">
+
+      <label for="category">বিভাগ *</label>
+      <select id="category" required>
+        <option value="">বিভাগ নির্বাচন করো</option>
+        <option value="ফ্যাশন">ফ্যাশন</option>
+        <option value="ইলেকট্রনিক্স">ইলেকট্রনিক্স</option>
+        <option value="জুতা">জুতা</option>
+        <option value="উপহার">উপহার</option>
+        <option value="অন্যান্য">অন্যান্য</option>
+      </select>
+
+      <label for="imageUrl">পণ্যের ছবির লিংক *</label>
+      <input id="imageUrl" type="url" required
+             placeholder="https://example.com/product.jpg">
+      <p class="muted">
+        আপাতত অনলাইনে থাকা ছবির সরাসরি লিংক দিতে হবে।
+        পরে Firebase Storage-এ ছবি আপলোডের ব্যবস্থা যোগ করব।
+      </p>
+
+      <label for="description">পণ্যের বিবরণ *</label>
+      <textarea id="description" maxlength="1500" required
+                placeholder="পণ্যের আকার, রং, বৈশিষ্ট্য ইত্যাদি লিখো"></textarea>
+
+      <button id="submitBtn" class="primary" type="submit">
+        পণ্য জমা দিন
+      </button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>📦 আমার পণ্য</h3>
+    <p class="muted">এখানে তোমার জমা দেওয়া পণ্যের অবস্থা দেখাবে।</p>
+    <div id="myProducts">লোড হচ্ছে...</div>
+  </div>
+
+  <p id="message" role="status" aria-live="polite"></p>
+  <p><a href="index.html">← দোকানের মূল পেজে ফিরে যাও</a></p>
+</main>
+
+<script type="module">
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    query,
+    where,
+    getDocs,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+    authDomain: "mishors-shop-admin.firebaseapp.com",
+    projectId: "mishors-shop-admin",
+    storageBucket: "mishors-shop-admin.firebasestorage.app",
+    messagingSenderId: "828816512879",
+    appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = id => document.getElementById(id);
+
+  let currentUser = null;
+  let sellerProfile = null;
+  let canSubmit = false;
+
+  function message(text, isError = false) {
+    $("message").textContent = text;
+    $("message").style.color = isError ? "#b91c1c" : "#166534";
+  }
+
+  function safeDate(value) {
+    if (!value || typeof value.toDate !== "function") return null;
+    return value.toDate();
+  }
+
+  function showDate(date) {
+    return date ? date.toLocaleDateString("bn-BD") : "নির্ধারিত নয়";
+  }
+
+  function resetPage() {
+    currentUser = null;
+    sellerProfile = null;
+    canSubmit = false;
+    $("accountInfo").textContent = "লগইন করা নেই।";
+    $("membershipInfo").textContent =
+      "বিক্রেতার সদস্যপদের তথ্য দেখতে লগইন করো।";
+    $("formCard").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+    $("loginBtn").classList.remove("hidden");
+    $("myProducts").textContent = "নিজের পণ্য দেখতে লগইন করো।";
+  }
+
+  $("loginBtn").addEventListener("click", () => {
+    window.location.href = "account.html";
+  });
+
+  $("logoutBtn").addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      window.location.href = "account.html";
+    } catch (error) {
+      message("লগআউট করা যায়নি। আবার চেষ্টা করো।", true);
+    }
+  });
+
+  async function loadMyProducts(uid) {
+    $("myProducts").textContent = "পণ্য লোড হচ্ছে...";
+
+    try {
+      const q = query(
+        collection(db, "products"),
+        where("sellerId", "==", uid)
+      );
+      const snapshot = await getDocs(q);
+
+      $("myProducts").replaceChildren();
+
+      if (snapshot.empty) {
+        $("myProducts").textContent = "এখনো কোনো পণ্য জমা দাওনি।";
+        return;
+      }
+
+      snapshot.forEach(productDoc => {
+        const p = productDoc.data();
+        const card = document.createElement("div");
+        card.className = "product";
+
+        const title = document.createElement("h4");
+        title.textContent = p.name || p.title || "নাম দেওয়া হয়নি";
+
+        const price = document.createElement("p");
+        price.textContent = "দাম: ৳" + (p.price ?? "—");
+
+        const status = document.createElement("p");
+        const approved =
+          p.status === "approved" || p.status === "active";
+        status.textContent = "অবস্থা: " +
+          (approved ? "অনুমোদিত" :
+          p.status === "rejected" ? "প্রত্যাখ্যাত" : "অনুমোদনের অপেক্ষায়");
+
+        card.append(title, price, status);
+        $("myProducts").appendChild(card);
+      });
+    } catch (error) {
+      $("myProducts").textContent =
+        "পণ্য দেখানো যাচ্ছে না। Firebase Security Rules ও পণ্যের ডেটা যাচাই করতে হবে।";
+    }
+  }
+
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    canSubmit = false;
+    $("formCard").classList.add("hidden");
+
+    if (!user) {
+      resetPage();
+      return;
+    }
+
+    $("loginBtn").classList.add("hidden");
+    $("logoutBtn").classList.remove("hidden");
+    $("accountInfo").textContent = "লগইন: " + user.email;
+    $("membershipInfo").textContent = "অ্যাকাউন্ট যাচাই হচ্ছে...";
+
+    try {
+      // এই পেজ ধরে নিচ্ছে users/{uid}-তে বিক্রেতার তথ্য থাকবে।
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+
+      if (!userSnap.exists()) {
+        $("membershipInfo").textContent =
+          "বিক্রেতার প্রোফাইল পাওয়া যায়নি। account.html-এর ডেটা কাঠামো মিলিয়ে নিতে হবে।";
+        await loadMyProducts(user.uid);
+        return;
+      }
+
+      sellerProfile = userSnap.data();
+
+      const role = sellerProfile.role;
+      const membershipStatus = sellerProfile.membershipStatus;
+      const expiry = safeDate(sellerProfile.membershipExpiresAt);
+      const now = new Date();
+
+      if (role !== "seller") {
+        $("membershipInfo").textContent =
+          "এই অ্যাকাউন্টটি বিক্রেতা হিসেবে অনুমোদিত নয়।";
+        await loadMyProducts(user.uid);
+        return;
+      }
+
+      if (
+        membershipStatus !== "active" ||
+        !expiry ||
+        expiry <= now
+      ) {
+        $("membershipInfo").textContent =
+          "সদস্যপদ সক্রিয় নয় অথবা মেয়াদ শেষ। বার্ষিক ৳১০০ ফি যাচাই করে অ্যাডমিনকে সদস্যপদ চালু করতে হবে।";
+        await loadMyProducts(user.uid);
+        return;
+      }
+
+      canSubmit = true;
+      $("membershipInfo").textContent =
+        "সদস্যপদ সক্রিয়। মেয়াদ শেষ: " + showDate(expiry);
+      $("formCard").classList.remove("hidden");
+
+      await loadMyProducts(user.uid);
+    } catch (error) {
+      $("membershipInfo").textContent =
+        "অ্যাকাউন্ট যাচাই করা যায়নি। Firebase Rules এবং users প্রোফাইল পরীক্ষা করতে হবে।";
+      message("অ্যাকাউন্ট যাচাই ব্যর্থ হয়েছে।", true);
+    }
+  });
+
+  $("productForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!currentUser || !canSubmit) {
+      message("সক্রিয় সদস্যপদ ছাড়া পণ্য জমা দেওয়া যাবে না।", true);
+      return;
+    }
+
+    const name = $("productName").value.trim();
+    const price = Number($("price").value);
+    const category = $("category").value;
+    const imageUrl = $("imageUrl").value.trim();
+    const description = $("description").value.trim();
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(imageUrl);
+    } catch {
+      message("ছবির সঠিক URL দাও।", true);
+      return;
+    }
+
+    if (
+      !name ||
+      !Number.isSafeInteger(price) ||
+      price < 1 ||
+      price > 10000000 ||
+      !category ||
+      !description ||
+      !["https:", "http:"].includes(parsedUrl.protocol)
+    ) {
+      message("সব তথ্য সঠিকভাবে পূরণ করো।", true);
+      return;
+    }
+
+    $("submitBtn").disabled = true;
+    $("submitBtn").textContent = "জমা হচ্ছে...";
+
+    try {
+      // Firestore Rules-এও sellerId, status ও membership যাচাই আবশ্যক।
+      await addDoc(collection(db, "products"), {
+        name,
+        title: name,
+        price,
+        category,
+        image: imageUrl,
+        imageUrl,
+        description,
+        sellerId: currentUser.uid,
+        sellerEmail: currentUser.email || "",
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      $("productForm").reset();
+      message("পণ্য জমা হয়েছে! অ্যাডমিন অনুমোদনের অপেক্ষায় আছে।");
+      await loadMyProducts(currentUser.uid);
+    } catch (error) {
+      message(
+        "পণ্য জমা হয়নি। Firebase Security Rules, সদস্যপদের তথ্য ও সংযোগ পরীক্ষা করতে হবে।",
+        true
+      );
+    } finally {
+      $("submitBtn").disabled = false;
+      $("submitBtn").textContent = "পণ্য জমা দিন";
+    }
+  });
+</script>
+</body>
+        </html>
