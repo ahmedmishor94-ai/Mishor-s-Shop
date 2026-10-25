@@ -56,8 +56,7 @@
       </select>
 
       <label for="name">তোমার নাম (নতুন অ্যাকাউন্টে)</label>
-      <input id="name" type="text" maxlength="80"
-             placeholder="তোমার নাম">
+      <input id="name" type="text" maxlength="80" placeholder="তোমার নাম">
 
       <label for="role">অ্যাকাউন্টের ধরন</label>
       <select id="role">
@@ -70,8 +69,7 @@
              placeholder="name@example.com" required>
 
       <label for="password">পাসওয়ার্ড</label>
-      <input id="password" type="password"
-             autocomplete="new-password"
+      <input id="password" type="password" autocomplete="current-password"
              minlength="6" placeholder="কমপক্ষে ৬ অক্ষর" required>
 
       <button id="submitBtn">অ্যাকাউন্ট তৈরি করো</button>
@@ -93,8 +91,7 @@
     <div id="message" role="status" aria-live="polite"></div>
     <p class="note">
       নিরাপত্তা: এই পেজ কাউকে Admin বানায় না।
-      বিক্রেতার অনুমোদন Firestore Security Rules দিয়ে
-      সুরক্ষিত করতে হবে।
+      বিক্রেতার অনুমোদন Firestore Security Rules দিয়ে সুরক্ষিত।
     </p>
     <p style="text-align:center"><a href="index.html">← দোকানে ফিরে যাও</a></p>
   </main>
@@ -127,9 +124,10 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
     const $ = id => document.getElementById(id);
+
     let busy = false;
+    let authCheckInProgress = false;
 
     function message(text, success = false) {
       $("message").textContent = text;
@@ -139,27 +137,98 @@
     }
 
     function friendlyError(error) {
+      console.error("Mishor's Shop error:", error);
+
+      const code = error?.code || "";
       const errors = {
-        "auth/email-already-in-use": "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
+        "auth/email-already-in-use":
+          "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
         "auth/invalid-email": "সঠিক ইমেইল ঠিকানা দাও।",
         "auth/weak-password": "আরও শক্তিশালী পাসওয়ার্ড দাও।",
-        "auth/invalid-credential": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
-        "auth/user-not-found": "অ্যাকাউন্ট পাওয়া যায়নি অথবা তথ্য সঠিক নয়।",
-        "auth/wrong-password": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
-        "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
-        "permission-denied": "Firebase অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
-        "unavailable": "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
+        "auth/invalid-credential":
+          "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/user-not-found":
+          "অ্যাকাউন্ট পাওয়া যায়নি অথবা তথ্য সঠিক নয়।",
+        "auth/wrong-password":
+          "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/too-many-requests":
+          "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
+        "permission-denied":
+          "Firestore অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
+        "unavailable":
+          "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
       };
-      return errors[error.code] ||
-        "কাজটি সম্পন্ন হয়নি। ইন্টারনেট ও Firebase সেটিংস পরীক্ষা করো।";
+
+      return errors[code] ||
+        "কাজটি সম্পন্ন হয়নি। ত্রুটির কোড: " +
+        (code || "unknown") +
+        "। ব্রাউজারের Console পরীক্ষা করতে হবে।";
+    }
+
+    // নতুন প্রোফাইলের নিরাপদ ডিফল্ট:
+    // role = buyer; sellerStatus = none.
+    // বিক্রেতার আবেদন শুধু সাইন-আপের সময় pending হয়।
+    async function ensureProfile(user, newName = "") {
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        return snap.data();
+      }
+
+      const name =
+        (newName || user.displayName || user.email || "ব্যবহারকারী")
+          .trim()
+          .slice(0, 80);
+
+      const profile = {
+        uid: user.uid,
+        name,
+        email: user.email,
+        role: "buyer",
+        sellerStatus: "none",
+        createdAt: serverTimestamp()
+      };
+
+      await setDoc(userRef, profile);
+
+      return {
+        uid: user.uid,
+        name,
+        email: user.email,
+        role: "buyer",
+        sellerStatus: "none"
+      };
+    }
+
+    function showProfile(user, profile) {
+      $("accountArea").hidden = true;
+      $("signedIn").hidden = false;
+
+      const name = profile.name || user.displayName || user.email;
+
+      let status = "ক্রেতা";
+
+      if (profile.role === "admin") {
+        status = "অ্যাডমিন";
+      } else if (profile.role === "seller") {
+        status = "অনুমোদিত বিক্রেতা";
+      } else if (profile.sellerStatus === "pending") {
+        status = "বিক্রেতার অনুমোদন অপেক্ষমাণ";
+      }
+
+      $("userInfo").textContent = `${name} — ${status}`;
     }
 
     $("mode").addEventListener("change", () => {
       const signup = $("mode").value === "signup";
+
       $("name").disabled = !signup;
       $("role").disabled = !signup;
-      $("password").autocomplete = signup ? "new-password" : "current-password";
-      $("submitBtn").textContent = signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
+      $("password").autocomplete =
+        signup ? "new-password" : "current-password";
+      $("submitBtn").textContent =
+        signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
       $("message").style.display = "none";
     });
 
@@ -176,10 +245,12 @@
         message("ইমেইল ও পাসওয়ার্ড দাও।");
         return;
       }
+
       if (mode === "signup" && !name) {
         message("তোমার নাম লিখো।");
         return;
       }
+
       if (mode === "signup" && password.length < 6) {
         message("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
         return;
@@ -195,17 +266,31 @@
           );
           const user = credential.user;
 
-          if (name) await updateProfile(user, { displayName: name });
+          if (name) {
+            await updateProfile(user, { displayName: name });
+          }
 
-          // নতুন অ্যাকাউন্টে কখনো admin role দেওয়া হয় না।
-          await setDoc(doc(db, "users", user.uid), {
+          const userRef = doc(db, "users", user.uid);
+
+          // নতুন অ্যাকাউন্টে কখনো admin role দেওয়া হবে না।
+          await setDoc(userRef, {
             uid: user.uid,
-            name: name,
+            name,
             email: user.email,
             role: "buyer",
             sellerStatus: role === "seller" ? "pending" : "none",
             createdAt: serverTimestamp()
           });
+
+          const profile = {
+            uid: user.uid,
+            name,
+            email: user.email,
+            role: "buyer",
+            sellerStatus: role === "seller" ? "pending" : "none"
+          };
+
+          showProfile(user, profile);
 
           message(
             role === "seller"
@@ -214,11 +299,18 @@
             true
           );
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
-          message("লগইন সফল হয়েছে!", true);
+          const credential = await signInWithEmailAndPassword(
+            auth, email, password
+          );
+
+          // পুরোনো লগইন করা অ্যাকাউন্টের প্রোফাইল না থাকলে
+          // অনুমোদিত Firestore Rules মেনে তৈরি করার চেষ্টা।
+          const profile = await ensureProfile(credential.user);
+
+          showProfile(credential.user, profile);
+          message("লগইন সফল হয়েছে এবং প্রোফাইল পরীক্ষা করা হয়েছে।", true);
         }
       } catch (error) {
-        console.error(error);
         message(friendlyError(error));
       } finally {
         busy = false;
@@ -228,13 +320,18 @@
 
     $("resetBtn").addEventListener("click", async () => {
       const email = $("email").value.trim();
+
       if (!email) {
         message("আগে ইমেইল লেখো, তারপর পাসওয়ার্ড রিসেট করো।");
         return;
       }
+
       try {
         await sendPasswordResetEmail(auth, email);
-        message("যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।", true);
+        message(
+          "যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।",
+          true
+        );
       } catch (error) {
         message(friendlyError(error));
       }
@@ -243,6 +340,8 @@
     $("logoutBtn").addEventListener("click", async () => {
       try {
         await signOut(auth);
+        $("accountArea").hidden = false;
+        $("signedIn").hidden = true;
         message("লগআউট সফল হয়েছে।", true);
       } catch (error) {
         message(friendlyError(error));
@@ -250,31 +349,34 @@
     });
 
     onAuthStateChanged(auth, async user => {
-      $("accountArea").hidden = !!user;
-      $("signedIn").hidden = !user;
-
-      if (!user) return;
+      if (authCheckInProgress) return;
+      authCheckInProgress = true;
 
       try {
+        if (!user) {
+          $("accountArea").hidden = false;
+          $("signedIn").hidden = true;
+          return;
+        }
+
+        $("accountArea").hidden = true;
+        $("signedIn").hidden = false;
+        $("userInfo").textContent = "প্রোফাইল পরীক্ষা হচ্ছে…";
+
         const snap = await getDoc(doc(db, "users", user.uid));
+
         if (snap.exists()) {
-          const profile = snap.data();
-          $("userInfo").textContent =
-            `${profile.name || user.email} — ` +
-            (profile.sellerStatus === "pending"
-              ? "বিক্রেতার অনুমোদন অপেক্ষমাণ"
-              : profile.role === "seller"
-              ? "অনুমোদিত বিক্রেতা"
-              : "ক্রেতা");
+          showProfile(user, snap.data());
         } else {
           $("userInfo").textContent =
-            `${user.displayName || user.email} — প্রোফাইল তৈরি হয়নি।`;
+            "প্রোফাইল তৈরি হয়নি। লগইন ফর্ম থেকে আবার লগইন করে চেষ্টা করো।";
         }
       } catch (error) {
-        $("userInfo").textContent =
-          "অ্যাকাউন্টে লগইন হয়েছে, কিন্তু প্রোফাইল পড়া যায়নি।";
+        $("userInfo").textContent = friendlyError(error);
+      } finally {
+        authCheckInProgress = false;
       }
     });
   </script>
 </body>
-  </html>
+</html>
