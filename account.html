@@ -6,41 +6,18 @@
   <title>অ্যাকাউন্ট | Mishor's Shop</title>
   <style>
     * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f3f6fb; color: #172033;
-    }
-    .container {
-      max-width: 440px; margin: 25px auto;
-      background: white; padding: 24px;
-      border-radius: 18px;
-      box-shadow: 0 6px 24px #00000010;
-    }
-    h1 { text-align: center; font-size: 25px; }
-    .subtitle { text-align: center; color: #667085; }
-    label { display: block; margin: 14px 0 6px; }
-    input, select {
-      width: 100%; padding: 13px;
-      border: 1px solid #ccd3df; border-radius: 9px;
-      font-size: 16px; background: white;
-    }
-    button {
-      width: 100%; padding: 13px; margin-top: 14px;
-      border: 0; border-radius: 9px;
-      background: #1769e0; color: white;
-      font-size: 16px; font-weight: bold;
-      cursor: pointer;
-    }
-    button.secondary { background: #e9eff9; color: #17345e; }
-    button:disabled { opacity: .6; }
-    #message {
-      margin-top: 16px; padding: 12px;
-      border-radius: 8px; display: none;
-      overflow-wrap: anywhere;
-    }
-    .note { font-size: 13px; color: #667085; line-height: 1.6; }
-    a { color: #1769e0; }
+    body { margin:0; padding:20px; font-family:Arial,sans-serif; background:#f3f6fb; color:#172033; }
+    .container { max-width:440px; margin:25px auto; background:white; padding:24px; border-radius:18px; box-shadow:0 6px 24px #00000010; }
+    h1 { text-align:center; font-size:25px; }
+    .subtitle { text-align:center; color:#667085; }
+    label { display:block; margin:14px 0 6px; }
+    input,select { width:100%; padding:13px; border:1px solid #ccd3df; border-radius:9px; font-size:16px; background:white; }
+    button { width:100%; padding:13px; margin-top:14px; border:0; border-radius:9px; background:#1769e0; color:white; font-size:16px; font-weight:bold; cursor:pointer; }
+    button.secondary { background:#e9eff9; color:#17345e; }
+    button:disabled { opacity:.6; }
+    #message { margin-top:16px; padding:12px; border-radius:8px; display:none; overflow-wrap:anywhere; }
+    .note { font-size:13px; color:#667085; line-height:1.6; }
+    a { color:#1769e0; }
   </style>
 </head>
 <body>
@@ -65,52 +42,37 @@
       </select>
 
       <label for="email">ইমেইল</label>
-      <input id="email" type="email" autocomplete="email"
-             placeholder="name@example.com" required>
+      <input id="email" type="email" autocomplete="email" placeholder="name@example.com" required>
 
       <label for="password">পাসওয়ার্ড</label>
-      <input id="password" type="password" autocomplete="current-password"
-             minlength="6" placeholder="কমপক্ষে ৬ অক্ষর" required>
+      <input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="কমপক্ষে ৬ অক্ষর" required>
 
       <button id="submitBtn">অ্যাকাউন্ট তৈরি করো</button>
-      <button id="resetBtn" class="secondary" type="button">
-        পাসওয়ার্ড ভুলে গেছ?
-      </button>
+      <button id="resetBtn" class="secondary" type="button">পাসওয়ার্ড ভুলে গেছ?</button>
     </div>
 
     <div id="signedIn" hidden>
       <h3>তুমি লগইন করেছ</h3>
       <p id="userInfo"></p>
-      <p class="note">
-        বিক্রেতার আবেদন Admin অনুমোদন না করা পর্যন্ত
-        বিক্রেতার সুবিধা চালু হবে না।
-      </p>
-      <button id="logoutBtn">লগআউট</button>
+      <p id="sellerInfo" class="note"></p>
+      <button id="applySellerBtn" hidden>বিক্রেতা হওয়ার আবেদন</button>
+      <button id="logoutBtn" class="secondary">লগআউট</button>
     </div>
 
     <div id="message" role="status" aria-live="polite"></div>
-    <p class="note">
-      নিরাপত্তা: এই পেজ কাউকে Admin বানায় না।
-      বিক্রেতার অনুমোদন Firestore Security Rules দিয়ে সুরক্ষিত।
-    </p>
+    <p class="note">নিরাপত্তা: এই পেজ কাউকে Admin বানায় না। বিক্রেতার অনুমোদন Firestore Security Rules দিয়ে সুরক্ষিত।</p>
     <p style="text-align:center"><a href="index.html">← দোকানে ফিরে যাও</a></p>
   </main>
 
   <script type="module">
-    import { initializeApp } from
-      "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
-      getAuth, createUserWithEmailAndPassword,
-      signInWithEmailAndPassword, sendPasswordResetEmail,
-      onAuthStateChanged, signOut, updateProfile
-    } from
-      "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, serverTimestamp
-    } from
-      "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
@@ -125,9 +87,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const $ = id => document.getElementById(id);
-
     let busy = false;
-    let authCheckInProgress = false;
 
     function message(text, success = false) {
       $("message").textContent = text;
@@ -138,176 +98,117 @@
 
     function friendlyError(error) {
       console.error("Mishor's Shop error:", error);
-
       const code = error?.code || "";
       const errors = {
-        "auth/email-already-in-use":
-          "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
+        "auth/email-already-in-use": "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
         "auth/invalid-email": "সঠিক ইমেইল ঠিকানা দাও।",
         "auth/weak-password": "আরও শক্তিশালী পাসওয়ার্ড দাও।",
-        "auth/invalid-credential":
-          "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
-        "auth/user-not-found":
-          "অ্যাকাউন্ট পাওয়া যায়নি অথবা তথ্য সঠিক নয়।",
-        "auth/wrong-password":
-          "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
-        "auth/too-many-requests":
-          "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
-        "permission-denied":
-          "Firestore অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
-        "unavailable":
-          "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
+        "auth/invalid-credential": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/user-not-found": "অ্যাকাউন্ট পাওয়া যায়নি অথবা তথ্য সঠিক নয়।",
+        "auth/wrong-password": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
+        "permission-denied": "Firestore অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
+        "unavailable": "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
       };
-
-      return errors[code] ||
-        "কাজটি সম্পন্ন হয়নি। ত্রুটির কোড: " +
-        (code || "unknown") +
-        "। ব্রাউজারের Console পরীক্ষা করতে হবে।";
+      return errors[code] || "কাজটি সম্পন্ন হয়নি। ত্রুটির কোড: " + (code || "unknown");
     }
 
-    // নতুন প্রোফাইলের নিরাপদ ডিফল্ট:
-    // role = buyer; sellerStatus = none.
-    // বিক্রেতার আবেদন শুধু সাইন-আপের সময় pending হয়।
     async function ensureProfile(user, newName = "") {
       const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
+      if (snap.exists()) return snap.data();
 
-      if (snap.exists()) {
-        return snap.data();
-      }
-
-      const name =
-        (newName || user.displayName || user.email || "ব্যবহারকারী")
-          .trim()
-          .slice(0, 80);
-
+      const name = (newName || user.displayName || user.email || "ব্যবহারকারী").trim().slice(0, 80);
       const profile = {
-        uid: user.uid,
-        name,
-        email: user.email,
-        role: "buyer",
-        sellerStatus: "none",
-        createdAt: serverTimestamp()
+        uid: user.uid, name, email: user.email, role: "buyer",
+        sellerStatus: "none", createdAt: serverTimestamp()
       };
-
       await setDoc(userRef, profile);
-
-      return {
-        uid: user.uid,
-        name,
-        email: user.email,
-        role: "buyer",
-        sellerStatus: "none"
-      };
+      return { uid:user.uid, name, email:user.email, role:"buyer", sellerStatus:"none" };
     }
 
-    function showProfile(user, profile) {
-      $("accountArea").hidden = true;
-      $("signedIn").hidden = false;
-
-      const name = profile.name || user.displayName || user.email;
-
-      let status = "ক্রেতা";
-
-      if (profile.role === "admin") {
-        status = "অ্যাডমিন";
-      } else if (profile.role === "seller") {
-        status = "অনুমোদিত বিক্রেতা";
-      } else if (profile.sellerStatus === "pending") {
-        status = "বিক্রেতার অনুমোদন অপেক্ষমাণ";
+    async function refreshProfile(user) {
+      const profileSnap = await getDoc(doc(db, "users", user.uid));
+      if (!profileSnap.exists()) {
+        $("userInfo").textContent = "প্রোফাইল পাওয়া যায়নি। আবার লগইন করে চেষ্টা করো।";
+        $("sellerInfo").textContent = "";
+        $("applySellerBtn").hidden = true;
+        return;
       }
 
+      const profile = profileSnap.data();
+      const appSnap = await getDoc(doc(db, "sellerApplications", user.uid));
+      const application = appSnap.exists() ? appSnap.data() : null;
+
+      $("accountArea").hidden = true;
+      $("signedIn").hidden = false;
+      const name = profile.name || user.displayName || user.email;
+      let status = "ক্রেতা";
+      if (profile.role === "admin") status = "অ্যাডমিন";
+      else if (profile.role === "seller") status = "অনুমোদিত বিক্রেতা";
+      else if (profile.sellerStatus === "pending" || application?.status === "pending") status = "বিক্রেতার অনুমোদন অপেক্ষমাণ";
+      else if (application?.status === "rejected") status = "বিক্রেতার আবেদন অনুমোদিত হয়নি";
       $("userInfo").textContent = `${name} — ${status}`;
+
+      const isSeller = profile.role === "seller";
+      const isAdmin = profile.role === "admin";
+      const pending = profile.sellerStatus === "pending" || application?.status === "pending";
+      $("applySellerBtn").hidden = isSeller || isAdmin || pending;
+      $("sellerInfo").textContent = isSeller
+        ? "তোমার বিক্রেতা অ্যাকাউন্ট অনুমোদিত।"
+        : isAdmin ? "Admin অ্যাকাউন্ট।"
+        : pending ? "তোমার আবেদন জমা আছে। Admin অনুমোদন না করা পর্যন্ত পণ্য যোগ করা যাবে না."
+        : application?.status === "rejected" ? "আবেদনটি অনুমোদিত হয়নি। প্রয়োজনে Admin-এর সঙ্গে যোগাযোগ করো."
+        : "বিক্রেতা হতে চাইলে নিচের বাটনে আবেদন জমা দাও।";
     }
 
     $("mode").addEventListener("change", () => {
       const signup = $("mode").value === "signup";
-
       $("name").disabled = !signup;
       $("role").disabled = !signup;
-      $("password").autocomplete =
-        signup ? "new-password" : "current-password";
-      $("submitBtn").textContent =
-        signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
+      $("password").autocomplete = signup ? "new-password" : "current-password";
+      $("submitBtn").textContent = signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
       $("message").style.display = "none";
     });
 
     $("submitBtn").addEventListener("click", async () => {
       if (busy) return;
-
       const mode = $("mode").value;
       const name = $("name").value.trim();
       const role = $("role").value;
       const email = $("email").value.trim();
       const password = $("password").value;
-
-      if (!email || !password) {
-        message("ইমেইল ও পাসওয়ার্ড দাও।");
-        return;
-      }
-
-      if (mode === "signup" && !name) {
-        message("তোমার নাম লিখো।");
-        return;
-      }
-
-      if (mode === "signup" && password.length < 6) {
-        message("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
-        return;
-      }
+      if (!email || !password) return message("ইমেইল ও পাসওয়ার্ড দাও।");
+      if (mode === "signup" && !name) return message("তোমার নাম লিখো।");
+      if (mode === "signup" && password.length < 6) return message("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
 
       busy = true;
       $("submitBtn").disabled = true;
-
       try {
         if (mode === "signup") {
-          const credential = await createUserWithEmailAndPassword(
-            auth, email, password
-          );
+          const credential = await createUserWithEmailAndPassword(auth, email, password);
           const user = credential.user;
-
-          if (name) {
-            await updateProfile(user, { displayName: name });
-          }
-
-          const userRef = doc(db, "users", user.uid);
-
-          // নতুন অ্যাকাউন্টে কখনো admin role দেওয়া হবে না।
-          await setDoc(userRef, {
-            uid: user.uid,
-            name,
-            email: user.email,
-            role: "buyer",
+          if (name) await updateProfile(user, { displayName: name });
+          await setDoc(doc(db, "users", user.uid), {
+            uid:user.uid, name, email:user.email, role:"buyer",
             sellerStatus: role === "seller" ? "pending" : "none",
-            createdAt: serverTimestamp()
+            createdAt:serverTimestamp()
           });
-
-          const profile = {
-            uid: user.uid,
-            name,
-            email: user.email,
-            role: "buyer",
-            sellerStatus: role === "seller" ? "pending" : "none"
-          };
-
-          showProfile(user, profile);
-
-          message(
-            role === "seller"
-              ? "অ্যাকাউন্ট তৈরি হয়েছে। বিক্রেতার আবেদন Admin অনুমোদনের অপেক্ষায়।"
-              : "ক্রেতার অ্যাকাউন্ট তৈরি হয়েছে!",
-            true
-          );
+          if (role === "seller") {
+            // Seller application document is separate from the protected user role.
+            await setDoc(doc(db, "sellerApplications", user.uid), {
+              uid:user.uid, name, email:user.email, status:"pending",
+              createdAt:serverTimestamp()
+            });
+          }
+          await refreshProfile(user);
+          message(role === "seller"
+            ? "অ্যাকাউন্ট তৈরি হয়েছে। বিক্রেতার আবেদন Admin অনুমোদনের অপেক্ষায়।"
+            : "ক্রেতার অ্যাকাউন্ট তৈরি হয়েছে!", true);
         } else {
-          const credential = await signInWithEmailAndPassword(
-            auth, email, password
-          );
-
-          // পুরোনো লগইন করা অ্যাকাউন্টের প্রোফাইল না থাকলে
-          // অনুমোদিত Firestore Rules মেনে তৈরি করার চেষ্টা।
-          const profile = await ensureProfile(credential.user);
-
-          showProfile(credential.user, profile);
+          const credential = await signInWithEmailAndPassword(auth, email, password);
+          await ensureProfile(credential.user);
+          await refreshProfile(credential.user);
           message("লগইন সফল হয়েছে এবং প্রোফাইল পরীক্ষা করা হয়েছে।", true);
         }
       } catch (error) {
@@ -318,23 +219,52 @@
       }
     });
 
+    $("applySellerBtn").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return message("আগে লগইন করো।");
+      $("applySellerBtn").disabled = true;
+      try {
+        const profileSnap = await getDoc(doc(db, "users", user.uid));
+        if (!profileSnap.exists()) throw new Error("profile-missing");
+        const profile = profileSnap.data();
+        if (profile.role === "admin" || profile.role === "seller") {
+          await refreshProfile(user);
+          return message("এই অ্যাকাউন্টে বিক্রেতার আবেদন দরকার নেই।", true);
+        }
+
+        const applicationRef = doc(db, "sellerApplications", user.uid);
+        const existing = await getDoc(applicationRef);
+        if (existing.exists() && existing.data().status === "pending") {
+          await refreshProfile(user);
+          return message("তোমার আবেদন আগে থেকেই জমা আছে।", true);
+        }
+        await setDoc(applicationRef, {
+          uid: user.uid,
+          name: profile.name || user.displayName || "ব্যবহারকারী",
+          email: user.email,
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+        await refreshProfile(user);
+        message("বিক্রেতার আবেদন জমা হয়েছে। Admin অনুমোদনের অপেক্ষায় থাকো।", true);
+      } catch (error) {
+        if (error?.code === "permission-denied") {
+          message("আবেদন জমা হয়নি: Firestore Security Rules-এ sellerApplications-এর অনুমতি যোগ করতে হবে।");
+        } else {
+          message(friendlyError(error));
+        }
+      } finally {
+        $("applySellerBtn").disabled = false;
+      }
+    });
+
     $("resetBtn").addEventListener("click", async () => {
       const email = $("email").value.trim();
-
-      if (!email) {
-        message("আগে ইমেইল লেখো, তারপর পাসওয়ার্ড রিসেট করো।");
-        return;
-      }
-
+      if (!email) return message("আগে ইমেইল লেখো, তারপর পাসওয়ার্ড রিসেট করো।");
       try {
         await sendPasswordResetEmail(auth, email);
-        message(
-          "যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।",
-          true
-        );
-      } catch (error) {
-        message(friendlyError(error));
-      }
+        message("যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।", true);
+      } catch (error) { message(friendlyError(error)); }
     });
 
     $("logoutBtn").addEventListener("click", async () => {
@@ -342,39 +272,24 @@
         await signOut(auth);
         $("accountArea").hidden = false;
         $("signedIn").hidden = true;
+        $("applySellerBtn").hidden = true;
         message("লগআউট সফল হয়েছে।", true);
-      } catch (error) {
-        message(friendlyError(error));
-      }
+      } catch (error) { message(friendlyError(error)); }
     });
 
     onAuthStateChanged(auth, async user => {
-      if (authCheckInProgress) return;
-      authCheckInProgress = true;
-
       try {
         if (!user) {
           $("accountArea").hidden = false;
           $("signedIn").hidden = true;
           return;
         }
-
         $("accountArea").hidden = true;
         $("signedIn").hidden = false;
         $("userInfo").textContent = "প্রোফাইল পরীক্ষা হচ্ছে…";
-
-        const snap = await getDoc(doc(db, "users", user.uid));
-
-        if (snap.exists()) {
-          showProfile(user, snap.data());
-        } else {
-          $("userInfo").textContent =
-            "প্রোফাইল তৈরি হয়নি। লগইন ফর্ম থেকে আবার লগইন করে চেষ্টা করো।";
-        }
+        await refreshProfile(user);
       } catch (error) {
         $("userInfo").textContent = friendlyError(error);
-      } finally {
-        authCheckInProgress = false;
       }
     });
   </script>
