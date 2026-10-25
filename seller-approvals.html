@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Approval | Mishor's Shop</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #172033;
+    }
+    header {
+      background: #123b2a;
+      color: white;
+      padding: 20px 16px;
+    }
+    header h1 { margin: 0 0 7px; font-size: 23px; }
+    header p { margin: 0; color: #d9eee1; }
+    main { max-width: 850px; margin: 22px auto; padding: 0 14px; }
+    .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 12px #0000000c;
+    }
+    input {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccd3df;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      padding: 11px 15px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 5px 4px 5px 0;
+    }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .primary { background: #17643f; color: white; }
+    .approve { background: #16834a; color: white; }
+    .reject { background: #c62828; color: white; }
+    .secondary { background: #e8edf4; color: #172033; }
+    .application {
+      border: 1px solid #e1e6ee;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+    .application h3 { margin: 0 0 10px; }
+    .muted { color: #687386; font-size: 14px; }
+    .status { font-weight: bold; }
+    .message { margin: 12px 0; white-space: pre-wrap; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛡️ Seller Approval</h1>
+    <p>Mishor's Shop — বিক্রেতা আবেদন ব্যবস্থাপনা</p>
+  </header>
+
+  <main>
+    <section class="panel" id="loginPanel">
+      <h2>অ্যাডমিন লগইন</h2>
+      <p class="muted">শুধু অনুমোদিত অ্যাডমিন অ্যাকাউন্ট দিয়ে প্রবেশ করো।</p>
+      <form id="loginForm">
+        <input id="email" type="email" placeholder="অ্যাডমিন ইমেইল" required>
+        <input id="password" type="password" placeholder="পাসওয়ার্ড" required>
+        <button class="primary" type="submit">লগইন</button>
+      </form>
+    </section>
+
+    <section class="panel hidden" id="dashboard">
+      <h2>বিক্রেতার আবেদনসমূহ</h2>
+      <p id="adminInfo" class="muted"></p>
+      <button class="primary" id="refreshBtn">আবার লোড করো</button>
+      <button class="secondary" id="logoutBtn">লগআউট</button>
+      <div id="message" class="message"></div>
+      <div id="applications"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // account.html থেকে তোমার আসল Firebase config এখানে বসাও।
+    const firebaseConfig = {
+      apiKey: "PASTE_YOUR_API_KEY",
+      authDomain: "mishors-shop-admin.firebaseapp.com",
+      projectId: "mishors-shop-admin",
+      storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+      messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+      appId: "PASTE_YOUR_APP_ID"
+    };
+
+    const ADMIN_UID = "A2kBB273NcSzQ2naJF2PBrue47k2";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginPanel = document.getElementById("loginPanel");
+    const dashboard = document.getElementById("dashboard");
+    const applications = document.getElementById("applications");
+    const message = document.getElementById("message");
+
+    let busy = false;
+
+    function showMessage(text, isError = false) {
+      message.textContent = text;
+      message.style.color = isError ? "#c62828" : "#17643f";
+    }
+
+    function setLoggedOutView() {
+      loginPanel.classList.remove("hidden");
+      dashboard.classList.add("hidden");
+    }
+
+    function setAdminView(user) {
+      loginPanel.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      document.getElementById("adminInfo").textContent =
+        "অ্যাডমিন হিসেবে লগইন: " + user.email;
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showMessage("");
+
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("email").value.trim(),
+          document.getElementById("password").value
+        );
+
+        if (credential.user.uid !== ADMIN_UID) {
+          await signOut(auth);
+          alert("এই অ্যাকাউন্টের অ্যাডমিন অনুমতি নেই।");
+          return;
+        }
+      } catch (error) {
+        alert("লগইন ব্যর্থ: " + error.message);
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setLoggedOutView();
+        return;
+      }
+
+      if (user.uid !== ADMIN_UID) {
+        await signOut(auth);
+        setLoggedOutView();
+        alert("অনুমতি নেই।");
+        return;
+      }
+
+      setAdminView(user);
+      await loadApplications();
+    });
+
+    async function loadApplications() {
+      applications.replaceChildren();
+      showMessage("আবেদন লোড হচ্ছে...");
+
+      try {
+        const snapshot = await getDocs(collection(db, "sellerApplications"));
+
+        const items = snapshot.docs.map((applicationDoc) => ({
+          id: applicationDoc.id,
+          ...applicationDoc.data()
+        }));
+
+        items.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() ?? 0;
+          const bTime = b.createdAt?.toMillis?.() ?? 0;
+          return bTime - aTime;
+        });
+
+        if (items.length === 0) {
+          showMessage("এখনো কোনো বিক্রেতার আবেদন পাওয়া যায়নি।");
+          return;
+        }
+
+        showMessage("মোট আবেদন: " + items.length);
+
+        for (const item of items) {
+          const card = document.createElement("article");
+          card.className = "application";
+
+          const title = document.createElement("h3");
+          title.textContent = item.name || "নাম দেওয়া হয়নি";
+
+          const email = document.createElement("p");
+          email.textContent = "ইমেইল: " + (item.email || "নেই");
+
+          const uid = document.createElement("p");
+          uid.className = "muted";
+          uid.textContent = "User ID: " + item.id;
+
+          const status = document.createElement("p");
+          status.className = "status";
+          status.textContent =
+            "অবস্থা: " + ({
+              pending: "অপেক্ষমাণ",
+              approved: "অনুমোদিত",
+              rejected: "বাতিল"
+            }[item.status] || item.status || "অজানা");
+
+          card.append(title, email, uid, status);
+
+          if (item.status === "pending") {
+            const approveButton = document.createElement("button");
+            approveButton.className = "approve";
+            approveButton.textContent = "✓ অনুমোদন";
+
+            const rejectButton = document.createElement("button");
+            rejectButton.className = "reject";
+            rejectButton.textContent = "✕ বাতিল";
+
+            approveButton.addEventListener("click", () =>
+              updateApplication(item.id, "approved", card)
+            );
+
+            rejectButton.addEventListener("click", () => {
+              if (confirm("এই বিক্রেতার আবেদন বাতিল করতে চাও?")) {
+                updateApplication(item.id, "rejected", card);
+              }
+            });
+
+            card.append(approveButton, rejectButton);
+          }
+
+          applications.append(card);
+        }
+      } catch (error) {
+        console.error(error);
+        showMessage(
+          "আবেদন লোড করা যায়নি। Firebase config ও Firestore Rules পরীক্ষা করো। " +
+          error.message,
+          true
+        );
+      }
+    }
+
+    async function updateApplication(userId, newStatus, card) {
+      if (busy) return;
+
+      const user = auth.currentUser;
+
+      if (!user || user.uid !== ADMIN_UID) {
+        showMessage("অ্যাডমিন অনুমতি নেই।", true);
+        return;
+      }
+
+      busy = true;
+      card.querySelectorAll("button").forEach(button => button.disabled = true);
+      showMessage("আপডেট করা হচ্ছে...");
+
+      try {
+        // আবেদন ও ব্যবহারকারীর প্রোফাইল একই batch-এ আপডেট হবে।
+        const batch = writeBatch(db);
+
+        batch.update(doc(db, "sellerApplications", userId), {
+          status: newStatus
+        });
+
+        batch.update(doc(db, "users", userId), {
+          role: newStatus === "approved" ? "seller" : "buyer",
+          sellerStatus: newStatus
+        });
+
+        await batch.commit();
+
+        showMessage(
+          newStatus === "approved"
+            ? "বিক্রেতাকে অনুমোদন দেওয়া হয়েছে।"
+            : "বিক্রেতার আবেদন বাতিল করা হয়েছে।"
+        );
+
+        await loadApplications();
+      } catch (error) {
+        console.error(error);
+        showMessage("আপডেট ব্যর্থ: " + error.message, true);
+        card.querySelectorAll("button").forEach(button => button.disabled = false);
+      } finally {
+        busy = false;
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadApplications);
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+    });
+  </script>
+</body>
+        </html>
