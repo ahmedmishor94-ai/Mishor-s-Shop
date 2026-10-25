@@ -197,6 +197,68 @@ footer{
   .search-row select{max-width:125px;font-size:12px}
   .cart-section{padding:12px}
 }
+/* Shikho-স্টাইল নিচের স্থায়ী মেনু */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 9px 5px calc(9px + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 18px #00000010;
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 58px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bottom-nav .nav-icon {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.bottom-nav a.active {
+  color: #d6298b;
+}
+
+.bottom-nav a.active::after {
+  content: "";
+  width: 48px;
+  height: 4px;
+  border-radius: 5px;
+  background: #d6298b;
+  margin-top: 2px;
+}
+
+body {
+  padding-bottom: 100px;
+}
+
+@media (min-width: 700px) {
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(100%, 700px);
+    border: 1px solid #e5e7eb;
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+  }
+  }
 </style>
   <link rel="icon" type="image/png" href="images/mishors-shop-logo.png">
 </head>
@@ -216,31 +278,7 @@ footer{
     </button>
   </div>
 </header>
-<nav style="background:#fff;padding:16px 10px;border-bottom:1px solid #e2e8f0;">
-  <div style="max-width:700px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
 
-    <a href="index.html" style="display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px 8px;background:#087f5b;color:white;border-radius:13px;text-decoration:none;font-size:16px;font-weight:bold;box-shadow:0 3px 8px #0001;">
-      🏠 হোম
-    </a>
-
-    <a href="account.html" style="display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px 8px;background:#e8f5ef;color:#075c43;border-radius:13px;text-decoration:none;font-size:16px;font-weight:bold;">
-      👤 অ্যাকাউন্ট
-    </a>
-
-    <a href="chat.html" style="display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px 8px;background:#e8efff;color:#1746a2;border-radius:13px;text-decoration:none;font-size:16px;font-weight:bold;">
-      💬 কাস্টমার চ্যাট
-    </a>
-
-    <a href="admin.html" style="display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px 8px;background:#fff3d6;color:#805300;border-radius:13px;text-decoration:none;font-size:16px;font-weight:bold;">
-      🛠️ অ্যাডমিন
-    </a>
-
-    <a href="admin-messages.html" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px;background:#f2e8ff;color:#6330a5;border-radius:13px;text-decoration:none;font-size:16px;font-weight:bold;">
-      📨 অ্যাডমিন মেসেজ
-    </a>
-
-  </div>
-</nav>
 
 <main>
   <section class="hero">
