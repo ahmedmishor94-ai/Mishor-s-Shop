@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাকাউন্ট | Mishor's Shop</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb; color: #172033;
+    }
+    .container {
+      max-width: 440px; margin: 25px auto;
+      background: white; padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 6px 24px #00000010;
+    }
+    h1 { text-align: center; font-size: 25px; }
+    .subtitle { text-align: center; color: #667085; }
+    label { display: block; margin: 14px 0 6px; }
+    input, select {
+      width: 100%; padding: 13px;
+      border: 1px solid #ccd3df; border-radius: 9px;
+      font-size: 16px; background: white;
+    }
+    button {
+      width: 100%; padding: 13px; margin-top: 14px;
+      border: 0; border-radius: 9px;
+      background: #1769e0; color: white;
+      font-size: 16px; font-weight: bold;
+      cursor: pointer;
+    }
+    button.secondary { background: #e9eff9; color: #17345e; }
+    button:disabled { opacity: .6; }
+    #message {
+      margin-top: 16px; padding: 12px;
+      border-radius: 8px; display: none;
+      overflow-wrap: anywhere;
+    }
+    .note { font-size: 13px; color: #667085; line-height: 1.6; }
+    a { color: #1769e0; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>🛍️ Mishor's Shop</h1>
+    <p class="subtitle">ক্রেতা ও বিক্রেতার অ্যাকাউন্ট</p>
+
+    <div id="accountArea">
+      <label for="mode">কী করতে চাও?</label>
+      <select id="mode">
+        <option value="signup">নতুন অ্যাকাউন্ট তৈরি</option>
+        <option value="login">আগের অ্যাকাউন্টে লগইন</option>
+      </select>
+
+      <label for="name">তোমার নাম (নতুন অ্যাকাউন্টে)</label>
+      <input id="name" type="text" maxlength="80"
+             placeholder="তোমার নাম">
+
+      <label for="role">অ্যাকাউন্টের ধরন</label>
+      <select id="role">
+        <option value="buyer">ক্রেতা</option>
+        <option value="seller">বিক্রেতা হতে চাই</option>
+      </select>
+
+      <label for="email">ইমেইল</label>
+      <input id="email" type="email" autocomplete="email"
+             placeholder="name@example.com" required>
+
+      <label for="password">পাসওয়ার্ড</label>
+      <input id="password" type="password"
+             autocomplete="new-password"
+             minlength="6" placeholder="কমপক্ষে ৬ অক্ষর" required>
+
+      <button id="submitBtn">অ্যাকাউন্ট তৈরি করো</button>
+      <button id="resetBtn" class="secondary" type="button">
+        পাসওয়ার্ড ভুলে গেছ?
+      </button>
+    </div>
+
+    <div id="signedIn" hidden>
+      <h3>তুমি লগইন করেছ</h3>
+      <p id="userInfo"></p>
+      <p class="note">
+        বিক্রেতার আবেদন Admin অনুমোদন না করা পর্যন্ত
+        বিক্রেতার সুবিধা চালু হবে না।
+      </p>
+      <button id="logoutBtn">লগআউট</button>
+    </div>
+
+    <div id="message" role="status" aria-live="polite"></div>
+    <p class="note">
+      নিরাপত্তা: এই পেজ কাউকে Admin বানায় না।
+      বিক্রেতার অনুমোদন Firestore Security Rules দিয়ে
+      সুরক্ষিত করতে হবে।
+    </p>
+    <p style="text-align:center"><a href="index.html">← দোকানে ফিরে যাও</a></p>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      getAuth, createUserWithEmailAndPassword,
+      signInWithEmailAndPassword, sendPasswordResetEmail,
+      onAuthStateChanged, signOut, updateProfile
+    } from
+      "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore, doc, getDoc, setDoc, serverTimestamp
+    } from
+      "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+      authDomain: "mishors-shop-admin.firebaseapp.com",
+      projectId: "mishors-shop-admin",
+      storageBucket: "mishors-shop-admin.firebasestorage.app",
+      messagingSenderId: "828816512879",
+      appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const $ = id => document.getElementById(id);
+    let busy = false;
+
+    function message(text, success = false) {
+      $("message").textContent = text;
+      $("message").style.display = "block";
+      $("message").style.background = success ? "#e8f8ed" : "#fff0f0";
+      $("message").style.color = success ? "#176534" : "#a32323";
+    }
+
+    function friendlyError(error) {
+      const errors = {
+        "auth/email-already-in-use": "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
+        "auth/invalid-email": "সঠিক ইমেইল ঠিকানা দাও।",
+        "auth/weak-password": "আরও শক্তিশালী পাসওয়ার্ড দাও।",
+        "auth/invalid-credential": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/user-not-found": "অ্যাকাউন্ট পাওয়া যায়নি অথবা তথ্য সঠিক নয়।",
+        "auth/wrong-password": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+        "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
+        "permission-denied": "Firebase অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
+        "unavailable": "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
+      };
+      return errors[error.code] ||
+        "কাজটি সম্পন্ন হয়নি। ইন্টারনেট ও Firebase সেটিংস পরীক্ষা করো।";
+    }
+
+    $("mode").addEventListener("change", () => {
+      const signup = $("mode").value === "signup";
+      $("name").disabled = !signup;
+      $("role").disabled = !signup;
+      $("password").autocomplete = signup ? "new-password" : "current-password";
+      $("submitBtn").textContent = signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
+      $("message").style.display = "none";
+    });
+
+    $("submitBtn").addEventListener("click", async () => {
+      if (busy) return;
+
+      const mode = $("mode").value;
+      const name = $("name").value.trim();
+      const role = $("role").value;
+      const email = $("email").value.trim();
+      const password = $("password").value;
+
+      if (!email || !password) {
+        message("ইমেইল ও পাসওয়ার্ড দাও।");
+        return;
+      }
+      if (mode === "signup" && !name) {
+        message("তোমার নাম লিখো।");
+        return;
+      }
+      if (mode === "signup" && password.length < 6) {
+        message("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
+        return;
+      }
+
+      busy = true;
+      $("submitBtn").disabled = true;
+
+      try {
+        if (mode === "signup") {
+          const credential = await createUserWithEmailAndPassword(
+            auth, email, password
+          );
+          const user = credential.user;
+
+          if (name) await updateProfile(user, { displayName: name });
+
+          // নতুন অ্যাকাউন্টে কখনো admin role দেওয়া হয় না।
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            name: name,
+            email: user.email,
+            role: "buyer",
+            sellerStatus: role === "seller" ? "pending" : "none",
+            createdAt: serverTimestamp()
+          });
+
+          message(
+            role === "seller"
+              ? "অ্যাকাউন্ট তৈরি হয়েছে। বিক্রেতার আবেদন Admin অনুমোদনের অপেক্ষায়।"
+              : "ক্রেতার অ্যাকাউন্ট তৈরি হয়েছে!",
+            true
+          );
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+          message("লগইন সফল হয়েছে!", true);
+        }
+      } catch (error) {
+        console.error(error);
+        message(friendlyError(error));
+      } finally {
+        busy = false;
+        $("submitBtn").disabled = false;
+      }
+    });
+
+    $("resetBtn").addEventListener("click", async () => {
+      const email = $("email").value.trim();
+      if (!email) {
+        message("আগে ইমেইল লেখো, তারপর পাসওয়ার্ড রিসেট করো।");
+        return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        message("যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।", true);
+      } catch (error) {
+        message(friendlyError(error));
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        message("লগআউট সফল হয়েছে।", true);
+      } catch (error) {
+        message(friendlyError(error));
+      }
+    });
+
+    onAuthStateChanged(auth, async user => {
+      $("accountArea").hidden = !!user;
+      $("signedIn").hidden = !user;
+
+      if (!user) return;
+
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+          const profile = snap.data();
+          $("userInfo").textContent =
+            `${profile.name || user.email} — ` +
+            (profile.sellerStatus === "pending"
+              ? "বিক্রেতার অনুমোদন অপেক্ষমাণ"
+              : profile.role === "seller"
+              ? "অনুমোদিত বিক্রেতা"
+              : "ক্রেতা");
+        } else {
+          $("userInfo").textContent =
+            `${user.displayName || user.email} — প্রোফাইল তৈরি হয়নি।`;
+        }
+      } catch (error) {
+        $("userInfo").textContent =
+          "অ্যাকাউন্টে লগইন হয়েছে, কিন্তু প্রোফাইল পড়া যায়নি।";
+      }
+    });
+  </script>
+</body>
+  </html>
