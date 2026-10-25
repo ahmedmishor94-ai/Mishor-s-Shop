@@ -713,31 +713,55 @@ renderProducts();
   💬 Admin-কে মেসেজ করুন
   </a>
 <nav class="bottom-nav" aria-label="প্রধান মেনু">
-  <a href="index.html" class="active">
+  <a href="index.html" data-page="home">
     <span class="nav-icon">🏠</span>
     <span>হোম</span>
   </a>
 
-  <a href="index.html#shop">
+  <a href="index.html#shop" data-page="explore">
     <span class="nav-icon">🧭</span>
     <span>এক্সপ্লোর</span>
   </a>
 
-  <a href="index.html#products">
+  <a href="index.html#products" data-page="shop">
     <span class="nav-icon">🛍️</span>
     <span>দোকান</span>
   </a>
 
-  <a href="chat.html">
+  <a href="chat.html" data-page="chat">
     <span class="nav-icon">💬</span>
     <span>চ্যাট</span>
   </a>
 
-  <a href="account.html">
+  <a href="account.html" data-page="account">
     <span class="nav-icon">👤</span>
     <span>অ্যাকাউন্ট</span>
   </a>
 </nav>
+
+<script>
+(function () {
+  const links = document.querySelectorAll(".bottom-nav a");
+  const currentPage = location.pathname.split("/").pop() || "index.html";
+  const hash = location.hash;
+
+  let activePage = "home";
+
+  if (currentPage === "chat.html") activePage = "chat";
+  else if (currentPage === "account.html") activePage = "account";
+  else if (currentPage === "admin.html" ||
+           currentPage === "admin-messages.html") activePage = "account";
+  else if (hash === "#shop") activePage = "explore";
+  else if (hash === "#products") activePage = "shop";
+
+  links.forEach(link => {
+    const active = link.dataset.page === activePage;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+})();
+                                  </script>
 </body>
 </html>
 </body>
