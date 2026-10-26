@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Admin Payment Verification | Mishor's Shop</title>
+<style>
+body{font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f3f5f9;color:#172033;margin:0;padding:16px}
+main{max-width:750px;margin:20px auto}
+.card{background:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0000000d;overflow-wrap:anywhere}
+h1{font-size:23px}
+h2{font-size:18px}
+input,button{box-sizing:border-box;width:100%;padding:12px;margin-top:9px;border-radius:8px;font-size:15px}
+input{border:1px solid #cbd5e1}
+button{border:0;background:#087f5b;color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.secondary{background:#334155}
+.reject{background:#b91c1c}
+.small{font-size:13px;color:#64748b;line-height:1.6}
+.status{white-space:pre-wrap;line-height:1.6}
+.actions{display:flex;gap:8px}
+.actions button{flex:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+<h1>🛡️ Admin Payment Verification</h1>
+<p>বিক্রেতাদের Nagad সদস্য ফি যাচাই</p>
+<p><b>সদস্য ফি: ৳১০০</b></p>
+<div id="loginBox">
+<form id="loginForm">
+<input id="email" type="email" placeholder="Admin ইমেইল" required>
+<input id="password" type="password" placeholder="পাসওয়ার্ড" required>
+<button type="submit">Admin লগইন</button>
+</form>
+</div>
+<div id="dashboard" hidden>
+<p id="adminInfo"></p>
+<button id="refreshBtn" class="secondary">আবেদন রিফ্রেশ</button>
+<button id="logoutBtn" class="secondary">লগআউট</button>
+</div>
+<p id="message" class="status">Firebase সংযোগ হচ্ছে...</p>
+</div>
+
+<div id="payments"></div>
+
+<div class="card">
+<a href="index.html">← Mishor's Shop-এ ফিরে যাও</a>
+</div>
+</main>
+
+<script type="module">
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {
+getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {
+getFirestore, collection, getDocs, doc, getDoc,
+writeBatch, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+  authDomain: "mishors-shop-admin.firebaseapp.com",
+  projectId: "mishors-shop-admin",
+  storageBucket: "mishors-shop-admin.firebasestorage.app",
+  messagingSenderId: "828816512879",
+  appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
+// তোমার Firebase Admin UID
+const ADMIN_UID = "A2kBB273NcSzQ2naJF2PBrue47k2";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const loginBox = document.getElementById("loginBox");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+const payments = document.getElementById("payments");
+
+function say(text) {
+  message.textContent = text;
+}
+
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function requireAdmin() {
+  if (!auth.currentUser || auth.currentUser.uid !== ADMIN_UID) {
+    throw new Error("ADMIN_ONLY");
+  }
+}
+
+onAuthStateChanged(auth, async user => {
+  payments.replaceChildren();
+
+  if (!user) {
+    loginBox.hidden = false;
+    dashboard.hidden = true;
+    say("Admin অ্যাকাউন্ট দিয়ে লগইন করো।");
+    return;
+  }
+
+  if (user.uid !== ADMIN_UID) {
+    loginBox.hidden = true;
+    dashboard.hidden = true;
+    say("এই অ্যাকাউন্টের Admin অনুমতি নেই। অন্য Admin অ্যাকাউন্ট ব্যবহার করো।");
+    await signOut(auth);
+    return;
+  }
+
+  loginBox.hidden = true;
+  dashboard.hidden = false;
+  document.getElementById("adminInfo").textContent =
+    "Admin হিসেবে লগইন: " + (user.email || user.uid);
+
+  await loadPayments();
+});
+
+document.getElementById("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  say("লগইন হচ্ছে...");
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value.trim(),
+      document.getElementById("password").value
+    );
+  } catch (err) {
+    console.error(err);
+    say("লগইন ব্যর্থ। ইমেইল, পাসওয়ার্ড ও Firebase Auth পরীক্ষা করো।");
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+});
+
+document.getElementById("refreshBtn").addEventListener("click", loadPayments);
+
+async function loadPayments() {
+  try {
+    requireAdmin();
+    say("পেমেন্ট আবেদন লোড হচ্ছে...");
+    payments.replaceChildren();
+
+    const snapshot = await getDocs(collection(db, "sellerPayments"));
+
+    if (snapshot.empty) {
+      say("এখনো কোনো সদস্য ফি-এর আবেদন জমা হয়নি।");
+      return;
+    }
+
+    const rows = snapshot.docs.map(s => ({ id: s.id, ...s.data() }));
+    rows.sort((a,b) => {
+      const at = a.createdAt?.toMillis?.() || 0;
+      const bt = b.createdAt?.toMillis?.() || 0;
+      return bt - at;
+    });
+
+    say("মোট আবেদন: " + rows.length);
+
+    for (const p of rows) {
+      const card = document.createElement("section");
+      card.className = "card";
+
+      const userRef = doc(db, "users", p.uid || p.id);
+      let userData = {};
+
+      try {
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) userData = userSnap.data();
+      } catch (err) {
+        console.error(err);
+      }
+
+      const date = p.createdAt?.toDate
+        ? p.createdAt.toDate().toLocaleString("bn-BD")
+        : "সময় পাওয়া যায়নি";
+
+      card.innerHTML = `
+        <h2>💳 সদস্য ফি আবেদন</h2>
+        <p><b>নাম:</b> ${safe(userData.name || "নাম পাওয়া যায়নি")}</p>
+        <p><b>ইমেইল:</b> ${safe(userData.email || "পাওয়া যায়নি")}</p>
+        <p><b>UID:</b> ${safe(p.uid || p.id)}</p>
+        <p><b>ফি:</b> ৳${safe(p.feeAmount)}</p>
+        <p><b>Transaction ID:</b> ${safe(p.transactionId || "নেই")}</p>
+        <p><b>জমার সময়:</b> ${safe(date)}</p>
+        <p><b>পেমেন্ট অবস্থা:</b> ${safe(p.status)}</p>
+        <p><b>বিক্রেতার অবস্থা:</b> ${safe(userData.sellerStatus || "অজানা")}</p>
+        <p class="small">Nagad লেনদেনের ইতিহাসে Transaction ID ও ৳১০০ মিলিয়ে নাও।</p>
+        <div class="actions">
+          <button data-approve>অনুমোদন</button>
+          <button class="reject" data-reject>বাতিল</button>
+        </div>
+      `;
+
+      const approveBtn = card.querySelector("[data-approve]");
+      const rejectBtn = card.querySelector("[data-reject]");
+
+      if (p.status !== "pending") {
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+      }
+
+      approveBtn.addEventListener("click", () => approvePayment(p, approveBtn, rejectBtn));
+      rejectBtn.addEventListener("click", () => rejectPayment(p, approveBtn, rejectBtn));
+
+      payments.appendChild(card);
+    }
+  } catch (err) {
+    console.error(err);
+    say("আবেদন লোড হয়নি। Admin UID ও Firestore Rules পরীক্ষা করো।");
+  }
+}
+
+async function approvePayment(p, approveBtn, rejectBtn) {
+  if (!confirm("Nagad-এ ৳১০০ পাওয়া নিশ্চিত করেছো? নিশ্চিত হলে অনুমোদন করো।")) return;
+
+  approveBtn.disabled = true;
+  rejectBtn.disabled = true;
+
+  try {
+    requireAdmin();
+
+    const userRef = doc(db, "users", p.uid || p.id);
+    const paymentRef = doc(db, "sellerPayments", p.id);
+
+    const [userSnap, paymentSnap] = await Promise.all([
+      getDoc(userRef), getDoc(paymentRef)
+    ]);
+
+    if (!userSnap.exists() || !paymentSnap.exists()) {
+      throw new Error("MISSING_DOCUMENT");
+    }
+
+    if (paymentSnap.data().status !== "pending") {
+      throw new Error("ALREADY_REVIEWED");
+    }
+
+    if (Number(paymentSnap.data().feeAmount) !== 100 ||
+        !paymentSnap.data().transactionId) {
+      throw new Error("INVALID_PAYMENT_RECORD");
+    }
+
+    const batch = writeBatch(db);
+    batch.update(paymentRef, {
+      status: "approved",
+      reviewedAt: serverTimestamp()
+    });
+    batch.update(userRef, {
+      role: "seller",
+      sellerStatus: "approved"
+    });
+    await batch.commit();
+
+    alert("পেমেন্ট ও বিক্রেতা অনুমোদিত হয়েছে।");
+    await loadPayments();
+  } catch (err) {
+    console.error(err);
+    say("অনুমোদন হয়নি। Firestore Rules বা ডকুমেন্টের অবস্থা পরীক্ষা করো।");
+    approveBtn.disabled = false;
+    rejectBtn.disabled = false;
+  }
+}
+
+async function rejectPayment(p, approveBtn, rejectBtn) {
+  if (!confirm("এই পেমেন্ট আবেদন বাতিল করবে?")) return;
+
+  approveBtn.disabled = true;
+  rejectBtn.disabled = true;
+
+  try {
+    requireAdmin();
+
+    const paymentRef = doc(db, "sellerPayments", p.id);
+    const paymentSnap = await getDoc(paymentRef);
+
+    if (!paymentSnap.exists() ||
+        paymentSnap.data().status !== "pending") {
+      throw new Error("ALREADY_REVIEWED");
+    }
+
+    await updateDoc(paymentRef, {
+      status: "rejected",
+      reviewedAt: serverTimestamp()
+    });
+
+    alert("আবেদন বাতিল করা হয়েছে।");
+    await loadPayments();
+  } catch (err) {
+    console.error(err);
+    say("বাতিল করা যায়নি। Firestore Rules পরীক্ষা করো।");
+    approveBtn.disabled = false;
+    rejectBtn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
