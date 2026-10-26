@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mishor's Shop | Seller Fee</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff7ed;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      max-width: 440px;
+      margin: 30px auto;
+      padding: 22px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px #0001;
+    }
+    h2 { color: #ea580c; }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    input { border: 1px solid #ccc; }
+    button {
+      border: 0;
+      background: #ea580c;
+      color: white;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .6; }
+    #status { white-space: pre-wrap; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>🛍️ বিক্রেতা সদস্য ফি</h2>
+  <p>সদস্য ফি: <b>৳১০০</b></p>
+
+  <p>১. তোমার প্রদর্শিত Nagad ব্যবসায়িক নম্বরে
+  ৳১০০ পাঠাও।</p>
+  <p>২. Transaction ID নিচে লিখে জমা দাও।</p>
+  <p>৩. Admin যাচাই করার পর সিদ্ধান্ত জানাবে।</p>
+
+  <form id="loginForm">
+    <h3>অ্যাকাউন্টে লগইন</h3>
+    <input id="email" type="email"
+      placeholder="তোমার ইমেইল" required>
+    <input id="password" type="password"
+      placeholder="পাসওয়ার্ড" required>
+    <button type="submit">লগইন</button>
+  </form>
+
+  <div id="paymentForm" hidden>
+    <p id="accountInfo"></p>
+    <form id="feeForm">
+      <label for="trx">Nagad Transaction ID</label>
+      <input id="trx" maxlength="120"
+        placeholder="Transaction ID লিখো" required>
+      <button id="submitBtn" type="submit">
+        পেমেন্ট প্রমাণ জমা দাও
+      </button>
+    </form>
+  </div>
+
+  <p id="status" role="status">লোড হচ্ছে...</p>
+  <p><a href="index.html">← দোকানে ফিরে যাও</a></p>
+</div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+  authDomain: "mishors-shop-admin.firebaseapp.com",
+  projectId: "mishors-shop-admin",
+  storageBucket: "mishors-shop-admin.firebasestorage.app",
+  messagingSenderId: "828816512879",
+  appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const status = document.getElementById("status");
+const loginForm = document.getElementById("loginForm");
+const paymentForm = document.getElementById("paymentForm");
+const feeForm = document.getElementById("feeForm");
+const submitBtn = document.getElementById("submitBtn");
+
+let currentUser = null;
+
+function showStatus(message) {
+  status.textContent = message;
+}
+
+onAuthStateChanged(auth, async user => {
+  currentUser = user;
+  loginForm.hidden = !!user;
+  paymentForm.hidden = !user;
+
+  if (!user) {
+    showStatus("Transaction ID জমা দিতে আগে লগইন করো।");
+    return;
+  }
+
+  document.getElementById("accountInfo").textContent =
+    "লগইন করা অ্যাকাউন্ট: " + user.email;
+
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      showStatus("তোমার users ডকুমেন্ট পাওয়া যায়নি। আগে অ্যাকাউন্ট তৈরি করো।");
+      submitBtn.disabled = true;
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    if (userData.sellerStatus === "approved") {
+      showStatus("তোমার বিক্রেতা অ্যাকাউন্ট ইতিমধ্যে অনুমোদিত।");
+      submitBtn.disabled = true;
+      return;
+    }
+
+    const paymentRef = doc(db, "sellerPayments", user.uid);
+    const paymentSnap = await getDoc(paymentRef);
+
+    if (paymentSnap.exists()) {
+      const payment = paymentSnap.data();
+      showStatus(
+        "তোমার সদস্য ফি-এর প্রমাণ আগে জমা হয়েছে।\n" +
+        "বর্তমান অবস্থা: " + payment.status +
+        "\nAdmin-এর যাচাইয়ের জন্য অপেক্ষা করো।"
+      );
+      submitBtn.disabled = true;
+      return;
+    }
+
+    submitBtn.disabled = false;
+    showStatus("লগইন সফল। Transaction ID জমা দিতে পারো।");
+  } catch (error) {
+    console.error(error);
+    showStatus("অ্যাকাউন্ট যাচাই করা যায়নি। Firebase Rules ও লগইন পরীক্ষা করো।");
+    submitBtn.disabled = true;
+  }
+});
+
+loginForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  showStatus("লগইন হচ্ছে...");
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value.trim(),
+      document.getElementById("password").value
+    );
+    showStatus("লগইন সফল।");
+  } catch (error) {
+    console.error(error);
+    showStatus("লগইন হয়নি। ইমেইল, পাসওয়ার্ড ও Firebase Auth পরীক্ষা করো।");
+  }
+});
+
+feeForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentUser) {
+    showStatus("আগে লগইন করো।");
+    return;
+  }
+
+  const transactionId = document.getElementById("trx")
+    .value.trim();
+
+  if (!transactionId) {
+    showStatus("Transaction ID লিখো।");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  showStatus("প্রমাণ জমা হচ্ছে...");
+
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error("USER_PROFILE_MISSING");
+    }
+
+    if (!["none", "pending"].includes(
+      userSnap.data().sellerStatus
+    )) {
+      throw new Error("SELLER_STATUS_NOT_ELIGIBLE");
+    }
+
+    const paymentRef = doc(
+      db, "sellerPayments", currentUser.uid
+    );
+
+    const oldPayment = await getDoc(paymentRef);
+
+    if (oldPayment.exists()) {
+      showStatus("প্রমাণ আগে জমা হয়েছে। Admin-এর যাচাইয়ের অপেক্ষা করো।");
+      return;
+    }
+
+    await setDoc(paymentRef, {
+      uid: currentUser.uid,
+      feeAmount: 100,
+      transactionId: transactionId,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+
+    showStatus(
+      "প্রমাণ সফলভাবে জমা হয়েছে।\n" +
+      "Admin Nagad লেনদেন যাচাই করে সিদ্ধান্ত জানাবে।"
+    );
+    feeForm.reset();
+  } catch (error) {
+    console.error(error);
+    showStatus(
+      "জমা হয়নি। Firebase Rules, অ্যাকাউন্টের অবস্থা " +
+      "ও Transaction ID পরীক্ষা করো।"
+    );
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+  </html>
