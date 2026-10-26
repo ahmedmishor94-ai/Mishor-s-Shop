@@ -7,62 +7,161 @@
 <meta name="description" content="Mishor's Shop — ফ্যাশন, ইলেকট্রনিক্স, জুতা ও প্রয়োজনীয় পণ্য অনলাইনে অর্ডার করুন।">
 <title>Mishor's Shop</title>
 <link rel="icon" type="image/png" href="images/mishors-shop-logo.png">
+
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--dark:#101827;--muted:#64748b;--primary:#087f5b;--primary-dark:#066548;--border:#e2e8f0}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--dark)}
-button,input,select{font:inherit}button{cursor:pointer}
+button,input,select{font:inherit}
+button{cursor:pointer}
 header{background:var(--dark);color:white;padding:17px 16px;position:sticky;top:0;z-index:10;box-shadow:0 3px 15px #0002}
 .topbar{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-size:22px;font-weight:800}.brand span{color:#55e6a5}.tagline{font-size:12px;color:#cbd5e1;margin-top:4px}
+.brand{font-size:22px;font-weight:800}
+.brand span{color:#55e6a5}
+.tagline{font-size:12px;color:#cbd5e1;margin-top:4px}
 .cart-top{border:0;border-radius:12px;background:var(--primary);color:white;padding:11px 13px;font-weight:bold}
 main{max-width:1200px;margin:auto;padding:16px}
 .hero{background:linear-gradient(120deg,#102d26,#087f5b);color:white;padding:28px 22px;border-radius:20px;margin:8px 0 20px;display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center;overflow:hidden}
-.hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 12px}.hero p{line-height:1.7;color:#e2f8ef;margin:0 0 18px}
-.hero img{width:100%;max-height:220px;object-fit:cover;border-radius:15px}.hero-btn{background:white;color:#075c43;border:0;border-radius:10px;padding:12px 16px;font-weight:bold}
-.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.trust div{background:white;border:1px solid var(--border);padding:13px 8px;border-radius:12px;text-align:center;font-size:13px;font-weight:bold}
-.section-title{font-size:22px;margin:22px 0 13px}.search-row{display:flex;gap:9px;margin-bottom:14px}
+.hero h1{font-size:clamp(25px,4vw,42px);margin:0 0 12px}
+.hero p{line-height:1.7;color:#e2f8ef;margin:0 0 18px}
+.hero img{width:100%;max-height:220px;object-fit:cover;border-radius:15px}
+.hero-btn{background:white;color:#075c43;border:0;border-radius:10px;padding:12px 16px;font-weight:bold}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.trust div{background:white;border:1px solid var(--border);padding:13px 8px;border-radius:12px;text-align:center;font-size:13px;font-weight:bold}
+.section-title{font-size:22px;margin:22px 0 13px}
+.search-row{display:flex;gap:9px;margin-bottom:14px}
 .search-row input{width:100%;min-width:0;border:1px solid var(--border);border-radius:12px;padding:13px;background:white}
 .search-row select{border:1px solid var(--border);border-radius:12px;padding:10px;background:white;max-width:145px}
-.categories{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}.cat-btn{white-space:nowrap;border:1px solid var(--border);background:white;border-radius:30px;padding:9px 14px}.cat-btn.active{background:var(--dark);color:white}
-.status{font-size:13px;color:var(--muted);margin:6px 0 12px}.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.categories{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
+.cat-btn{white-space:nowrap;border:1px solid var(--border);background:white;border-radius:30px;padding:9px 14px}
+.cat-btn.active{background:var(--dark);color:white}
+.status{font-size:13px;color:var(--muted);margin:6px 0 12px}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .product{background:white;border:1px solid var(--border);border-radius:15px;overflow:hidden;min-width:0;box-shadow:0 3px 12px #0f172a08;display:flex;flex-direction:column}
-.product-photo{width:100%;height:190px;object-fit:cover;background:#edf2f7;display:block}.product-info{padding:12px;display:flex;flex-direction:column;flex:1}
-.product-name{font-size:15px;font-weight:bold;line-height:1.5;margin-bottom:7px}.category-label{font-size:11px;color:var(--muted);margin-bottom:8px}.price{font-size:19px;font-weight:800;color:var(--primary);margin:0 0 12px}
-.add-btn{width:100%;margin-top:auto;border:0;border-radius:9px;background:var(--primary);color:white;padding:11px 8px;font-weight:bold}.add-btn:hover,.checkout-btn:hover{background:var(--primary-dark)}
+.product-photo{width:100%;height:190px;object-fit:cover;background:#edf2f7;display:block}
+.product-info{padding:12px;display:flex;flex-direction:column;flex:1}
+.product-name{font-size:15px;font-weight:bold;line-height:1.5;margin-bottom:7px}
+.category-label{font-size:11px;color:var(--muted);margin-bottom:8px}
+.price{font-size:19px;font-weight:800;color:var(--primary);margin:0 0 12px}
+.add-btn{width:100%;margin-top:auto;border:0;border-radius:9px;background:var(--primary);color:white;padding:11px 8px;font-weight:bold}
+.add-btn:hover,.checkout-btn:hover{background:var(--primary-dark)}
 .empty{padding:25px;text-align:center;background:white;border-radius:12px;color:var(--muted);grid-column:1/-1}
 .cart-section{margin-top:30px;background:white;border:1px solid var(--border);padding:17px;border-radius:16px}
 .cart-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
-.cart-line-name{font-size:14px;line-height:1.5}.qty-controls{display:flex;align-items:center;gap:8px;white-space:nowrap}
-.qty-controls button{width:29px;height:29px;border:1px solid var(--border);background:#f8fafc;border-radius:7px}.remove-btn{color:#b91c1c}
-.cart-total{font-size:21px;font-weight:800;margin:18px 0}.checkout-btn{width:100%;border:0;border-radius:10px;padding:14px;color:white;background:var(--primary);font-weight:bold}
+.cart-line-name{font-size:14px;line-height:1.5}
+.qty-controls{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.qty-controls button{width:29px;height:29px;border:1px solid var(--border);background:#f8fafc;border-radius:7px}
+.remove-btn{color:#b91c1c}
+.cart-total{font-size:21px;font-weight:800;margin:18px 0}
+.checkout-btn{width:100%;border:0;border-radius:10px;padding:14px;color:white;background:var(--primary);font-weight:bold}
 .clear-btn{width:100%;border:1px solid var(--border);border-radius:10px;padding:11px;background:white;margin-top:8px}
 .notice{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
 footer{text-align:center;background:var(--dark);color:#cbd5e1;padding:25px 15px 115px;margin-top:30px;font-size:13px;line-height:1.8}
 .whatsapp-float{position:fixed;right:16px;bottom:95px;z-index:20;background:#25d366;color:white;text-decoration:none;border-radius:50px;padding:13px 16px;font-weight:bold;box-shadow:0 4px 15px #0003}
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:1000;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:1px solid #e5e7eb;padding:7px 5px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -4px 18px #00000010}
 .bottom-nav a,.bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:58px;color:#94a3b8;text-decoration:none;font-size:11px;font-weight:600;background:transparent;border:0;padding:0}
-.bottom-nav .nav-icon{font-size:23px;line-height:1.2}.bottom-nav .active{color:#d6298b}
+.bottom-nav .nav-icon{font-size:23px;line-height:1.2}
+.bottom-nav .active{color:#d6298b}
 .bottom-nav .active::after{content:"";width:38px;height:3px;border-radius:5px;background:#d6298b;margin-top:1px}
-.more-menu{position:fixed;right:10px;bottom:78px;z-index:1001;min-width:190px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 28px #0002;padding:7px}
-.more-menu[hidden]{display:none}.more-menu a{display:block;padding:12px 10px;color:#263244;text-decoration:none;border-radius:9px;font-size:14px}
-.more-menu a:hover{background:#fff0f7}.menu-backdrop{position:fixed;inset:0;z-index:999;background:#0001}
-@media(max-width:900px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.product-photo{height:170px}}
-@media(max-width:600px){main{padding:11px}header{padding:13px 11px}.brand{font-size:18px}.cart-top{padding:10px;font-size:13px}.hero{grid-template-columns:1fr;padding:22px 16px}.hero img{height:150px}.trust{gap:6px}.trust div{font-size:11px;padding:11px 4px}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product-photo{height:145px}.product-info{padding:9px}.product-name{font-size:14px}.price{font-size:17px}.add-btn{font-size:12px}.search-row select{max-width:125px;font-size:12px}.cart-section{padding:12px}}
-@media(min-width:700px){.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,700px);border:1px solid #e5e7eb;border-bottom:0;border-radius:18px 18px 0 0}}
+.more-menu{position:fixed;right:10px;bottom:78px;z-index:1001;min-width:220px;max-width:calc(100vw - 20px);background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 28px #0002;padding:7px}
+.more-menu[hidden]{display:none}
+.more-menu a{display:block;padding:12px 10px;color:#263244;text-decoration:none;border-radius:9px;font-size:14px}
+.more-menu a:hover{background:#fff0f7}
+.menu-backdrop{position:fixed;inset:0;z-index:999;background:#0001}
+.menu-backdrop[hidden]{display:none}
+@media(max-width:900px){
+.products{grid-template-columns:repeat(3,minmax(0,1fr))}
+.product-photo{height:170px}
+}
+@media(max-width:600px){
+main{padding:11px}
+header{padding:13px 11px}
+.brand{font-size:18px}
+.cart-top{padding:10px;font-size:13px}
+.hero{grid-template-columns:1fr;padding:22px 16px}
+.hero img{height:150px}
+.trust{gap:6px}
+.trust div{font-size:11px;padding:11px 4px}
+.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.product-photo{height:145px}
+.product-info{padding:9px}
+.product-name{font-size:14px}
+.price{font-size:17px}
+.add-btn{font-size:12px}
+.search-row select{max-width:125px;font-size:12px}
+.cart-section{padding:12px}
+}
+@media(min-width:700px){
+.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,700px);border:1px solid #e5e7eb;border-bottom:0;border-radius:18px 18px 0 0}
+}
 body{padding-bottom:90px}
 </style>
 </head>
+
 <body>
-<div style="text-align:center;padding:15px 0"><img src="images/mishors-shop-logo.png" alt="Mishor's Shop Logo" style="width:150px;max-width:45%;height:auto"></div>
-<header><div class="topbar"><div><div class="brand">Mishor's <span>Shop</span></div><div class="tagline">আপনার অনলাইন শপিং সঙ্গী</div></div><button class="cart-top" onclick="goToCart()">🛒 কার্ট (<span id="cartCount">0</span>)</button></div></header>
+
+<div style="text-align:center;padding:15px 0">
+<img src="images/mishors-shop-logo.png" alt="Mishor's Shop Logo" style="width:150px;max-width:45%;height:auto">
+</div>
+
+<header>
+<div class="topbar">
+<div>
+<div class="brand">Mishor's <span>Shop</span></div>
+<div class="tagline">আপনার অনলাইন শপিং সঙ্গী</div>
+</div>
+<button class="cart-top" onclick="goToCart()">🛒 কার্ট (<span id="cartCount">0</span>)</button>
+</div>
+</header>
+
 <main>
-<section class="hero"><div><h1>আপনার পছন্দের পণ্য, এক জায়গায়</h1><p>ফ্যাশন, ইলেকট্রনিক্স, জুতা ও আরও অনেক পণ্য দেখুন। পছন্দ হলে কার্টে যোগ করে WhatsApp-এ অর্ডার করুন।</p><button class="hero-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">🛍️ পণ্য দেখুন</button></div><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80" alt="Shopping store" onerror="this.style.display='none'"></section>
-<section class="trust"><div>📦 সহজ অর্ডার</div><div>💬 WhatsApp যোগাযোগ</div><div>📱 মোবাইল উপযোগী</div></section>
-<section id="shop"><h2 class="section-title">আমাদের পণ্য</h2><div class="search-row"><input id="searchInput" type="search" placeholder="🔎 পণ্যের নাম লিখুন..." oninput="renderProducts()"><select id="sortSelect" onchange="renderProducts()"><option value="default">সাজানো</option><option value="low">দাম: কম আগে</option><option value="high">দাম: বেশি আগে</option><option value="name">নাম অনুযায়ী</option></select></div><div class="categories" id="categories"></div><div class="status" id="firebaseStatus">পণ্য লোড হচ্ছে...</div><div class="products" id="products"></div></section>
-<section class="cart-section" id="cart"><h2 class="section-title" style="margin-top:0">🛒 আপনার কার্ট</h2><div id="cartItems">এখনো কোনো পণ্য যোগ করা হয়নি।</div><div class="cart-total">মোট: ৳<span id="cartTotal">0</span></div><button class="checkout-btn" onclick="checkout()">WhatsApp-এ অর্ডার করুন</button><button class="clear-btn" onclick="clearCart()">কার্ট খালি করুন</button><p class="notice">অর্ডার পাঠানোর পর WhatsApp-এ মেসেজটি দেখে Send চাপুন। ডেলিভারি চার্জ ও পেমেন্টের নিয়ম বিক্রেতার সঙ্গে নিশ্চিত করুন।</p></section>
+<section class="hero">
+<div>
+<h1>আপনার পছন্দের পণ্য, এক জায়গায়</h1>
+<p>ফ্যাশন, ইলেকট্রনিক্স, জুতা ও আরও অনেক পণ্য দেখুন। পছন্দ হলে কার্টে যোগ করে WhatsApp-এ অর্ডার করুন।</p>
+<button class="hero-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">🛍️ পণ্য দেখুন</button>
+</div>
+<img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80" alt="Shopping store" onerror="this.style.display='none'">
+</section>
+
+<section class="trust">
+<div>📦 সহজ অর্ডার</div>
+<div>💬 WhatsApp যোগাযোগ</div>
+<div>📱 মোবাইল উপযোগী</div>
+</section>
+
+<section id="shop">
+<h2 class="section-title">আমাদের পণ্য</h2>
+<div class="search-row">
+<input id="searchInput" type="search" placeholder="🔎 পণ্যের নাম লিখুন..." oninput="renderProducts()">
+<select id="sortSelect" onchange="renderProducts()">
+<option value="default">সাজানো</option>
+<option value="low">দাম: কম আগে</option>
+<option value="high">দাম: বেশি আগে</option>
+<option value="name">নাম অনুযায়ী</option>
+</select>
+</div>
+<div class="categories" id="categories"></div>
+<div class="status" id="firebaseStatus">পণ্য লোড হচ্ছে...</div>
+<div class="products" id="products"></div>
+</section>
+
+<section class="cart-section" id="cart">
+<h2 class="section-title" style="margin-top:0">🛒 আপনার কার্ট</h2>
+<div id="cartItems">এখনো কোনো পণ্য যোগ করা হয়নি।</div>
+<div class="cart-total">মোট: ৳<span id="cartTotal">0</span></div>
+<button class="checkout-btn" onclick="checkout()">WhatsApp-এ অর্ডার করুন</button>
+<button class="clear-btn" onclick="clearCart()">কার্ট খালি করুন</button>
+<p class="notice">অর্ডার পাঠানোর পর WhatsApp-এ মেসেজটি দেখে Send চাপুন। ডেলিভারি চার্জ ও পেমেন্টের নিয়ম বিক্রেতার সঙ্গে নিশ্চিত করুন।</p>
+</section>
 </main>
-<footer><strong>Mishor's Shop</strong><br>অনলাইন শপিং, সহজ অর্ডার<br>অর্ডার ও পণ্য সম্পর্কে জানতে WhatsApp-এ যোগাযোগ করুন।</footer>
+
+<footer>
+<strong>Mishor's Shop</strong><br>
+অনলাইন শপিং, সহজ অর্ডার<br>
+অর্ডার ও পণ্য সম্পর্কে জানতে WhatsApp-এ যোগাযোগ করুন।
+</footer>
+
 <a class="whatsapp-float" href="https://wa.me/8801747036594?text=Assalamu%20Alaikum%2C%20Mishor%27s%20Shop%20Admin" target="_blank" rel="noopener">💬 Admin-কে মেসেজ করুন</a>
 
 <nav class="bottom-nav" aria-label="প্রধান মেনু">
@@ -70,18 +169,17 @@ body{padding-bottom:90px}
 <a href="index.html#shop" data-page="explore"><span class="nav-icon">🧭</span><span>এক্সপ্লোর</span></a>
 <a href="index.html#shop" data-page="shop"><span class="nav-icon">🛍️</span><span>দোকান</span></a>
 <a href="chat.html" data-page="chat"><span class="nav-icon">💬</span><span>চ্যাট</span></a>
-<button type="button" id="moreButton" aria-expanded="false" aria-controls="moreMenu"><span class="nav-icon">☰</span><span>More</span></button>
+<button type="button" id="moreButton" aria-expanded="false" aria-controls="moreMenu">
+<span class="nav-icon">☰</span><span>More</span>
+</button>
 </nav>
+
+<!-- More Tools menu: প্রতিটি ID একবারই থাকবে -->
 <div id="menuBackdrop" class="menu-backdrop" hidden></div>
+
 <div id="moreMenu" class="more-menu" hidden>
-<a href="account.html">👤 অ্যাকাউন্ট</a><div id="menuBackdrop" class="menu-backdrop" hidden></div>
-<div id="moreMenu" class="more-menu" hidden>
-  <a href="account.html">👤 অ্যাকাউন্ট</a>
-  <a href="seller-dashboard.html">🛍️ বিক্রেতা ড্যাশবোর্ড</a>
-  <a href="seller-approvals.html">✅ Seller Approval</a>
-  <a href="admin-message.html">✉️ Admin Message</a>
-  <a href="admin-chat.html">💬 Admin Chat</a>
-</div>
+<a href="account.html">👤 অ্যাকাউন্ট</a>
+<a href="seller-dashboard.html">🛍️ বিক্রেতা ড্যাশবোর্ড</a>
 <a href="seller-approvals.html">✅ Seller Approval</a>
 <a href="admin-message.html">✉️ Admin Message</a>
 <a href="admin-chat.html">💬 Admin Chat</a>
@@ -90,9 +188,20 @@ body{padding-bottom:90px}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",authDomain:"mishors-shop-admin.firebaseapp.com",projectId:"mishors-shop-admin",storageBucket:"mishors-shop-admin.firebasestorage.app",messagingSenderId:"828816512879",appId:"1:828816512879:web:3e297717db9b391f09fa9a"};
+
+const firebaseConfig={
+apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+authDomain:"mishors-shop-admin.firebaseapp.com",
+projectId:"mishors-shop-admin",
+storageBucket:"mishors-shop-admin.firebasestorage.app",
+messagingSenderId:"828816512879",
+appId:"1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
 const WHATSAPP_NUMBER="8801747036594";
-const app=initializeApp(firebaseConfig);const db=getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
 const defaultProducts=[
 {id:"demo_1",name:"স্টাইলিশ ঘড়ি",price:300,category:"Fashion",image:"https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=700&q=80"},
 {id:"demo_2",name:"ওয়্যারলেস হেডফোন",price:500,category:"Electronics",image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"},
@@ -105,36 +214,243 @@ const defaultProducts=[
 {id:"demo_9",name:"স্কিন কেয়ার পণ্য",price:400,category:"Beauty & Personal Care",image:"https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=700&q=80"},
 {id:"demo_10",name:"ঘরের সাজসজ্জা",price:550,category:"Home & Living",image:"https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=700&q=80"},
 {id:"demo_11",name:"স্পোর্টস বল",price:350,category:"Sports",image:"https://images.unsplash.com/photo-1614632537423-1e6c2e7e0b1c?auto=format&fit=crop&w=700&q=80"},
-{id:"demo_12",name:"প্রয়োজনীয় সামগ্রী",price:150,category:"Necessary Products",image:"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80"}];
-const categoryList=[{value:"All",label:"সব পণ্য"},{value:"Fashion",label:"👗 ফ্যাশন"},{value:"Electronics",label:"📱 ইলেকট্রনিক্স"},{value:"Shoes",label:"👟 জুতা"},{value:"Sports",label:"⚽ স্পোর্টস"},{value:"Beauty & Personal Care",label:"🧴 বিউটি"},{value:"Home & Living",label:"🏠 ঘর সাজানো"},{value:"Necessary Products",label:"🛍️ প্রয়োজনীয়"},{value:"Gift",label:"🎁 উপহার"}];
+{id:"demo_12",name:"প্রয়োজনীয় সামগ্রী",price:150,category:"Necessary Products",image:"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80"}
+];
+
+const categoryList=[
+{value:"All",label:"সব পণ্য"},
+{value:"Fashion",label:"👗 ফ্যাশন"},
+{value:"Electronics",label:"📱 ইলেকট্রনিক্স"},
+{value:"Shoes",label:"👟 জুতা"},
+{value:"Sports",label:"⚽ স্পোর্টস"},
+{value:"Beauty & Personal Care",label:"🧴 বিউটি"},
+{value:"Home & Living",label:"🏠 ঘর সাজানো"},
+{value:"Necessary Products",label:"🛍️ প্রয়োজনীয়"},
+{value:"Gift",label:"🎁 উপহার"}
+];
+
 let products=[...defaultProducts],cart={},activeCategory="All";
+
 function safeText(v){return String(v??"")}
-function normalizeCategory(value){const v=safeText(value).trim(),lower=v.toLowerCase();const aliases={"fashion":"Fashion","ফ্যাশন":"Fashion","পোশাক ও ফ্যাশন":"Fashion","electronics":"Electronics","ইলেকট্রনিক্স":"Electronics","shoes":"Shoes","জুতা":"Shoes","sports":"Sports","স্পোর্টস":"Sports","beauty & personal care":"Beauty & Personal Care","beauty":"Beauty & Personal Care","বিউটি":"Beauty & Personal Care","home & living":"Home & Living","home":"Home & Living","ঘর সাজানো":"Home & Living","necessary products":"Necessary Products","necessary":"Necessary Products","প্রয়োজনীয় পণ্য":"Necessary Products","gift":"Gift","উপহার":"Gift"};return aliases[lower]||aliases[v]||v||"Fashion"}
-function money(v){const n=Number(v);return Number.isFinite(n)?n.toLocaleString("en-US"):"0"}
-function escapeHTML(v){return safeText(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
-function renderCategories(){const holder=document.getElementById("categories");holder.innerHTML=categoryList.map(c=>`<button class="cat-btn ${activeCategory===c.value?"active":""}" data-category="${escapeHTML(c.value)}">${escapeHTML(c.label)}</button>`).join("");holder.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{activeCategory=btn.dataset.category;renderCategories();renderProducts()}))}
-function renderProducts(){const search=document.getElementById("searchInput").value.trim().toLowerCase(),sort=document.getElementById("sortSelect").value;let shown=products.filter(p=>safeText(p.name).toLowerCase().includes(search)&&(activeCategory==="All"||normalizeCategory(p.category)===activeCategory));if(sort==="low")shown.sort((a,b)=>Number(a.price)-Number(b.price));if(sort==="high")shown.sort((a,b)=>Number(b.price)-Number(a.price));if(sort==="name")shown.sort((a,b)=>safeText(a.name).localeCompare(safeText(b.name),"bn"));const holder=document.getElementById("products");if(!shown.length){holder.innerHTML='<div class="empty">এই নামে কোনো পণ্য পাওয়া যায়নি।</div>';return}holder.innerHTML=shown.map(p=>{const image=safeText(p.image),safeImage=/^https:\/\//i.test(image)?image:"";return `<article class="product"><img class="product-photo" src="${escapeHTML(safeImage)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x450/f1f5f9/475569?text=Product+Photo';"><div class="product-info"><div class="product-name">${escapeHTML(p.name)}</div><div class="category-label">${escapeHTML(normalizeCategory(p.category))}</div><div class="price">৳${money(p.price)}</div><button class="add-btn" data-add="${escapeHTML(p.id)}">＋ কার্টে যোগ করুন</button></div></article>`}).join("");holder.querySelectorAll("[data-add]").forEach(btn=>btn.addEventListener("click",()=>addToCart(btn.dataset.add)))}
-function addToCart(id){const p=products.find(x=>String(x.id)===String(id));if(!p)return;const key=String(p.id);if(!cart[key])cart[key]={...p,qty:0};cart[key].qty++;renderCart()}
-function changeQty(id,delta){const k=String(id);if(!cart[k])return;cart[k].qty+=delta;if(cart[k].qty<=0)delete cart[k];renderCart()}
-function removeItem(id){delete cart[String(id)];renderCart()}
-function clearCart(){cart={};renderCart()}
-function renderCart(){const items=Object.values(cart),count=items.reduce((s,p)=>s+p.qty,0),total=items.reduce((s,p)=>s+(Number(p.price)||0)*p.qty,0);document.getElementById("cartCount").textContent=count;document.getElementById("cartTotal").textContent=money(total);const holder=document.getElementById("cartItems");if(!items.length){holder.innerHTML='<p class="notice">এখনো কোনো পণ্য যোগ করা হয়নি। পছন্দের পণ্য থেকে “কার্টে যোগ করুন” চাপুন।</p>';return}holder.innerHTML=items.map(p=>`<div class="cart-line"><div class="cart-line-name"><strong>${escapeHTML(p.name)}</strong><br>৳${money(p.price)} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}</div><div class="qty-controls"><button data-minus="${escapeHTML(p.id)}" aria-label="একটি কমান">−</button><strong>${p.qty}</strong><button data-plus="${escapeHTML(p.id)}" aria-label="একটি বাড়ান">＋</button><button class="remove-btn" data-remove="${escapeHTML(p.id)}" aria-label="পণ্য সরান">×</button></div></div>`).join("");holder.querySelectorAll("[data-minus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.minus,-1)));holder.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));holder.querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>removeItem(b.dataset.remove)))}
-function goToCart(){document.getElementById("cart").scrollIntoView({behavior:"smooth"})}
-function checkout(){const items=Object.values(cart);if(!items.length){alert("ভাই, আগে কার্টে অন্তত একটি পণ্য যোগ করুন।");return}const total=items.reduce((s,p)=>s+(Number(p.price)||0)*p.qty,0);let message="🛍️ Mishor's Shop - নতুন অর্ডার\n\n"+items.map((p,i)=>`${i+1}. ${p.name} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}`).join("\n")+`\n\nমোট পণ্যের দাম: ৳${money(total)}\n\nনাম: \nঠিকানা: \nমোবাইল নম্বর: \n\nডেলিভারি চার্জ ও পেমেন্টের নিয়ম নিশ্চিত করুন।`;window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,"_blank","noopener")}
-window.goToCart=goToCart;window.checkout=checkout;window.clearCart=clearCart;
-try{onSnapshot(collection(db,"products"),snapshot=>{const remote=snapshot.docs.map(doc=>{const d=doc.data();return{id:"fb_"+doc.id,name:safeText(d.name||"নতুন পণ্য"),price:Number(d.price)||0,category:normalizeCategory(d.category),image:safeText(d.image||"")}});products=[...defaultProducts,...remote];document.getElementById("firebaseStatus").textContent=remote.length?`Firebase থেকে ${remote.length}টি পণ্য লোড হয়েছে।`:"ডেমো পণ্য দেখানো হচ্ছে। Admin Panel থেকে যোগ করা পণ্য এখানে দেখা যাবে।";renderProducts()},error=>{console.error("Firebase products error:",error);document.getElementById("firebaseStatus").textContent="Firebase পণ্য লোড হয়নি। ডেমো পণ্য দেখানো হচ্ছে।";products=[...defaultProducts];renderProducts()})}catch(error){console.error(error);document.getElementById("firebaseStatus").textContent="Firebase সংযোগে সমস্যা। ডেমো পণ্য দেখানো হচ্ছে।";products=[...defaultProducts];renderProducts()}
-renderCategories();renderCart();renderProducts();
+
+function normalizeCategory(value){
+const v=safeText(value).trim(),lower=v.toLowerCase();
+const aliases={
+"fashion":"Fashion","ফ্যাশন":"Fashion","পোশাক ও ফ্যাশন":"Fashion",
+"electronics":"Electronics","ইলেকট্রনিক্স":"Electronics",
+"shoes":"Shoes","জুতা":"Shoes",
+"sports":"Sports","স্পোর্টস":"Sports",
+"beauty & personal care":"Beauty & Personal Care","beauty":"Beauty & Personal Care","বিউটি":"Beauty & Personal Care",
+"home & living":"Home & Living","home":"Home & Living","ঘর সাজানো":"Home & Living",
+"necessary products":"Necessary Products","necessary":"Necessary Products","প্রয়োজনীয় পণ্য":"Necessary Products",
+"gift":"Gift","উপহার":"Gift"
+};
+return aliases[lower]||aliases[v]||v||"Fashion";
+}
+
+function money(v){
+const n=Number(v);
+return Number.isFinite(n)?n.toLocaleString("en-US"):"0";
+}
+
+function escapeHTML(v){
+return safeText(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+
+function renderCategories(){
+const holder=document.getElementById("categories");
+holder.innerHTML=categoryList.map(c=>`<button class="cat-btn ${activeCategory===c.value?"active":""}" data-category="${escapeHTML(c.value)}">${escapeHTML(c.label)}</button>`).join("");
+holder.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+activeCategory=btn.dataset.category;
+renderCategories();
+renderProducts();
+}));
+}
+
+function renderProducts(){
+const search=document.getElementById("searchInput").value.trim().toLowerCase();
+const sort=document.getElementById("sortSelect").value;
+let shown=products.filter(p=>safeText(p.name).toLowerCase().includes(search)&&(activeCategory==="All"||normalizeCategory(p.category)===activeCategory));
+
+if(sort==="low")shown.sort((a,b)=>Number(a.price)-Number(b.price));
+if(sort==="high")shown.sort((a,b)=>Number(b.price)-Number(a.price));
+if(sort==="name")shown.sort((a,b)=>safeText(a.name).localeCompare(safeText(b.name),"bn"));
+
+const holder=document.getElementById("products");
+if(!shown.length){
+holder.innerHTML='<div class="empty">এই নামে কোনো পণ্য পাওয়া যায়নি।</div>';
+return;
+}
+
+holder.innerHTML=shown.map(p=>{
+const image=safeText(p.image);
+const safeImage=/^https:\/\//i.test(image)?image:"";
+return `<article class="product">
+<img class="product-photo" src="${escapeHTML(safeImage)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x450/f1f5f9/475569?text=Product+Photo';">
+<div class="product-info">
+<div class="product-name">${escapeHTML(p.name)}</div>
+<div class="category-label">${escapeHTML(normalizeCategory(p.category))}</div>
+<div class="price">৳${money(p.price)}</div>
+<button class="add-btn" data-add="${escapeHTML(p.id)}">＋ কার্টে যোগ করুন</button>
+</div></article>`;
+}).join("");
+
+holder.querySelectorAll("[data-add]").forEach(btn=>btn.addEventListener("click",()=>addToCart(btn.dataset.add)));
+}
+
+function addToCart(id){
+const p=products.find(x=>String(x.id)===String(id));
+if(!p)return;
+const key=String(p.id);
+if(!cart[key])cart[key]={...p,qty:0};
+cart[key].qty++;
+renderCart();
+}
+
+function changeQty(id,delta){
+const k=String(id);
+if(!cart[k])return;
+cart[k].qty+=delta;
+if(cart[k].qty<=0)delete cart[k];
+renderCart();
+}
+
+function removeItem(id){
+delete cart[String(id)];
+renderCart();
+}
+
+function clearCart(){
+cart={};
+renderCart();
+}
+
+function renderCart(){
+const items=Object.values(cart);
+const count=items.reduce((s,p)=>s+p.qty,0);
+const total=items.reduce((s,p)=>s+(Number(p.price)||0)*p.qty,0);
+document.getElementById("cartCount").textContent=count;
+document.getElementById("cartTotal").textContent=money(total);
+
+const holder=document.getElementById("cartItems");
+if(!items.length){
+holder.innerHTML='<p class="notice">এখনো কোনো পণ্য যোগ করা হয়নি। পছন্দের পণ্য থেকে “কার্টে যোগ করুন” চাপুন।</p>';
+return;
+}
+
+holder.innerHTML=items.map(p=>`<div class="cart-line">
+<div class="cart-line-name"><strong>${escapeHTML(p.name)}</strong><br>৳${money(p.price)} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}</div>
+<div class="qty-controls">
+<button data-minus="${escapeHTML(p.id)}" aria-label="একটি কমান">−</button>
+<strong>${p.qty}</strong>
+<button data-plus="${escapeHTML(p.id)}" aria-label="একটি বাড়ান">＋</button>
+<button class="remove-btn" data-remove="${escapeHTML(p.id)}" aria-label="পণ্য সরান">×</button>
+</div></div>`).join("");
+
+holder.querySelectorAll("[data-minus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.minus,-1)));
+holder.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));
+holder.querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>removeItem(b.dataset.remove)));
+}
+
+function goToCart(){
+document.getElementById("cart").scrollIntoView({behavior:"smooth"});
+}
+
+function checkout(){
+const items=Object.values(cart);
+if(!items.length){
+alert("ভাই, আগে কার্টে অন্তত একটি পণ্য যোগ করুন।");
+return;
+}
+const total=items.reduce((s,p)=>s+(Number(p.price)||0)*p.qty,0);
+let message="🛍️ Mishor's Shop - নতুন অর্ডার\n\n"+
+items.map((p,i)=>`${i+1}. ${p.name} × ${p.qty} = ৳${money(Number(p.price)*p.qty)}`).join("\n")+
+`\n\nমোট পণ্যের দাম: ৳${money(total)}\n\nনাম: \nঠিকানা: \nমোবাইল নম্বর: \n\nডেলিভারি চার্জ ও পেমেন্টের নিয়ম নিশ্চিত করুন।`;
+window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,"_blank","noopener");
+}
+
+window.goToCart=goToCart;
+window.checkout=checkout;
+window.clearCart=clearCart;
+
+try{
+onSnapshot(collection(db,"products"),snapshot=>{
+const remote=snapshot.docs.map(doc=>{
+const d=doc.data();
+return{
+id:"fb_"+doc.id,
+name:safeText(d.name||"নতুন পণ্য"),
+price:Number(d.price)||0,
+category:normalizeCategory(d.category),
+image:safeText(d.image||"")
+};
+});
+products=[...defaultProducts,...remote];
+document.getElementById("firebaseStatus").textContent=remote.length
+?`Firebase থেকে ${remote.length}টি পণ্য লোড হয়েছে।`
+:"ডেমো পণ্য দেখানো হচ্ছে। Admin Panel থেকে যোগ করা পণ্য এখানে দেখা যাবে।";
+renderProducts();
+},error=>{
+console.error("Firebase products error:",error);
+document.getElementById("firebaseStatus").textContent="Firebase পণ্য লোড হয়নি। ডেমো পণ্য দেখানো হচ্ছে।";
+products=[...defaultProducts];
+renderProducts();
+});
+}catch(error){
+console.error(error);
+document.getElementById("firebaseStatus").textContent="Firebase সংযোগে সমস্যা। ডেমো পণ্য দেখানো হচ্ছে।";
+products=[...defaultProducts];
+renderProducts();
+}
+
+renderCategories();
+renderCart();
+renderProducts();
 </script>
+
 <script>
 (function(){
-const moreButton=document.getElementById("moreButton"),menu=document.getElementById("moreMenu"),backdrop=document.getElementById("menuBackdrop");
-function closeMenu(){menu.hidden=true;backdrop.hidden=true;moreButton.setAttribute("aria-expanded","false")}
-function toggleMenu(){const opening=menu.hidden;menu.hidden=!opening;backdrop.hidden=!opening;moreButton.setAttribute("aria-expanded",String(opening))}
-moreButton.addEventListener("click",toggleMenu);backdrop.addEventListener("click",closeMenu);document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});menu.querySelectorAll("a").forEach(a=>a.addEventListener("click",closeMenu));
-const page=location.pathname.split("/").pop()||"index.html",hash=location.hash;let active="home";
-if(page==="chat.html")active="chat";else if(page==="account.html")active="account";else if(hash==="#shop")active="explore";
-document.querySelectorAll(".bottom-nav [data-page]").forEach(a=>{const isActive=a.dataset.page===active;a.classList.toggle("active",isActive);if(isActive)a.setAttribute("aria-current","page")});
+const moreButton=document.getElementById("moreButton");
+const menu=document.getElementById("moreMenu");
+const backdrop=document.getElementById("menuBackdrop");
+
+function closeMenu(){
+menu.hidden=true;
+backdrop.hidden=true;
+moreButton.setAttribute("aria-expanded","false");
+}
+
+function toggleMenu(){
+const opening=menu.hidden;
+menu.hidden=!opening;
+backdrop.hidden=!opening;
+moreButton.setAttribute("aria-expanded",String(opening));
+}
+
+moreButton.addEventListener("click",toggleMenu);
+backdrop.addEventListener("click",closeMenu);
+
+document.addEventListener("keydown",e=>{
+if(e.key==="Escape")closeMenu();
+});
+
+menu.querySelectorAll("a").forEach(a=>a.addEventListener("click",closeMenu));
+
+const page=location.pathname.split("/").pop()||"index.html";
+const hash=location.hash;
+let active="home";
+
+if(page==="chat.html")active="chat";
+else if(page==="account.html")active="account";
+else if(hash==="#shop")active="explore";
+
+document.querySelectorAll(".bottom-nav [data-page]").forEach(a=>{
+const isActive=a.dataset.page===active;
+a.classList.toggle("active",isActive);
+if(isActive)a.setAttribute("aria-current","page");
+});
 })();
 </script>
+
 </body>
 </html>
