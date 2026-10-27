@@ -403,7 +403,7 @@ $("webOrderForm").addEventListener("submit",async event=>{
   $("orderMessage").textContent=
    "অর্ডার সফলভাবে জমা হয়েছে! অর্ডার নম্বর: "+orderRefs.join(", ")+
    ". ডেলিভারি চার্জ পরে বিক্রেতা নিশ্চিত করবেন।";
-    }}catch(error){
+    }catch(error){
   console.error("Order submission failed:", error);
   $("orderMessage").textContent =
     "অর্ডার জমা হয়নি। Error: " +
