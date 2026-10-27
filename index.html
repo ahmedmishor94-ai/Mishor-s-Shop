@@ -403,10 +403,13 @@ $("webOrderForm").addEventListener("submit",async event=>{
   $("orderMessage").textContent=
    "অর্ডার সফলভাবে জমা হয়েছে! অর্ডার নম্বর: "+orderRefs.join(", ")+
    ". ডেলিভারি চার্জ পরে বিক্রেতা নিশ্চিত করবেন।";
- }catch(error){
-  console.error("Order submission failed:",error);
-  $("orderMessage").textContent=
-   "অর্ডার জমা হয়নি। Firebase Rules-এ orders লেখার অনুমতি নেই বা অন্য কোনো সংযোগ সমস্যা হয়েছে। Rules ঠিক করার পর আবার চেষ্টা করুন।";
+    }}catch(error){
+  console.error("Order submission failed:", error);
+  $("orderMessage").textContent =
+    "অর্ডার জমা হয়নি। Error: " +
+    (error.code || "unknown") +
+    " — " +
+    (error.message || "অজানা সমস্যা");
  }finally{
   submitting=false;
   $("placeOrderBtn").disabled=false;
