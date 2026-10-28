@@ -1,12 +1,13 @@
 {
+  "id": "./",
   "name": "Mishor's Shop",
   "short_name": "Mishor Shop",
-  "description": "Mishor's Shop - অনলাইন কেনাকাটা",
+  "description": "Mishor's Shop — অনলাইনে পণ্য দেখুন এবং অর্ডার করুন।",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#f97316",
+  "background_color": "#f4f6fa",
+  "theme_color": "#101827",
   "orientation": "portrait",
   "icons": [
     {
