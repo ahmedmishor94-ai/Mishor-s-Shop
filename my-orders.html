@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>আমার অর্ডার | Mishor's Shop</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6fa;color:#101827;font-family:Arial,"Noto Sans Bengali",sans-serif}
+header{background:#101827;color:white;padding:18px}
+header a{color:white;text-decoration:none}
+main{max-width:850px;margin:22px auto;padding:0 14px 35px}
+h1{font-size:25px;margin:8px 0}
+.muted{color:#64748b;font-size:14px;line-height:1.7}
+.panel,.order{background:white;border:1px solid #e4e9f1;border-radius:16px;padding:17px;margin:14px 0}
+button{border:0;border-radius:10px;background:#087f5b;color:white;padding:12px 16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6}
+input{display:block;width:100%;padding:12px;margin:8px 0 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+label{font-weight:bold;font-size:14px}
+.order-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.order-id{font-size:13px;color:#64748b;overflow-wrap:anywhere}
+.status{display:inline-block;border-radius:20px;padding:6px 10px;background:#e2e8f0;font-size:12px;font-weight:bold}
+.status.pending{background:#fef3c7;color:#92400e}
+.status.confirmed,.status.processing{background:#dbeafe;color:#1d4ed8}
+.status.shipped{background:#ede9fe;color:#6d28d9}
+.status.delivered{background:#dcfce7;color:#166534}
+.status.cancelled{background:#fee2e2;color:#991b1b}
+.item{padding:10px 0;border-bottom:1px solid #e4e9f1;line-height:1.7}
+.total{font-size:19px;font-weight:bold;color:#087f5b;margin-top:13px}
+.hidden{display:none!important}
+a.link{color:#087f5b}
+</style>
+</head>
+<body>
+<header>
+  <strong><a href="index.html">🛍️ Mishor's Shop</a></strong>
+</header>
+
+<main>
+  <h1>📦 আমার অর্ডার</h1>
+  <p class="muted">তোমার অর্ডার ও অর্ডারের বর্তমান অবস্থা এখানে দেখতে পারবে।</p>
+
+  <section class="panel" id="loginPanel">
+    <h3>অ্যাকাউন্টে লগইন করো</h3>
+    <p class="muted">অর্ডার দেখতে অর্ডার করার সময় ব্যবহৃত অ্যাকাউন্টে লগইন করতে হবে।</p>
+    <button id="loginBtn" type="button">লগইন / অ্যাকাউন্ট খুলুন</button>
+  </section>
+
+  <section class="panel hidden" id="userPanel">
+    <div id="userInfo" class="muted"></div>
+    <button id="refreshBtn" type="button">অর্ডার রিফ্রেশ করো</button>
+    <button id="logoutBtn" type="button" style="background:#475569">লগআউট</button>
+  </section>
+
+  <p id="message" class="muted" role="status" aria-live="polite">লোড হচ্ছে...</p>
+  <section id="orders"></section>
+</main>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+  authDomain: "mishors-shop-admin.firebaseapp.com",
+  projectId: "mishors-shop-admin",
+  storageBucket: "mishors-shop-admin.firebasestorage.app",
+  messagingSenderId: "828816512879",
+  appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let loading = false;
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function money(value) {
+  return (Number(value) || 0).toLocaleString("en-US");
+}
+
+function statusInfo(status) {
+  const statuses = {
+    pending: ["অপেক্ষমাণ", "pending"],
+    confirmed: ["নিশ্চিত", "confirmed"],
+    processing: ["প্রস্তুত করা হচ্ছে", "processing"],
+    shipped: ["পাঠানো হয়েছে", "shipped"],
+    delivered: ["ডেলিভারি সম্পন্ন", "delivered"],
+    cancelled: ["বাতিল", "cancelled"]
+  };
+  return statuses[String(status || "").toLowerCase()]
+    || [String(status || "অবস্থা জানা যায়নি"), ""];
+}
+
+function formatDate(timestamp) {
+  if (!timestamp || typeof timestamp.toDate !== "function") {
+    return "তারিখ পাওয়া যায়নি";
+  }
+  return timestamp.toDate().toLocaleString("bn-BD", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+}
+
+function renderOrders(orders) {
+  if (!orders.length) {
+    $("orders").innerHTML = `
+      <div class="panel">
+        <h3>এখনো কোনো অর্ডার নেই</h3>
+        <p class="muted">পণ্য পছন্দ হলে হোমপেজ থেকে অর্ডার করতে পারো।</p>
+        <a class="link" href="index.html">কেনাকাটা শুরু করো →</a>
+      </div>`;
+    return;
+  }
+
+  $("orders").innerHTML = orders.map(order => {
+    const data = order.data;
+    const [statusLabel, statusClass] = statusInfo(data.status);
+    const items = Array.isArray(data.items) ? data.items : [];
+
+    return `
+      <article class="order">
+        <div class="order-top">
+          <div>
+            <strong>অর্ডার</strong>
+            <div class="order-id">${escapeHTML(order.id)}</div>
+          </div>
+          <span class="status ${statusClass}">
+            ${escapeHTML(statusLabel)}
+          </span>
+        </div>
+
+        <p class="muted">তারিখ: ${escapeHTML(formatDate(data.createdAt))}</p>
+
+        ${items.length ? items.map(item => `
+          <div class="item">
+            <strong>${escapeHTML(item.name || "পণ্য")}</strong><br>
+            দাম: ৳${money(item.price)} ×
+            ${money(item.quantity)} =
+            ৳${money(item.lineTotal ?? (Number(item.price || 0) * Number(item.quantity || 0)))}
+          </div>
+        `).join("") : `<p class="muted">পণ্যের বিস্তারিত নেই।</p>`}
+
+        <div class="total">মোট: ৳${money(data.total ?? data.subtotal)}</div>
+        <p class="muted">ডেলিভারি চার্জ: ৳${money(data.deliveryCharge)}</p>
+      </article>`;
+  }).join("");
+}
+
+async function loadOrders() {
+  if (!currentUser || loading) return;
+
+  loading = true;
+  $("message").textContent = "তোমার অর্ডার লোড হচ্ছে...";
+  $("orders").innerHTML = "";
+  $("refreshBtn").disabled = true;
+
+  try {
+    // শুধু বর্তমান লগইন করা ক্রেতার অর্ডার
+    const ordersQuery = query(
+      collection(db, "orders"),
+      where("buyerId", "==", currentUser.uid)
+    );
+
+    const snapshot = await getDocs(ordersQuery);
+
+    const orders = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      data: docSnap.data()
+    }));
+
+    orders.sort((a, b) => {
+      const timeA = a.data.createdAt?.toMillis?.() || 0;
+      const timeB = b.data.createdAt?.toMillis?.() || 0;
+      return timeB - timeA;
+    });
+
+    renderOrders(orders);
+    $("message").textContent =
+      `তোমার মোট ${orders.length}টি অর্ডার পাওয়া গেছে।`;
+
+  } catch (error) {
+    console.error("Order loading error:", error);
+    $("message").textContent =
+      "অর্ডার লোড হয়নি। ইন্টারনেট ও Firestore Rules পরীক্ষা করো।";
+  } finally {
+    loading = false;
+    $("refreshBtn").disabled = false;
+  }
+}
+
+$("loginBtn").addEventListener("click", () => {
+  location.href = "account.html";
+});
+
+$("refreshBtn").addEventListener("click", loadOrders);
+
+$("logoutBtn").addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    location.reload();
+  } catch (error) {
+    $("message").textContent = "লগআউট হয়নি। আবার চেষ্টা করো।";
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+
+  $("loginPanel").classList.toggle("hidden", !!user);
+  $("userPanel").classList.toggle("hidden", !user);
+
+  if (!user) {
+    $("userInfo").textContent = "";
+    $("orders").innerHTML = "";
+    $("message").textContent = "অর্ডার দেখতে আগে লগইন করো।";
+    return;
+  }
+
+  $("userInfo").textContent =
+    "লগইন করা অ্যাকাউন্ট: " + (user.email || "ইমেইল নেই");
+
+  loadOrders();
+});
+</script>
+</body>
+  </html>
