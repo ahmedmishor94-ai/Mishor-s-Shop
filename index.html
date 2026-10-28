@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
+<meta name="theme-color"<link rel="manifest" href="./manifest.json">
+<meta name="mobile-web-app-capable" content="yes"> content="#101827">
 <meta name="description" content="Mishor's Shop — অনলাইনে পণ্য দেখুন এবং অর্ডার করুন।">
 <title>Mishor's Shop</title>
 <link rel="icon" type="image/png" href="images/mishors-shop-logo.png">
@@ -339,6 +340,15 @@ renderCategories();renderCart();renderProducts();
  const page=location.pathname.split("/").pop()||"index.html",active=page==="chat.html"?"chat":location.hash==="#shop"?"explore":"home";
  document.querySelectorAll(".bottom-nav [data-page]").forEach(a=>{const yes=a.dataset.page===active;a.classList.toggle("active",yes);if(yes)a.setAttribute("aria-current","page")});
 })();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("Mishor's Shop app is ready"))
+      .catch(error => console.error("App setup error:", error));
+  });
+}
 </script>
 </body>
 </html>
