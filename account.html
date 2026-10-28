@@ -1,738 +1,750 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f47721">
-  <title>অ্যাকাউন্ট ও দোকান | Mishor's Shop</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 16px; background: #f4f6fa;
-      color: #172033; font-family: Arial, sans-serif;
-    }
-    .container { max-width: 600px; margin: 18px auto; }
-    .card {
-      background: white; padding: 20px; margin-bottom: 16px;
-      border-radius: 16px; box-shadow: 0 5px 22px #0000000a;
-    }
-    h1, h2, h3 { line-height: 1.4; }
-    h1 { text-align: center; font-size: 25px; margin-top: 5px; }
-    h2 { font-size: 20px; }
-    .sub, .muted { color: #667085; line-height: 1.6; }
-    label { display: block; font-weight: 600; margin: 13px 0 6px; }
-    input, textarea, select {
-      width: 100%; padding: 12px; border: 1px solid #d0d5dd;
-      border-radius: 9px; font-size: 16px; background: white;
-    }
-    textarea { min-height: 90px; resize: vertical; }
-    button, .button {
-      display: inline-block; text-align: center; width: 100%;
-      border: 0; border-radius: 9px; padding: 13px;
-      margin-top: 12px; background: #f47721; color: white;
-      font-size: 15px; font-weight: bold; cursor: pointer;
-      text-decoration: none;
-    }
-    button.secondary { background: #edf1f7; color: #172033; }
-    button:disabled { opacity: .55; cursor: wait; }
-    .hidden { display: none !important; }
-    .notice { padding: 12px; border-radius: 9px; margin: 12px 0;
-      overflow-wrap: anywhere; line-height: 1.6; }
-    .success { background: #e7f8ec; color: #176534; }
-    .error { background: #fff0f0; color: #a32323; }
-    .shop-head { text-align: center; }
-    .avatar {
-      width: 100px; height: 100px; border-radius: 50%;
-      object-fit: cover; background: #edf1f7;
-      border: 1px solid #e2e6ee;
-    }
-    .product-grid {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .product {
-      border: 1px solid #eaecf0; border-radius: 12px;
-      overflow: hidden; min-width: 0;
-    }
-    .product img {
-      width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
-      background: #f2f4f7;
-    }
-    .product-info { padding: 10px; overflow-wrap: anywhere; }
-    .price { color: #e56a12; font-weight: bold; }
-    .small { font-size: 13px; }
-    a { color: #1769e0; overflow-wrap: anywhere; }
-    .top-links { text-align: center; margin: 14px 0; line-height: 2; }
-    @media (max-width: 350px) {
-      body { padding: 8px; }
-      .card { padding: 14px; }
-      .product-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10233f">
+<title>অ্যাকাউন্ট ও দোকান | Mishor's Shop</title>
+<style>
+:root{--navy:#10233f;--yellow:#ffbd27;--bg:#f3f6fb;--ink:#172438;--muted:#65758a;--line:#dce4ef;--green:#119b68}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,Arial,"Noto Sans Bengali",sans-serif}
+header{background:var(--navy);color:#fff;padding:16px;text-align:center}
+header a{color:var(--yellow);text-decoration:none}
+main{max-width:850px;margin:18px auto;padding:0 12px 35px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px;margin:14px 0;box-shadow:0 3px 14px #10233f08}
+h1{font-size:25px;margin:5px 0}
+h2{font-size:21px;margin:0 0 12px}
+h3{font-size:18px}
+p{line-height:1.65}
+label{display:block;font-weight:650;margin:12px 0 5px}
+input,select,textarea{display:block;width:100%;padding:12px;border:1px solid #ccd5e2;border-radius:9px;background:white;font:inherit}
+textarea{min-height:90px;resize:vertical}
+button,.button{display:inline-block;border:0;border-radius:9px;padding:12px 15px;margin-top:10px;background:var(--navy);color:white;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+button.primary{background:var(--yellow);color:var(--navy)}
+button.secondary{background:#e9eff9;color:var(--navy)}
+button.green{background:var(--green);color:white}
+button:disabled{opacity:.55;cursor:not-allowed}
+.full{width:100%}
+.muted,.note{color:var(--muted);font-size:14px;line-height:1.65}
+.status{padding:11px;border-radius:9px;background:#eef3fa;overflow-wrap:anywhere;white-space:pre-wrap}
+.error{background:#fff0f0;color:#a32323}
+.success{background:#e8f8ed;color:#176534}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0;background:#fff}
+.card img{width:100%;height:165px;object-fit:cover;border-radius:9px;background:#f0f3f8}
+.card h3{margin:9px 0 4px;overflow-wrap:anywhere}
+.price{font-weight:800;color:#08784d;font-size:18px}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row>*{flex:1;min-width:120px}
+.toplinks{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:8px}
+.toplinks a{color:#fff}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+@media(max-width:500px){main{padding:0 9px 25px}.panel{padding:13px}.card img{height:140px}}
+</style>
 </head>
 <body>
-<main class="container">
-  <section class="card">
-    <h1>🛍️ Mishor's Shop</h1>
-    <p class="sub" style="text-align:center">
-      নিজের দোকান তৈরি করো, পণ্য দেখাও, ক্রেতার কাছে পৌঁছাও।
-    </p>
-    <div class="top-links">
-      <a href="index.html">হোম</a> ·
-      <a href="account.html?view=shops">সব দোকান</a>
-    </div>
-  </section>
+<header>
+  <h1>🛍️ Mishor's Shop</h1>
+  <div>ক্রেতা ও বিক্রেতার অনলাইন মার্কেটপ্লেস</div>
+  <nav class="toplinks">
+    <a href="index.html">হোম</a>
+    <a href="account.html">অ্যাকাউন্ট</a>
+    <a href="account.html?view=shops">সব দোকান</a>
+  </nav>
+</header>
 
-  <div id="message" class="notice hidden" role="status"
-       aria-live="polite"></div>
+<main>
+  <section id="message" class="status" hidden role="status"></section>
 
   <!-- Public shop directory -->
-  <section id="directory" class="card hidden">
-    <h2>🏪 দোকানগুলো ঘুরে দেখো</h2>
-    <p class="muted">Mishor's Shop-এর বিক্রেতাদের দোকান।</p>
-    <div id="shopList" class="product-grid"></div>
+  <section id="directoryView" class="panel" hidden>
+    <h2>🏪 সব সক্রিয় দোকান</h2>
+    <p class="muted">অনুমোদিত বিক্রেতাদের দোকান দেখো এবং পণ্য বেছে নাও।</p>
+    <button id="reloadDirectory" class="secondary">দোকানের তালিকা রিফ্রেশ</button>
+    <div id="directoryStatus" class="status">দোকান লোড হচ্ছে...</div>
+    <div id="directoryGrid" class="grid"></div>
   </section>
 
-  <!-- Public shop profile -->
-  <section id="publicShop" class="card hidden">
-    <div class="shop-head">
-      <img id="publicLogo" class="avatar" alt="দোকানের ছবি">
-      <h2 id="publicShopName">দোকান</h2>
-      <p id="publicShopDescription" class="muted"></p>
-      <p id="publicShopOwner" class="small muted"></p>
-    </div>
+  <!-- Public individual shop -->
+  <section id="publicShopView" class="panel" hidden>
+    <a href="account.html?view=shops">← সব দোকানে ফিরে যাও</a>
+    <div id="publicShopContent"></div>
     <hr>
-    <h3>এই দোকানের পণ্য</h3>
-    <div id="publicProducts" class="product-grid"></div>
+    <h2>এই দোকানের পণ্য</h2>
+    <div id="publicProductStatus" class="status">পণ্য লোড হচ্ছে...</div>
+    <div id="publicProductGrid" class="grid"></div>
   </section>
 
-  <!-- Authentication -->
-  <section id="authCard" class="card hidden">
+  <!-- Login and registration -->
+  <section id="accountPanel" class="panel">
     <h2>অ্যাকাউন্ট</h2>
-    <label for="mode">কী করতে চাও?</label>
-    <select id="mode">
-      <option value="signup">নতুন অ্যাকাউন্ট তৈরি</option>
-      <option value="login">আগের অ্যাকাউন্টে লগইন</option>
-    </select>
+    <div id="authForm">
+      <label for="mode">কী করতে চাও?</label>
+      <select id="mode">
+        <option value="signup">নতুন অ্যাকাউন্ট তৈরি</option>
+        <option value="login">আগের অ্যাকাউন্টে লগইন</option>
+      </select>
 
-    <div id="signupFields">
       <label for="name">তোমার নাম</label>
-      <input id="name" maxlength="80" autocomplete="name"
-             placeholder="তোমার নাম">
+      <input id="name" maxlength="80" autocomplete="name" placeholder="তোমার নাম">
+
       <label for="role">অ্যাকাউন্টের ধরন</label>
       <select id="role">
         <option value="buyer">ক্রেতা</option>
         <option value="seller">বিক্রেতা হতে চাই</option>
       </select>
+
+      <label for="email">ইমেইল</label>
+      <input id="email" type="email" autocomplete="email" placeholder="name@example.com">
+
+      <label for="password">পাসওয়ার্ড</label>
+      <input id="password" type="password" minlength="6" autocomplete="new-password" placeholder="কমপক্ষে ৬ অক্ষর">
+
+      <button id="submitBtn" class="primary full">অ্যাকাউন্ট তৈরি করো</button>
+      <button id="resetBtn" class="secondary full" type="button">পাসওয়ার্ড ভুলে গেছ?</button>
     </div>
 
-    <label for="email">ইমেইল</label>
-    <input id="email" type="email" autocomplete="email"
-           placeholder="name@example.com">
-
-    <label for="password">পাসওয়ার্ড</label>
-    <input id="password" type="password" minlength="6"
-           autocomplete="new-password" placeholder="কমপক্ষে ৬ অক্ষর">
-
-    <button id="submitBtn">অ্যাকাউন্ট তৈরি করো</button>
-    <button id="resetBtn" class="secondary" type="button">
-      পাসওয়ার্ড ভুলে গেছ?
-    </button>
+    <div id="signedIn" hidden>
+      <h3>তোমার অ্যাকাউন্ট</h3>
+      <p id="userInfo"></p>
+      <p id="sellerInfo" class="note"></p>
+      <button id="applySellerBtn" class="primary full" hidden>বিক্রেতা হওয়ার আবেদন</button>
+      <button id="logoutBtn" class="secondary full">লগআউট</button>
+    </div>
   </section>
 
-  <!-- Signed-in account -->
-  <section id="accountCard" class="card hidden">
-    <h2>তোমার অ্যাকাউন্ট</h2>
-    <p id="userInfo"></p>
-    <p id="sellerInfo" class="muted"></p>
+  <!-- Seller shop editor -->
+  <section id="sellerPanel" class="panel" hidden>
+    <h2>🏪 আমার দোকান</h2>
+    <p class="muted">দোকানের নাম, বিবরণ ও ছবির সরাসরি HTTPS লিংক দাও।</p>
 
-    <button id="applySellerBtn" class="hidden">
-      বিক্রেতা হওয়ার আবেদন
-    </button>
-
-    <button id="shopEditorBtn" class="hidden">
-      আমার দোকান তৈরি / সম্পাদনা
-    </button>
-
-    <a id="viewMyShop" class="button hidden" href="#">
-      আমার দোকান দেখো
-    </a>
-
-    <button id="logoutBtn" class="secondary">লগআউট</button>
-  </section>
-
-  <!-- Seller shop profile editor -->
-  <section id="shopEditor" class="card hidden">
-    <h2>🏪 আমার দোকানের প্রোফাইল</h2>
-    <p class="muted">
-      দোকানের নাম, পরিচিতি ও ছবির লিংক দাও।
-      দোকানের তথ্য ক্রেতারা দেখতে পারবে।
-    </p>
-
-    <label for="shopName">দোকানের নাম *</label>
+    <label for="shopName">দোকানের নাম</label>
     <input id="shopName" maxlength="80" placeholder="যেমন: Mishor Fashion">
 
-    <label for="shopDescription">দোকানের পরিচিতি</label>
-    <textarea id="shopDescription" maxlength="500"
-      placeholder="তোমার দোকানে কী কী পাওয়া যায়?"></textarea>
+    <label for="shopDescription">দোকানের বিবরণ</label>
+    <textarea id="shopDescription" maxlength="500" placeholder="তোমার দোকানে কী ধরনের পণ্য পাওয়া যায়?"></textarea>
 
-    <label for="shopImage">দোকানের ছবির URL</label>
-    <input id="shopImage" type="url" maxlength="1000"
-      placeholder="https://example.com/shop.jpg">
+    <label for="shopImage">দোকানের ছবি/লোগোর HTTPS লিংক (ঐচ্ছিক)</label>
+    <input id="shopImage" type="url" maxlength="1000" placeholder="https://example.com/shop.jpg">
 
-    <button id="saveShopBtn">দোকানের প্রোফাইল সংরক্ষণ</button>
-    <p class="muted small">
-      নিরাপত্তার জন্য কেবল অনুমোদিত বিক্রেতাই দোকানের প্রোফাইল
-      তৈরি বা সম্পাদনা করতে পারবে।
-    </p>
+    <button id="saveShopBtn" class="primary full">দোকানের তথ্য সংরক্ষণ</button>
+    <p id="shopStatus" class="status">দোকানের তথ্য লোড হচ্ছে...</p>
+    <a id="myShopLink" href="#" hidden>আমার দোকান দেখো →</a>
   </section>
 
   <!-- Seller product editor -->
-  <section id="productEditor" class="card hidden">
-    <h2>📦 দোকানে নতুন পণ্য যোগ করো</h2>
+  <section id="productPanel" class="panel" hidden>
+    <h2>➕ নতুন পণ্য যোগ করো</h2>
 
-    <label for="productName">পণ্যের নাম *</label>
-    <input id="productName" maxlength="100" placeholder="পণ্যের নাম">
+    <label for="productName">পণ্যের নাম</label>
+    <input id="productName" maxlength="100" placeholder="যেমন: টি-শার্ট">
 
-    <label for="productPrice">দাম (৳) *</label>
-    <input id="productPrice" type="number" min="1" max="100000000"
-      step="1" placeholder="যেমন: 500">
+    <label for="productPrice">দাম (টাকা)</label>
+    <input id="productPrice" type="number" min="1" max="10000000" step="1" placeholder="500">
+
+    <label for="productImage">পণ্যের ছবির HTTPS লিংক</label>
+    <input id="productImage" type="url" maxlength="1000" placeholder="https://example.com/product.jpg">
 
     <label for="productDescription">পণ্যের বিবরণ</label>
-    <textarea id="productDescription" maxlength="1000"
-      placeholder="পণ্যের বিস্তারিত"></textarea>
+    <textarea id="productDescription" maxlength="1000" placeholder="পণ্যের রং, সাইজ ও অন্যান্য তথ্য"></textarea>
 
-    <label for="productImage">পণ্যের ছবির URL</label>
-    <input id="productImage" type="url" maxlength="1000"
-      placeholder="https://example.com/product.jpg">
+    <button id="addProductBtn" class="primary full">পণ্য যোগ করো</button>
+    <p id="productStatus" class="status">এখানে কাজের অবস্থা দেখাবে।</p>
 
-    <button id="addProductBtn">পণ্য যোগ করো</button>
-
-    <h3>আমার যোগ করা পণ্য</h3>
-    <div id="myProducts" class="product-grid"></div>
+    <hr>
+    <h2>আমার যোগ করা পণ্য</h2>
+    <div id="myProductsStatus" class="status">পণ্য লোড হচ্ছে...</div>
+    <div id="myProductsGrid" class="grid"></div>
   </section>
 
-  <section class="card">
-    <p class="muted small">
-      নিরাপত্তা: এই পেজ থেকে কেউ নিজেকে Admin বা অনুমোদিত বিক্রেতা
-      বানাতে পারবে না। Firebase Security Rules-এও অনুমতি যাচাই করতে হবে।
-    </p>
-    <p style="text-align:center"><a href="index.html">← হোম পেজে ফিরে যাও</a></p>
-  </section>
+  <p class="note">নিরাপত্তা: বিক্রেতার অনুমোদন ও ডেটা পরিবর্তনের অনুমতি Firestore Security Rules নিয়ন্ত্রণ করে। শুধু এই পেজে বাটন লুকিয়ে রাখাই নিরাপত্তা নয়।</p>
+  <p style="text-align:center"><a href="index.html">← Mishor's Shop হোমপেজে ফিরে যাও</a></p>
 </main>
 
 <script type="module">
-  import { initializeApp, getApp, getApps }
-    from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getAuth, createUserWithEmailAndPassword,
-    signInWithEmailAndPassword, sendPasswordResetEmail,
-    onAuthStateChanged, signOut, updateProfile
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import {
-    getFirestore, doc, getDoc, setDoc, getDocs, addDoc,
-    collection, query, where, limit, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, addDoc, collection, query,
+  where, getDocs, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
-    authDomain: "mishors-shop-admin.firebaseapp.com",
-    projectId: "mishors-shop-admin",
-    storageBucket: "mishors-shop-admin.firebasestorage.app",
-    messagingSenderId: "828816512879",
-    appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
+  authDomain: "mishors-shop-admin.firebaseapp.com",
+  projectId: "mishors-shop-admin",
+  storageBucket: "mishors-shop-admin.firebasestorage.app",
+  messagingSenderId: "828816512879",
+  appId: "1:828816512879:web:3e297717db9b391f09fa9a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+
+let busy = false;
+let currentProfile = null;
+let currentShop = null;
+let currentShopId = null;
+
+function showMessage(text, type = "info") {
+  const el = $("message");
+  el.textContent = text;
+  el.hidden = false;
+  el.className = "status" + (type === "error" ? " error" : type === "success" ? " success" : "");
+}
+
+function setStatus(id, text, type = "info") {
+  const el = $(id);
+  el.textContent = text;
+  el.className = "status" + (type === "error" ? " error" : type === "success" ? " success" : "");
+}
+
+function friendlyError(error) {
+  console.error("Mishor's Shop:", error);
+  const code = error?.code || "";
+  const errors = {
+    "auth/email-already-in-use": "এই ইমেইলে আগে অ্যাকাউন্ট আছে। লগইন করো।",
+    "auth/invalid-email": "সঠিক ইমেইল ঠিকানা দাও।",
+    "auth/weak-password": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।",
+    "auth/invalid-credential": "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।",
+    "auth/user-not-found": "অ্যাকাউন্ট পাওয়া যায়নি।",
+    "auth/wrong-password": "পাসওয়ার্ড সঠিক নয়।",
+    "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
+    "permission-denied": "Firestore অনুমতি দেয়নি। Security Rules পরীক্ষা করতে হবে।",
+    "unavailable": "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
   };
+  return errors[code] || "কাজটি সম্পন্ন হয়নি। ত্রুটি: " + (code || error?.message || "unknown");
+}
 
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const $ = id => document.getElementById(id);
+function safeImage(url) {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" ? value : "";
+  } catch {
+    return "";
+  }
+}
 
-  let busy = false;
-  let currentProfile = null;
-  const params = new URLSearchParams(location.search);
-  const shopId = params.get("shop");
-  const directoryMode = params.get("view") === "shops";
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[ch]));
+}
 
-  function showMessage(text, success = false) {
-    const el = $("message");
-    el.textContent = text;
-    el.className = "notice " + (success ? "success" : "error");
-    el.classList.remove("hidden");
+function money(value) {
+  return "৳ " + Number(value || 0).toLocaleString("en-US");
+}
+
+async function ensureProfile(user, newName = "") {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) return snap.data();
+
+  const name = (newName || user.displayName || user.email || "ব্যবহারকারী").trim().slice(0, 80);
+  const profile = {
+    uid: user.uid,
+    name,
+    email: user.email || "",
+    role: "buyer",
+    sellerStatus: "none",
+    createdAt: serverTimestamp()
+  };
+  await setDoc(ref, profile);
+  return profile;
+}
+
+async function refreshProfile(user) {
+  const profileSnap = await getDoc(doc(db, "users", user.uid));
+  if (!profileSnap.exists()) {
+    $("userInfo").textContent = "প্রোফাইল পাওয়া যায়নি। আবার লগইন করে চেষ্টা করো।";
+    return;
   }
 
-  function errorMessage(error) {
-    console.error("Mishor's Shop:", error);
-    const code = error?.code || "";
-    const messages = {
-      "auth/email-already-in-use": "এই ইমেইলে অ্যাকাউন্ট আছে। লগইন করো।",
-      "auth/invalid-email": "সঠিক ইমেইল দাও।",
-      "auth/weak-password": "আরও শক্তিশালী পাসওয়ার্ড দাও।",
-      "auth/invalid-credential": "ইমেইল বা পাসওয়ার্ড সঠিক নয়।",
-      "auth/too-many-requests": "অনেকবার চেষ্টা হয়েছে। পরে আবার চেষ্টা করো।",
-      "permission-denied": "Firebase Security Rules অনুমতি দেয়নি।",
-      "unavailable": "ইন্টারনেট বা Firebase সংযোগ পরীক্ষা করো।"
-    };
-    return messages[code] || ("কাজটি সম্পন্ন হয়নি। ত্রুটি: " + (code || "unknown"));
-  }
-
-  function safeImage(url) {
-    if (typeof url !== "string") return "";
-    try {
-      const parsed = new URL(url);
-      return parsed.protocol === "https:" ? parsed.href : "";
-    } catch {
-      return "";
-    }
-  }
-
-  function setImage(img, url) {
-    const valid = safeImage(url);
-    if (valid) {
-      img.src = valid;
-      img.onerror = () => {
-        img.removeAttribute("src");
-        img.onerror = null;
-      };
-    } else {
-      img.removeAttribute("src");
-    }
-  }
-
-  function makeProductCard(product, id) {
-    const card = document.createElement("article");
-    card.className = "product";
-
-    const img = document.createElement("img");
-    img.alt = product.name || "পণ্য";
-    img.loading = "lazy";
-    setImage(img, product.imageUrl);
-
-    const info = document.createElement("div");
-    info.className = "product-info";
-
-    const title = document.createElement("strong");
-    title.textContent = product.name || "নামহীন পণ্য";
-
-    const price = document.createElement("p");
-    price.className = "price";
-    price.textContent = "৳" + Number(product.price || 0).toLocaleString("en-BD");
-
-    const desc = document.createElement("p");
-    desc.className = "small muted";
-    desc.textContent = product.description || "";
-
-    info.append(title, price, desc);
-
-    if (id) {
-      const link = document.createElement("a");
-      link.href = "account.html?shop=" + encodeURIComponent(product.sellerId || "");
-      link.textContent = "দোকান দেখো";
-      link.className = "small";
-      info.appendChild(link);
-    }
-
-    card.append(img, info);
-    return card;
-  }
-
-  async function getUserProfile(user) {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) return snap.data();
-
-    const profile = {
-      uid: user.uid,
-      name: user.displayName || user.email || "ব্যবহারকারী",
-      email: user.email || "",
-      role: "buyer",
-      sellerStatus: "none",
-      createdAt: serverTimestamp()
-    };
-    await setDoc(ref, profile);
-    return profile;
-  }
-
-  async function loadDirectory() {
-    $("directory").classList.remove("hidden");
-    $("authCard").classList.add("hidden");
-    $("accountCard").classList.add("hidden");
-
-    try {
-      const snap = await getDocs(
-        query(collection(db, "shops"), limit(60))
-      );
-      const list = $("shopList");
-      list.replaceChildren();
-
-      if (snap.empty) {
-        list.textContent = "এখনো কোনো দোকান তৈরি হয়নি।";
-        return;
-      }
-
-      snap.forEach(item => {
-        const shop = item.data();
-        if (shop.status !== "active") return;
-
-        const card = document.createElement("article");
-        card.className = "product";
-
-        const img = document.createElement("img");
-        img.alt = shop.shopName || "দোকান";
-        img.loading = "lazy";
-        setImage(img, shop.imageUrl);
-
-        const info = document.createElement("div");
-        info.className = "product-info";
-        const title = document.createElement("strong");
-        title.textContent = shop.shopName || "দোকান";
-        const desc = document.createElement("p");
-        desc.className = "small muted";
-        desc.textContent = shop.description || "";
-
-        const link = document.createElement("a");
-        link.className = "button";
-        link.href = "account.html?shop=" + encodeURIComponent(item.id);
-        link.textContent = "দোকান দেখো";
-
-        info.append(title, desc, link);
-        card.append(img, info);
-        list.appendChild(card);
-      });
-
-      if (!list.children.length) {
-        list.textContent = "এখনো কোনো সক্রিয় দোকান নেই।";
-      }
-    } catch (error) {
-      showMessage(errorMessage(error));
-    }
-  }
-
-  async function loadPublicShop(uid) {
-    $("publicShop").classList.remove("hidden");
-    $("authCard").classList.add("hidden");
-    $("accountCard").classList.add("hidden");
-
-    try {
-      const snap = await getDoc(doc(db, "shops", uid));
-      if (!snap.exists() || snap.data().status !== "active") {
-        showMessage("এই দোকান পাওয়া যায়নি অথবা এখন সক্রিয় নয়।");
-        return;
-      }
-
-      const shop = snap.data();
-      $("publicShopName").textContent = shop.shopName || "দোকান";
-      $("publicShopDescription").textContent = shop.description || "";
-      $("publicShopOwner").textContent = "Mishor's Shop-এর বিক্রেতা";
-      setImage($("publicLogo"), shop.imageUrl);
-
-      const products = await getDocs(query(
-        collection(db, "products"),
-        where("sellerId", "==", uid),
-        limit(100)
-      ));
-
-      const grid = $("publicProducts");
-      grid.replaceChildren();
-      products.forEach(item => {
-        const product = item.data();
-        if (product.active === false) return;
-        grid.appendChild(makeProductCard(product, item.id));
-      });
-
-      if (!grid.children.length) {
-        grid.textContent = "এই দোকানে এখনো কোনো পণ্য যোগ করা হয়নি।";
-      }
-    } catch (error) {
-      showMessage(errorMessage(error));
-    }
-  }
-
-  async function refreshAccount(user) {
-    currentProfile = await getUserProfile(user);
-    const profile = currentProfile;
-
-    $("authCard").classList.add("hidden");
-    $("accountCard").classList.remove("hidden");
-    $("userInfo").textContent =
-      (profile.name || user.email || "ব্যবহারকারী") +
-      " — " + (profile.role === "admin" ? "Admin" :
-        profile.role === "seller" ? "অনুমোদিত বিক্রেতা" : "ক্রেতা");
-
-    const seller = profile.role === "seller";
-    const admin = profile.role === "admin";
-    const pending = profile.sellerStatus === "pending";
-
-    $("sellerInfo").textContent = seller
-      ? "তোমার বিক্রেতা অ্যাকাউন্ট অনুমোদিত।"
-      : admin ? "তুমি Admin অ্যাকাউন্টে লগইন করেছ।"
-      : pending ? "তোমার বিক্রেতার আবেদন অপেক্ষমাণ।"
-      : "দোকান তৈরি করতে হলে প্রথমে বিক্রেতা হিসেবে অনুমোদিত হতে হবে।";
-
-    $("applySellerBtn").classList.toggle("hidden", seller || admin || pending);
-    $("shopEditorBtn").classList.toggle("hidden", !seller);
-    $("productEditor").classList.toggle("hidden", !seller);
-
-    if (seller) {
-      const shopSnap = await getDoc(doc(db, "shops", user.uid));
-      if (shopSnap.exists()) {
-        const shop = shopSnap.data();
-        $("shopName").value = shop.shopName || "";
-        $("shopDescription").value = shop.description || "";
-        $("shopImage").value = shop.imageUrl || "";
-        $("viewMyShop").href = "account.html?shop=" + encodeURIComponent(user.uid);
-        $("viewMyShop").classList.remove("hidden");
-      } else {
-        $("viewMyShop").classList.add("hidden");
-      }
-      await loadMyProducts(user.uid);
-    }
-  }
-
-  async function loadMyProducts(uid) {
-    const grid = $("myProducts");
-    grid.replaceChildren();
-    const snap = await getDocs(query(
-      collection(db, "products"),
-      where("sellerId", "==", uid),
-      limit(100)
-    ));
-
-    snap.forEach(item => {
-      grid.appendChild(makeProductCard(item.data(), item.id));
-    });
-
-    if (!grid.children.length) {
-      grid.textContent = "তুমি এখনো কোনো পণ্য যোগ করোনি।";
-    }
-  }
-
-  $("mode").addEventListener("change", () => {
-    const signup = $("mode").value === "signup";
-    $("signupFields").classList.toggle("hidden", !signup);
-    $("password").autocomplete = signup ? "new-password" : "current-password";
-    $("submitBtn").textContent = signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
-  });
-
-  $("submitBtn").addEventListener("click", async () => {
-    if (busy) return;
-    const mode = $("mode").value;
-    const name = $("name").value.trim();
-    const role = $("role").value;
-    const email = $("email").value.trim();
-    const password = $("password").value;
-
-    if (!email || !password) return showMessage("ইমেইল ও পাসওয়ার্ড দাও।");
-    if (mode === "signup" && !name) return showMessage("তোমার নাম লিখো।");
-    if (mode === "signup" && password.length < 6)
-      return showMessage("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
-
-    busy = true;
-    $("submitBtn").disabled = true;
-    try {
-      if (mode === "signup") {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = credential.user;
-        await updateProfile(user, { displayName: name });
-
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid, name, email: user.email,
-          role: "buyer",
-          sellerStatus: role === "seller" ? "pending" : "none",
-          createdAt: serverTimestamp()
-        });
-
-        if (role === "seller") {
-          await setDoc(doc(db, "sellerApplications", user.uid), {
-            uid: user.uid, name, email: user.email,
-            status: "pending", createdAt: serverTimestamp()
-          });
-        }
-
-        showMessage(role === "seller"
-          ? "অ্যাকাউন্ট তৈরি হয়েছে। Admin অনুমোদনের অপেক্ষায় থাকো।"
-          : "ক্রেতার অ্যাকাউন্ট তৈরি হয়েছে!", true);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        showMessage("লগইন সফল হয়েছে!", true);
-      }
-    } catch (error) {
-      showMessage(errorMessage(error));
-    } finally {
-      busy = false;
-      $("submitBtn").disabled = false;
-    }
-  });
-
-  $("applySellerBtn").addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (!user) return showMessage("আগে লগইন করো।");
-
-    $("applySellerBtn").disabled = true;
-    try {
-      const ref = doc(db, "sellerApplications", user.uid);
-      const existing = await getDoc(ref);
-      if (existing.exists() && existing.data().status === "pending") {
-        showMessage("তোমার আবেদন আগেই জমা হয়েছে।", true);
-        return;
-      }
-
-      await setDoc(ref, {
-        uid: user.uid,
-        name: currentProfile?.name || user.displayName || "ব্যবহারকারী",
-        email: user.email || "",
-        status: "pending",
-        createdAt: serverTimestamp()
-      });
-      await setDoc(doc(db, "users", user.uid), {
-        sellerStatus: "pending"
-      }, { merge: true });
-
-      showMessage("বিক্রেতার আবেদন জমা হয়েছে।", true);
-      await refreshAccount(user);
-    } catch (error) {
-      showMessage(errorMessage(error));
-    } finally {
-      $("applySellerBtn").disabled = false;
-    }
-  });
-
-  $("shopEditorBtn").addEventListener("click", () => {
-    $("shopEditor").classList.toggle("hidden");
-    $("shopEditor").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-
-  $("saveShopBtn").addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (!user || currentProfile?.role !== "seller") {
-      return showMessage("শুধু অনুমোদিত বিক্রেতা দোকান তৈরি করতে পারবেন।");
-    }
-
-    const shopName = $("shopName").value.trim();
-    const description = $("shopDescription").value.trim();
-    const rawImage = $("shopImage").value.trim();
-    const imageUrl = rawImage ? safeImage(rawImage) : "";
-
-    if (!shopName) return showMessage("দোকানের নাম লিখো।");
-    if (rawImage && !imageUrl) {
-      return showMessage("ছবির লিংকটি সঠিক HTTPS URL হতে হবে।");
-    }
-
-    $("saveShopBtn").disabled = true;
-    try {
-      const old = await getDoc(doc(db, "shops", user.uid));
-      await setDoc(doc(db, "shops", user.uid), {
-        ownerId: user.uid,
-        shopName,
-        description,
-        imageUrl,
-        status: "active",
-        createdAt: old.exists() ? old.data().createdAt : serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-
-      $("viewMyShop").href = "account.html?shop=" + encodeURIComponent(user.uid);
-      $("viewMyShop").classList.remove("hidden");
-      showMessage("দোকানের প্রোফাইল সংরক্ষিত হয়েছে!", true);
-    } catch (error) {
-      showMessage(errorMessage(error));
-    } finally {
-      $("saveShopBtn").disabled = false;
-    }
-  });
-
-  $("addProductBtn").addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (!user || currentProfile?.role !== "seller") {
-      return showMessage("শুধু অনুমোদিত বিক্রেতা পণ্য যোগ করতে পারবেন।");
-    }
-
-    const name = $("productName").value.trim();
-    const price = Number($("productPrice").value);
-    const description = $("productDescription").value.trim();
-    const rawImage = $("productImage").value.trim();
-    const imageUrl = rawImage ? safeImage(rawImage) : "";
-
-    if (!name) return showMessage("পণ্যের নাম লিখো।");
-    if (!Number.isSafeInteger(price) || price < 1 || price > 100000000) {
-      return showMessage("পণ্যের সঠিক দাম লিখো।");
-    }
-    if (rawImage && !imageUrl) {
-      return showMessage("ছবির লিংকটি সঠিক HTTPS URL হতে হবে।");
-    }
-
-    $("addProductBtn").disabled = true;
-    try {
-      const shopSnap = await getDoc(doc(db, "shops", user.uid));
-      if (!shopSnap.exists() || shopSnap.data().status !== "active") {
-        return showMessage("আগে দোকানের প্রোফাইল সংরক্ষণ করো।");
-      }
-
-      await addDoc(collection(db, "products"), {
-        sellerId: user.uid,
-        shopName: shopSnap.data().shopName,
-        name, price, description, imageUrl,
-        active: true,
-        createdAt: serverTimestamp()
-      });
-
-      $("productName").value = "";
-      $("productPrice").value = "";
-      $("productDescription").value = "";
-      $("productImage").value = "";
-      await loadMyProducts(user.uid);
-      showMessage("পণ্য দোকানে যোগ হয়েছে!", true);
-    } catch (error) {
-      showMessage(errorMessage(error));
-    } finally {
-      $("addProductBtn").disabled = false;
-    }
-  });
-
-  $("resetBtn").addEventListener("click", async () => {
-    const email = $("email").value.trim();
-    if (!email) return showMessage("আগে ইমেইল লিখো।");
-    try {
-      await sendPasswordResetEmail(auth, email);
-      showMessage("ইমেইল থাকলে পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হবে।", true);
-    } catch (error) {
-      showMessage(errorMessage(error));
-    }
-  });
-
-  $("logoutBtn").addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      showMessage("লগআউট সফল হয়েছে।", true);
-    } catch (error) {
-      showMessage(errorMessage(error));
-    }
-  });
-
-  // The same page supports public shop links and the shop directory.
-  if (shopId) {
-    await loadPublicShop(shopId);
-  } else if (directoryMode) {
-    await loadDirectory();
+  currentProfile = profileSnap.data();
+  const appSnap = await getDoc(doc(db, "sellerApplications", user.uid));
+  const application = appSnap.exists() ? appSnap.data() : null;
+
+  $("authForm").hidden = true;
+  $("signedIn").hidden = false;
+
+  const isAdmin = currentProfile.role === "admin";
+  const isSeller = currentProfile.role === "seller";
+  const pending = currentProfile.sellerStatus === "pending" || application?.status === "pending";
+
+  let status = "ক্রেতা";
+  if (isAdmin) status = "অ্যাডমিন";
+  else if (isSeller) status = "অনুমোদিত বিক্রেতা";
+  else if (pending) status = "বিক্রেতার অনুমোদনের অপেক্ষায়";
+  else if (application?.status === "rejected") status = "বিক্রেতার আবেদন প্রত্যাখ্যাত";
+
+  $("userInfo").textContent = `${currentProfile.name || user.displayName || user.email} — ${status}`;
+
+  $("applySellerBtn").hidden = isSeller || isAdmin || pending;
+  $("sellerInfo").textContent = isAdmin
+    ? "Admin অ্যাকাউন্ট।"
+    : isSeller
+      ? "তোমার বিক্রেতা অ্যাকাউন্ট অনুমোদিত। নিচে দোকানের তথ্য ও পণ্য পরিচালনা করো।"
+      : pending
+        ? "তোমার আবেদন জমা আছে। Admin অনুমোদন না করা পর্যন্ত দোকান বা পণ্য যোগ করা যাবে না।"
+        : application?.status === "rejected"
+          ? "আবেদনটি অনুমোদিত হয়নি। আবার আবেদন করতে পারো।"
+          : "বিক্রেতা হতে চাইলে আবেদন জমা দাও।";
+
+  $("sellerPanel").hidden = !isSeller && !isAdmin;
+  $("productPanel").hidden = !isSeller && !isAdmin;
+
+  if (isSeller || isAdmin) {
+    await loadMyShop(user);
+    await loadMyProducts(user);
   } else {
-    $("authCard").classList.remove("hidden");
-    onAuthStateChanged(auth, async user => {
-      if (!user) {
-        currentProfile = null;
-        $("authCard").classList.remove("hidden");
-        $("accountCard").classList.add("hidden");
-        $("shopEditor").classList.add("hidden");
-        $("productEditor").classList.add("hidden");
-        return;
+    $("sellerPanel").hidden = true;
+    $("productPanel").hidden = true;
+  }
+}
+
+async function loadMyShop(user) {
+  try {
+    const snap = await getDoc(doc(db, "shops", user.uid));
+    currentShop = snap.exists() ? snap.data() : null;
+    currentShopId = user.uid;
+
+    $("shopName").value = currentShop?.shopName || "";
+    $("shopDescription").value = currentShop?.description || "";
+    $("shopImage").value = currentShop?.imageUrl || "";
+
+    if (currentShop) {
+      setStatus("shopStatus", "দোকানের তথ্য পাওয়া গেছে। সংরক্ষণ করলে পরিবর্তনগুলো আপডেট হবে।", "success");
+      $("myShopLink").href = "account.html?shop=" + encodeURIComponent(user.uid);
+      $("myShopLink").hidden = false;
+    } else {
+      setStatus("shopStatus", "এখনো দোকান তৈরি হয়নি। তথ্য পূরণ করে সংরক্ষণ করো।");
+      $("myShopLink").hidden = true;
+    }
+  } catch (error) {
+    setStatus("shopStatus", friendlyError(error), "error");
+  }
+}
+
+$("saveShopBtn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user || !currentProfile) return showMessage("আগে লগইন করো।", "error");
+  if (currentProfile.role !== "seller" && currentProfile.role !== "admin") {
+    return showMessage("দোকান তৈরি করতে Admin অনুমোদিত বিক্রেতা হতে হবে।", "error");
+  }
+
+  const shopName = $("shopName").value.trim();
+  const description = $("shopDescription").value.trim();
+  const imageRaw = $("shopImage").value.trim();
+  const imageUrl = safeImage(imageRaw);
+
+  if (shopName.length < 2) return setStatus("shopStatus", "দোকানের নাম কমপক্ষে ২ অক্ষরের হতে হবে।", "error");
+  if (description.length > 500) return setStatus("shopStatus", "বিবরণ সর্বোচ্চ ৫০০ অক্ষর হতে পারবে।", "error");
+  if (imageRaw && !imageUrl) return setStatus("shopStatus", "ছবির লিংক HTTPS হতে হবে।", "error");
+
+  const btn = $("saveShopBtn");
+  btn.disabled = true;
+
+  try {
+    const shopRef = doc(db, "shops", user.uid);
+    const old = await getDoc(shopRef);
+
+    const data = {
+      ownerId: user.uid,
+      shopName,
+      description,
+      imageUrl,
+      status: "active",
+      updatedAt: serverTimestamp()
+    };
+    if (!old.exists()) data.createdAt = serverTimestamp();
+
+    await setDoc(shopRef, data, { merge: true });
+    currentShop = {...currentShop, ...data};
+    currentShopId = user.uid;
+    setStatus("shopStatus", "দোকানের তথ্য সংরক্ষণ হয়েছে!", "success");
+    $("myShopLink").href = "account.html?shop=" + encodeURIComponent(user.uid);
+    $("myShopLink").hidden = false;
+    showMessage("দোকানের তথ্য সংরক্ষণ হয়েছে।", "success");
+  } catch (error) {
+    setStatus("shopStatus", friendlyError(error), "error");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("addProductBtn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user || !currentProfile) return setStatus("productStatus", "আগে লগইন করো।", "error");
+  if (currentProfile.role !== "seller" && currentProfile.role !== "admin") {
+    return setStatus("productStatus", "Admin অনুমোদিত বিক্রেতা হতে হবে।", "error");
+  }
+
+  const name = $("productName").value.trim();
+  const price = Number($("productPrice").value);
+  const imageRaw = $("productImage").value.trim();
+  const imageUrl = safeImage(imageRaw);
+  const description = $("productDescription").value.trim();
+
+  if (name.length < 2) return setStatus("productStatus", "পণ্যের নাম কমপক্ষে ২ অক্ষরের হতে হবে।", "error");
+  if (!Number.isSafeInteger(price) || price < 1 || price > 10000000) {
+    return setStatus("productStatus", "সঠিক পূর্ণসংখ্যার দাম লিখো।", "error");
+  }
+  if (imageRaw && !imageUrl) return setStatus("productStatus", "ছবির লিংক HTTPS হতে হবে।", "error");
+  if (description.length > 1000) return setStatus("productStatus", "বিবরণ সর্বোচ্চ ১০০০ অক্ষর হতে পারবে।", "error");
+
+  try {
+    const shopSnap = await getDoc(doc(db, "shops", user.uid));
+    if (!shopSnap.exists() || shopSnap.data().status !== "active") {
+      return setStatus("productStatus", "আগে দোকানের তথ্য সংরক্ষণ করো।", "error");
+    }
+
+    const shop = shopSnap.data();
+    await addDoc(collection(db, "products"), {
+      sellerId: user.uid,
+      shopName: shop.shopName,
+      name,
+      price,
+      description,
+      imageUrl,
+      active: true,
+      status: "approved",
+      createdAt: serverTimestamp()
+    });
+
+    $("productName").value = "";
+    $("productPrice").value = "";
+    $("productImage").value = "";
+    $("productDescription").value = "";
+    setStatus("productStatus", "পণ্য সফলভাবে যোগ হয়েছে!", "success");
+    await loadMyProducts(user);
+  } catch (error) {
+    setStatus("productStatus", friendlyError(error), "error");
+  }
+});
+
+async function loadMyProducts(user) {
+  try {
+    const q = query(collection(db, "products"), where("sellerId", "==", user.uid), limit(60));
+    const snap = await getDocs(q);
+    const items = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    $("myProductsGrid").innerHTML = "";
+
+    if (!items.length) {
+      setStatus("myProductsStatus", "এখনো কোনো পণ্য যোগ করা হয়নি।");
+      return;
+    }
+
+    setStatus("myProductsStatus", `তোমার ${items.length}টি পণ্য পাওয়া গেছে।`, "success");
+    for (const p of items) {
+      const card = document.createElement("article");
+      card.className = "card";
+      const img = safeImage(p.imageUrl || p.image);
+      card.innerHTML = `
+        ${img ? `<img src="${escapeHTML(img)}" alt="" loading="lazy">` : ""}
+        <h3>${escapeHTML(p.name || "নামহীন পণ্য")}</h3>
+        <div class="price">${money(p.price)}</div>
+        <p class="muted">${escapeHTML(p.description || "")}</p>
+        <p class="note">স্ট্যাটাস: ${escapeHTML(p.status || "active")}</p>`;
+      $("myProductsGrid").appendChild(card);
+    }
+  } catch (error) {
+    setStatus("myProductsStatus", friendlyError(error), "error");
+  }
+}
+
+function showDirectoryMode() {
+  $("accountPanel").hidden = true;
+  $("sellerPanel").hidden = true;
+  $("productPanel").hidden = true;
+  $("directoryView").hidden = false;
+  $("publicShopView").hidden = true;
+}
+
+async function loadDirectory() {
+  showDirectoryMode();
+  $("directoryGrid").innerHTML = "";
+  setStatus("directoryStatus", "দোকান লোড হচ্ছে...");
+
+  try {
+    // গুরুত্বপূর্ণ: Firestore Rules filter নয়।
+    // তাই active দোকানের query-তে active শর্তটি থাকতে হবে।
+    const q = query(
+      collection(db, "shops"),
+      where("status", "==", "active"),
+      limit(60)
+    );
+    const snap = await getDocs(q);
+    const shops = snap.docs.map(d => ({id:d.id, ...d.data()}));
+
+    if (!shops.length) {
+      setStatus("directoryStatus", "এখনো কোনো সক্রিয় দোকান পাওয়া যায়নি।");
+      return;
+    }
+
+    setStatus("directoryStatus", `${shops.length}টি সক্রিয় দোকান পাওয়া গেছে।`, "success");
+
+    for (const shop of shops) {
+      const card = document.createElement("article");
+      card.className = "card";
+      const img = safeImage(shop.imageUrl);
+      card.innerHTML = `
+        ${img ? `<img src="${escapeHTML(img)}" alt="" loading="lazy">` : ""}
+        <h3>${escapeHTML(shop.shopName || "নামহীন দোকান")}</h3>
+        <p class="muted">${escapeHTML(shop.description || "এই দোকানের বিবরণ দেওয়া হয়নি।")}</p>
+        <a class="button" href="account.html?shop=${encodeURIComponent(shop.id)}">দোকান দেখো →</a>`;
+      $("directoryGrid").appendChild(card);
+    }
+  } catch (error) {
+    setStatus("directoryStatus", friendlyError(error), "error");
+  }
+}
+
+async function loadPublicShop(shopId) {
+  $("accountPanel").hidden = true;
+  $("sellerPanel").hidden = true;
+  $("productPanel").hidden = true;
+  $("directoryView").hidden = true;
+  $("publicShopView").hidden = false;
+  $("publicShopContent").textContent = "দোকান লোড হচ্ছে...";
+  $("publicProductGrid").innerHTML = "";
+  setStatus("publicProductStatus", "পণ্য লোড হচ্ছে...");
+
+  try {
+    const shopSnap = await getDoc(doc(db, "shops", shopId));
+    if (!shopSnap.exists()) {
+      $("publicShopContent").textContent = "দোকান পাওয়া যায়নি।";
+      return;
+    }
+
+    const shop = shopSnap.data();
+    if (shop.status !== "active" && auth.currentUser?.uid !== shopId && currentProfile?.role !== "admin") {
+      $("publicShopContent").textContent = "এই দোকানটি বর্তমানে সবার জন্য উন্মুক্ত নয়।";
+      return;
+    }
+
+    const img = safeImage(shop.imageUrl);
+    $("publicShopContent").innerHTML = `
+      ${img ? `<img src="${escapeHTML(img)}" alt="" style="width:100%;max-height:250px;object-fit:cover;border-radius:12px">` : ""}
+      <h2>${escapeHTML(shop.shopName || "দোকান")}</h2>
+      <p>${escapeHTML(shop.description || "এই দোকানের বিবরণ দেওয়া হয়নি।")}</p>`;
+
+    // এই query sellerId দিয়ে সীমাবদ্ধ, তাই অন্য দোকানের পণ্য মেশে না।
+    const q = query(
+      collection(db, "products"),
+      where("sellerId", "==", shopId),
+      limit(100)
+    );
+    const snap = await getDocs(q);
+    const products = snap.docs.map(d => ({id:d.id, ...d.data()}))
+      .filter(p => p.active !== false && (!p.status || ["active","approved"].includes(p.status)));
+
+    if (!products.length) {
+      setStatus("publicProductStatus", "এই দোকানে এখনো কোনো সক্রিয় পণ্য নেই।");
+      return;
+    }
+
+    setStatus("publicProductStatus", `${products.length}টি পণ্য পাওয়া গেছে।`, "success");
+
+    for (const p of products) {
+      const card = document.createElement("article");
+      card.className = "card";
+      const imgUrl = safeImage(p.imageUrl || p.image);
+      card.innerHTML = `
+        ${imgUrl ? `<img src="${escapeHTML(imgUrl)}" alt="" loading="lazy">` : ""}
+        <h3>${escapeHTML(p.name || p.title || "পণ্য")}</h3>
+        <div class="price">${money(p.price)}</div>
+        <p class="muted">${escapeHTML(p.description || "")}</p>`;
+      $("publicProductGrid").appendChild(card);
+    }
+  } catch (error) {
+    $("publicShopContent").textContent = friendlyError(error);
+    setStatus("publicProductStatus", friendlyError(error), "error");
+  }
+}
+
+$("reloadDirectory").addEventListener("click", loadDirectory);
+
+$("mode").addEventListener("change", () => {
+  const signup = $("mode").value === "signup";
+  $("name").disabled = !signup;
+  $("role").disabled = !signup;
+  $("password").autocomplete = signup ? "new-password" : "current-password";
+  $("submitBtn").textContent = signup ? "অ্যাকাউন্ট তৈরি করো" : "লগইন করো";
+});
+
+$("submitBtn").addEventListener("click", async () => {
+  if (busy) return;
+  const mode = $("mode").value;
+  const name = $("name").value.trim();
+  const role = $("role").value;
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) return showMessage("ইমেইল ও পাসওয়ার্ড দাও।", "error");
+  if (mode === "signup" && !name) return showMessage("তোমার নাম লিখো।", "error");
+  if (mode === "signup" && password.length < 6) return showMessage("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।", "error");
+
+  busy = true;
+  $("submitBtn").disabled = true;
+
+  try {
+    if (mode === "signup") {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = credential.user;
+      await updateProfile(user, {displayName:name});
+
+      await setDoc(doc(db, "users", user.uid), {
+        uid:user.uid,
+        name,
+        email:user.email,
+        role:"buyer",
+        sellerStatus:role === "seller" ? "pending" : "none",
+        createdAt:serverTimestamp()
+      });
+
+      if (role === "seller") {
+        await setDoc(doc(db, "sellerApplications", user.uid), {
+          uid:user.uid,
+          name,
+          email:user.email,
+          status:"pending",
+          createdAt:serverTimestamp()
+        });
       }
 
-      try {
-        await refreshAccount(user);
-      } catch (error) {
-        showMessage(errorMessage(error));
-      }
-    });
+      await refreshProfile(user);
+      showMessage(
+        role === "seller"
+          ? "অ্যাকাউন্ট তৈরি হয়েছে। বিক্রেতার আবেদন Admin অনুমোদনের অপেক্ষায়।"
+          : "ক্রেতার অ্যাকাউন্ট তৈরি হয়েছে!",
+        "success"
+      );
+    } else {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      await ensureProfile(credential.user);
+      await refreshProfile(credential.user);
+      showMessage("লগইন সফল হয়েছে।", "success");
+    }
+  } catch (error) {
+    showMessage(friendlyError(error), "error");
+  } finally {
+    busy = false;
+    $("submitBtn").disabled = false;
   }
+});
+
+$("applySellerBtn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return showMessage("আগে লগইন করো।", "error");
+
+  $("applySellerBtn").disabled = true;
+  try {
+    const profileSnap = await getDoc(doc(db, "users", user.uid));
+    if (!profileSnap.exists()) throw new Error("profile-missing");
+    const profile = profileSnap.data();
+
+    if (profile.role === "admin" || profile.role === "seller") {
+      return showMessage("এই অ্যাকাউন্টে বিক্রেতার আবেদন দরকার নেই।", "success");
+    }
+
+    const ref = doc(db, "sellerApplications", user.uid);
+    const old = await getDoc(ref);
+    if (old.exists() && old.data().status === "pending") {
+      return showMessage("তোমার আবেদন আগে থেকেই জমা আছে।");
+    }
+
+    await setDoc(ref, {
+      uid:user.uid,
+      name:profile.name || user.displayName || "ব্যবহারকারী",
+      email:user.email || "",
+      status:"pending",
+      createdAt:serverTimestamp()
+    });
+    await setDoc(doc(db, "users", user.uid), {sellerStatus:"pending"}, {merge:true});
+    await refreshProfile(user);
+    showMessage("বিক্রেতার আবেদন জমা হয়েছে।", "success");
+  } catch (error) {
+    showMessage(friendlyError(error), "error");
+  } finally {
+    $("applySellerBtn").disabled = false;
+  }
+});
+
+$("resetBtn").addEventListener("click", async () => {
+  const email = $("email").value.trim();
+  if (!email) return showMessage("আগে ইমেইল লেখো।", "error");
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showMessage("যদি এই ইমেইলে অ্যাকাউন্ট থাকে, পাসওয়ার্ড রিসেটের নির্দেশ পাঠানো হয়েছে।", "success");
+  } catch (error) {
+    showMessage(friendlyError(error), "error");
+  }
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    currentProfile = null;
+    $("authForm").hidden = false;
+    $("signedIn").hidden = true;
+    $("sellerPanel").hidden = true;
+    $("productPanel").hidden = true;
+    showMessage("লগআউট সফল হয়েছে।", "success");
+  } catch (error) {
+    showMessage(friendlyError(error), "error");
+  }
+});
+
+// Public directory/profile routes do not require login.
+const params = new URLSearchParams(location.search);
+const directoryMode = params.get("view") === "shops";
+const shopId = params.get("shop");
+
+if (directoryMode) {
+  loadDirectory();
+} else if (shopId) {
+  loadPublicShop(shopId);
+}
+
+onAuthStateChanged(auth, async user => {
+  // Keep public shop pages public. Login state is still observed.
+  if (directoryMode || shopId) {
+    if (user) {
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        currentProfile = snap.exists() ? snap.data() : null;
+      } catch (error) {
+        console.warn("Profile check:", error);
+      }
+    }
+    return;
+  }
+
+  if (!user) {
+    $("authForm").hidden = false;
+    $("signedIn").hidden = true;
+    $("sellerPanel").hidden = true;
+    $("productPanel").hidden = true;
+    return;
+  }
+
+  $("userInfo").textContent = "প্রোফাইল পরীক্ষা হচ্ছে...";
+  try {
+    await ensureProfile(user);
+    await refreshProfile(user);
+  } catch (error) {
+    showMessage(friendlyError(error), "error");
+  }
+});
 </script>
 </body>
-  </html>
+</html>
