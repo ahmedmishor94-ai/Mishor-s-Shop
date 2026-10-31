@@ -5,24 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101827">
 <title>Admin Payment Verification | Mishor's Shop</title>
+
 <style>
 body{font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f3f5f9;color:#172033;margin:0;padding:16px}
 main{max-width:750px;margin:20px auto}
 .card{background:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0000000d;overflow-wrap:anywhere}
-h1{font-size:23px} h2{font-size:18px}
+h1{font-size:23px}
+h2{font-size:18px}
 input,button{box-sizing:border-box;width:100%;padding:12px;margin-top:9px;border-radius:8px;font-size:15px}
 input{border:1px solid #cbd5e1}
 button{border:0;background:#087f5b;color:white;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.5}
+button:disabled{opacity:.5;cursor:not-allowed}
 .secondary{background:#334155}
 .reject{background:#b91c1c}
+.migration{background:#1d4ed8}
 .small{font-size:13px;color:#64748b;line-height:1.6}
-.status{white-space:pre-wrap;line-height:1.6}
+.status{white-space:pre-wrap;line-height:1.7}
 .actions{display:flex;gap:8px}
 .actions button{flex:1}
 [hidden]{display:none!important}
 </style>
 </head>
+
 <body>
 <main>
 
@@ -41,8 +45,19 @@ button:disabled{opacity:.5}
 
 <div id="dashboard" hidden>
 <p id="adminInfo"></p>
+
 <button id="refreshBtn" class="secondary">আবেদন রিফ্রেশ</button>
+
+<button id="migrationBtn" class="migration">
+পুরোনো Seller Membership Migration
+</button>
+
 <button id="logoutBtn" class="secondary">লগআউট</button>
+
+<p class="small">
+Migration চালালে যেসব পুরোনো অনুমোদিত Seller-এর Membership এখনো সক্রিয়
+এবং মেয়াদ ভবিষ্যতে আছে, শুধু তাদের Public Membership রেকর্ড তৈরি হবে।
+</p>
 </div>
 
 <p id="message" class="status">Firebase সংযোগ হচ্ছে...</p>
@@ -100,6 +115,8 @@ const dashboard=$("dashboard");
 const message=$("message");
 const payments=$("payments");
 
+let busy=false;
+
 function say(t){
  message.textContent=t;
 }
@@ -111,7 +128,7 @@ function safe(value){
   ">":"&gt;",
   '"':"&quot;",
   "'":"&#39;"
- })[c]);
+ }[c]));
 }
 
 function requireAdmin(){
@@ -124,6 +141,10 @@ function dateText(value){
  return value?.toDate
   ? value.toDate().toLocaleString("bn-BD")
   : "তথ্য নেই";
+}
+
+function getDate(value){
+ return value?.toDate?.()||null;
 }
 
 onAuthStateChanged(auth,async user=>{
@@ -170,6 +191,7 @@ $("loginForm").addEventListener("submit",async e=>{
 });
 
 $("logoutBtn").addEventListener("click",()=>signOut(auth));
+
 $("refreshBtn").addEventListener("click",loadPayments);
 
 async function loadPayments(){
@@ -273,10 +295,13 @@ async function loadPayments(){
 
 async function approvePayment(p,approveBtn,rejectBtn){
 
+ if(busy)return;
+
  if(!confirm(
   "Nagad-এ ৳১০০ পাওয়া নিশ্চিত করেছো? নিশ্চিত হলে অনুমোদন করো।"
  ))return;
 
+ busy=true;
  approveBtn.disabled=true;
  rejectBtn.disabled=true;
 
@@ -287,15 +312,14 @@ async function approvePayment(p,approveBtn,rejectBtn){
    !p.uid||
    Number(p.feeAmount)!==100||
    !p.transactionId||
-   !p.senderPhone
+   !p.senderPhone||
+   p.paymentMethod!=="Nagad"
   ){
    throw new Error("INVALID_PAYMENT_RECORD");
   }
 
   const userRef=doc(db,"users",p.uid);
   const paymentRef=doc(db,"sellerPayments",p.id);
-
-  // Public-safe membership document
   const publicMembershipRef=doc(
    db,
    "publicSellerMemberships",
@@ -317,8 +341,9 @@ async function approvePayment(p,approveBtn,rejectBtn){
    payment.status!=="pending"||
    payment.uid!==p.uid||
    Number(payment.feeAmount)!==100||
-   !payment.transactionId||
-   !payment.senderPhone
+   payment.transactionId!==p.transactionId||
+   payment.senderPhone!==p.senderPhone||
+   payment.paymentMethod!=="Nagad"
   ){
    throw new Error("INVALID_OR_REVIEWED_PAYMENT");
   }
@@ -326,28 +351,22 @@ async function approvePayment(p,approveBtn,rejectBtn){
   const user=userSnap.data();
 
   const now=new Date();
+  const oldExpiry=getDate(user.membershipExpiresAt);
 
-  const oldExpiry=
-   user.membershipExpiresAt?.toDate?.()||null;
+  const oldExpiryIsFuture=oldExpiry&&oldExpiry>now;
 
-  // আগের মেয়াদ থাকলে সেখান থেকে ৩৬৫ দিন যোগ হবে।
-  // মেয়াদ শেষ হলে আজ থেকে নতুন ৩৬৫ দিন শুরু হবে।
-  const baseDate=
-   oldExpiry&&oldExpiry>now
-    ? oldExpiry
-    : now;
+  const baseDate=oldExpiryIsFuture?oldExpiry:now;
 
   const newExpiry=new Date(
    baseDate.getTime()+365*24*60*60*1000
   );
 
-  const oldStart=
-   user.membershipStartedAt?.toDate?.()||null;
+  const oldStart=getDate(user.membershipStartedAt);
 
   const startDate=
-   oldExpiry&&oldExpiry>now&&oldStart
-    ? oldStart
-    : now;
+   oldExpiryIsFuture&&oldStart
+    ?oldStart
+    :now;
 
   const expiryTimestamp=Timestamp.fromDate(newExpiry);
 
@@ -368,7 +387,7 @@ async function approvePayment(p,approveBtn,rejectBtn){
    membershipExpiresAt:expiryTimestamp
   });
 
-  // 3. Public-safe membership record updated
+  // 3. Public-safe membership record
   batch.set(publicMembershipRef,{
    sellerId:p.uid,
    membershipStatus:"active",
@@ -390,19 +409,26 @@ async function approvePayment(p,approveBtn,rejectBtn){
   console.error(err);
 
   say(
-   "অনুমোদন হয়নি। Firestore Rules, Payment তথ্য এবং "+
-   "publicSellerMemberships অনুমতি পরীক্ষা করো।"
+   "অনুমোদন হয়নি: "+
+   (err.code||err.message||"অজানা সমস্যা")+
+   "। Firestore Rules পরীক্ষা করো।"
   );
 
   approveBtn.disabled=false;
   rejectBtn.disabled=false;
+
+ }finally{
+  busy=false;
  }
 }
 
 async function rejectPayment(p,approveBtn,rejectBtn){
 
+ if(busy)return;
+
  if(!confirm("এই পেমেন্ট আবেদন বাতিল করবে?"))return;
 
+ busy=true;
  approveBtn.disabled=true;
  rejectBtn.disabled=true;
 
@@ -410,7 +436,6 @@ async function rejectPayment(p,approveBtn,rejectBtn){
   requireAdmin();
 
   const paymentRef=doc(db,"sellerPayments",p.id);
-
   const paymentSnap=await getDoc(paymentRef);
 
   if(
@@ -431,13 +456,128 @@ async function rejectPayment(p,approveBtn,rejectBtn){
 
  }catch(err){
   console.error(err);
-
-  say("বাতিল করা যায়নি। Firestore Rules পরীক্ষা করো।");
+  say("বাতিল করা যায়নি: "+(err.code||err.message||"অজানা সমস্যা"));
 
   approveBtn.disabled=false;
   rejectBtn.disabled=false;
+
+ }finally{
+  busy=false;
  }
 }
+
+// পুরোনো সক্রিয় Seller-দের Public Membership তৈরি
+async function migrateOldSellers(){
+
+ if(busy)return;
+
+ if(!confirm(
+  "পুরোনো Seller-দের Membership Migration শুরু করবে?\n\n"+
+  "শুধু যাদের role=seller, sellerStatus=approved এবং "+
+  "membershipExpiresAt ভবিষ্যতের তারিখ, তাদের রেকর্ড তৈরি হবে।"
+ ))return;
+
+ busy=true;
+ $("migrationBtn").disabled=true;
+
+ try{
+  requireAdmin();
+
+  say("পুরোনো Seller তালিকা যাচাই হচ্ছে...");
+
+  const usersSnapshot=await getDocs(collection(db,"users"));
+
+  const now=Date.now();
+  const eligible=[];
+
+  for(const userDoc of usersSnapshot.docs){
+   const u=userDoc.data();
+
+   if(
+    u.role!=="seller"||
+    u.sellerStatus!=="approved"||
+    u.membershipStatus!=="active"
+   )continue;
+
+   const expiry=getDate(u.membershipExpiresAt);
+
+   if(!expiry||expiry.getTime()<=now)continue;
+
+   eligible.push({
+    uid:userDoc.id,
+    expiry
+   });
+  }
+
+  if(!eligible.length){
+   say(
+    "Migration করার মতো সক্রিয় মেয়াদ থাকা পুরোনো Seller পাওয়া যায়নি।"
+   );
+   return;
+  }
+
+  // Firestore batch limit 500; নিরাপদে 400 করে লেখা
+  let migrated=0;
+
+  for(let i=0;i<eligible.length;i+=400){
+
+   requireAdmin();
+
+   const chunk=eligible.slice(i,i+400);
+   const batch=writeBatch(db);
+
+   for(const seller of chunk){
+    const publicRef=doc(
+     db,
+     "publicSellerMemberships",
+     seller.uid
+    );
+
+    batch.set(publicRef,{
+     sellerId:seller.uid,
+     membershipStatus:"active",
+     membershipExpiresAt:Timestamp.fromDate(seller.expiry),
+     updatedAt:serverTimestamp()
+    });
+   }
+
+   await batch.commit();
+   migrated+=chunk.length;
+
+   say(
+    "Migration চলছে...\n"+
+    migrated+" / "+eligible.length+" জন Seller সম্পন্ন।"
+   );
+  }
+
+  say(
+   "Migration সফল!\n"+
+   "মোট "+migrated+" জন সক্রিয় Seller-এর Public Membership তৈরি হয়েছে।"
+  );
+
+  alert(
+   "Migration সফল!\n"+
+   migrated+" জন Seller-এর Membership রেকর্ড তৈরি হয়েছে।"
+  );
+
+ }catch(err){
+  console.error(err);
+
+  say(
+   "Migration সম্পন্ন হয়নি: "+
+   (err.code||err.message||"অজানা সমস্যা")
+  );
+
+ }finally{
+  busy=false;
+  $("migrationBtn").disabled=false;
+ }
+}
+
+$("migrationBtn").addEventListener(
+ "click",
+ migrateOldSellers
+);
 </script>
 
 </body>
