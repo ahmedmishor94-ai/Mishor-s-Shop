@@ -211,7 +211,10 @@ footer strong{font-size:17px;color:#fff}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
-import {getFirestore,collection,onSnapshot,doc,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+import {
+ getFirestore,collection,onSnapshot,doc,getDoc,
+ writeBatch,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
 const firebaseConfig={
  apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
@@ -221,11 +224,19 @@ const firebaseConfig={
  messagingSenderId:"828816512879",
  appId:"1:828816512879:web:3e297717db9b391f09fa9a"
 };
+
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
 const $=id=>document.getElementById(id);
-let currentUser=null,products=[],cart={},activeCategory="All",submitting=false;
+
+let currentUser=null;
+let products=[];
+let cart={};
+let activeCategory="All";
+let submitting=false;
+let membershipCache=new Map();
+
 const categories=[
  {value:"All",label:"সব পণ্য"},
  {value:"Fashion",label:"👗 ফ্যাশন"},
@@ -237,97 +248,453 @@ const categories=[
  {value:"Necessary Products",label:"🛍️ প্রয়োজনীয়"},
  {value:"Gift",label:"🎁 উপহার"}
 ];
+
 function normalizeCategory(value){
  const v=String(value||"").trim().toLowerCase();
  const aliases={
   "fashion":"Fashion","ফ্যাশন":"Fashion","পোশাক ও ফ্যাশন":"Fashion",
-  "electronics":"Electronics","ইলেকট্রনিক্স":"Electronics","shoes":"Shoes","জুতা":"Shoes",
-  "sports":"Sports","স্পোর্টস":"Sports","beauty":"Beauty & Personal Care","beauty & personal care":"Beauty & Personal Care","বিউটি":"Beauty & Personal Care",
-  "home":"Home & Living","home & living":"Home & Living","ঘর সাজানো":"Home & Living",
-  "necessary":"Necessary Products","necessary products":"Necessary Products","প্রয়োজনীয় পণ্য":"Necessary Products",
+  "electronics":"Electronics","ইলেকট্রনিক্স":"Electronics",
+  "shoes":"Shoes","জুতা":"Shoes",
+  "sports":"Sports","স্পোর্টস":"Sports",
+  "beauty":"Beauty & Personal Care",
+  "beauty & personal care":"Beauty & Personal Care",
+  "বিউটি":"Beauty & Personal Care",
+  "home":"Home & Living","home & living":"Home & Living",
+  "ঘর সাজানো":"Home & Living",
+  "necessary":"Necessary Products",
+  "necessary products":"Necessary Products",
+  "প্রয়োজনীয় পণ্য":"Necessary Products",
   "gift":"Gift","উপহার":"Gift"
  };
  return aliases[v]||String(value||"অন্যান্য");
 }
-function money(v){return (Number(v)||0).toLocaleString("en-US")}
-function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function renderCategories(){
- $("categories").innerHTML=categories.map(c=>`<button type="button" class="cat-btn ${activeCategory===c.value?"active":""}" data-cat="${escapeHTML(c.value)}">${escapeHTML(c.label)}</button>`).join("");
- $("categories").querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()=>{activeCategory=b.dataset.cat;renderCategories();renderProducts()}));
+
+function money(v){
+ return (Number(v)||0).toLocaleString("en-US");
 }
+
+function escapeHTML(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+// Membership সক্রিয় কি না পরীক্ষা
+function isMembershipActive(sellerId){
+ const membership=membershipCache.get(sellerId);
+
+ if(!membership)return false;
+ if(membership.membershipStatus!=="active")return false;
+
+ const expiry=membership.membershipExpiresAt;
+
+ if(!expiry||typeof expiry.toDate!=="function")return false;
+
+ return expiry.toDate().getTime()>Date.now();
+}
+
+// মেয়াদ শেষ Seller-এর পণ্য ও কার্ট থেকে পণ্য সরানো
+function removeExpiredProducts(){
+ const activeIds=new Set(
+  products
+   .filter(p=>isMembershipActive(p.sellerId))
+   .map(p=>p.id)
+ );
+
+ for(const id of Object.keys(cart)){
+  if(!activeIds.has(id)){
+   delete cart[id];
+  }
+ }
+
+ renderCart();
+}
+
+function renderCategories(){
+ $("categories").innerHTML=categories.map(c=>
+  `<button type="button" class="cat-btn ${activeCategory===c.value?"active":""}" data-cat="${escapeHTML(c.value)}">${escapeHTML(c.label)}</button>`
+ ).join("");
+
+ $("categories").querySelectorAll("[data-cat]").forEach(b=>{
+  b.addEventListener("click",()=>{
+   activeCategory=b.dataset.cat;
+   renderCategories();
+   renderProducts();
+  });
+ });
+}
+
 function renderProducts(){
- const search=$("searchInput").value.trim().toLowerCase(),sort=$("sortSelect").value;
- let shown=products.filter(p=>p.name.toLowerCase().includes(search)&&(activeCategory==="All"||normalizeCategory(p.category)===activeCategory));
+ const search=$("searchInput").value.trim().toLowerCase();
+ const sort=$("sortSelect").value;
+
+ let shown=products.filter(p=>
+  isMembershipActive(p.sellerId)&&
+  p.name.toLowerCase().includes(search)&&
+  (activeCategory==="All"||normalizeCategory(p.category)===activeCategory)
+ );
+
  if(sort==="low")shown.sort((a,b)=>a.price-b.price);
  if(sort==="high")shown.sort((a,b)=>b.price-a.price);
  if(sort==="name")shown.sort((a,b)=>a.name.localeCompare(b.name,"bn"));
- if(!shown.length){$("products").innerHTML='<div class="empty">এখন কোনো অনুমোদিত পণ্য পাওয়া যায়নি।<br>পরে আবার চেষ্টা করুন।</div>';return}
+
+ if(!shown.length){
+  $("products").innerHTML=
+   '<div class="empty">এখন কোনো সক্রিয় বিক্রেতার অনুমোদিত পণ্য পাওয়া যায়নি।<br>পরে আবার চেষ্টা করুন।</div>';
+  return;
+ }
+
  $("products").innerHTML=shown.map(p=>{
   const image=/^https:\/\//i.test(p.image)?p.image:"";
-  return `<article class="product"><div class="product-photo-wrap"><img class="product-photo" src="${escapeHTML(image)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x450/f1f5f9/475569?text=Product';"></div><div class="product-info"><div class="product-name">${escapeHTML(p.name)}</div><div class="category-label">${escapeHTML(normalizeCategory(p.category))}</div><div class="price">৳${money(p.price)}</div><button type="button" class="add-btn" data-add="${escapeHTML(p.id)}">＋ কার্টে যোগ করুন</button></div></article>`;
+
+  return `
+   <article class="product">
+    <div class="product-photo-wrap">
+     <img class="product-photo"
+      src="${escapeHTML(image)}"
+      alt="${escapeHTML(p.name)}"
+      loading="lazy"
+      onerror="this.onerror=null;this.src='https://placehold.co/600x450/f1f5f9/475569?text=Product';">
+    </div>
+    <div class="product-info">
+     <div class="product-name">${escapeHTML(p.name)}</div>
+     <div class="category-label">${escapeHTML(normalizeCategory(p.category))}</div>
+     <div class="price">৳${money(p.price)}</div>
+     <button type="button" class="add-btn" data-add="${escapeHTML(p.id)}">＋ কার্টে যোগ করুন</button>
+    </div>
+   </article>
+  `;
  }).join("");
- $("products").querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>addToCart(b.dataset.add)));
+
+ $("products").querySelectorAll("[data-add]").forEach(b=>{
+  b.addEventListener("click",()=>addToCart(b.dataset.add));
+ });
 }
+
 function addToCart(id){
- const p=products.find(x=>x.id===id);if(!p)return;
- if(!p.sellerId){alert("এই পণ্যটি এখনো কোনো অনুমোদিত বিক্রেতার সঙ্গে যুক্ত নয়।");return}
- if(!cart[id])cart[id]={...p,qty:0};cart[id].qty++;renderCart();
+ const p=products.find(x=>x.id===id);
+
+ if(!p||!isMembershipActive(p.sellerId)){
+  alert("এই বিক্রেতার সদস্যপদের মেয়াদ শেষ হয়েছে অথবা সদস্যপদ সক্রিয় নয়।");
+  renderProducts();
+  return;
+ }
+
+ if(!p.sellerId){
+  alert("এই পণ্যটি কোনো বিক্রেতার সঙ্গে যুক্ত নয়।");
+  return;
+ }
+
+ if(!cart[id])cart[id]={...p,qty:0};
+ cart[id].qty++;
+ renderCart();
 }
-function changeQty(id,delta){if(!cart[id])return;cart[id].qty+=delta;if(cart[id].qty<=0)delete cart[id];renderCart()}
-function removeItem(id){delete cart[id];renderCart()}
-function clearCart(){cart={};renderCart()}
+
+function changeQty(id,delta){
+ if(!cart[id])return;
+
+ if(!isMembershipActive(cart[id].sellerId)){
+  delete cart[id];
+  renderCart();
+  renderProducts();
+  alert("বিক্রেতার সদস্যপদের মেয়াদ শেষ হয়েছে।");
+  return;
+ }
+
+ cart[id].qty+=delta;
+
+ if(cart[id].qty<=0)delete cart[id];
+
+ renderCart();
+}
+
+function removeItem(id){
+ delete cart[id];
+ renderCart();
+}
+
+function clearCart(){
+ cart={};
+ renderCart();
+}
+
 function renderCart(){
- const items=Object.values(cart);
+ const items=Object.values(cart).filter(p=>
+  isMembershipActive(p.sellerId)
+ );
+
  $("cartCount").textContent=items.reduce((s,p)=>s+p.qty,0);
- $("cartTotal").textContent=money(items.reduce((s,p)=>s+p.price*p.qty,0));
- if(!items.length){$("cartItems").innerHTML='<p class="notice">এখনো কোনো পণ্য যোগ করা হয়নি।</p>';return}
- $("cartItems").innerHTML=items.map(p=>`<div class="cart-line"><div class="cart-line-name"><strong>${escapeHTML(p.name)}</strong><br>৳${money(p.price)} × ${p.qty} = ৳${money(p.price*p.qty)}</div><div class="qty-controls"><button type="button" data-minus="${escapeHTML(p.id)}" aria-label="একটি কমান">−</button><strong>${p.qty}</strong><button type="button" data-plus="${escapeHTML(p.id)}" aria-label="একটি বাড়ান">＋</button><button type="button" class="remove-btn" data-remove="${escapeHTML(p.id)}" aria-label="সরান">×</button></div></div>`).join("");
- $("cartItems").querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));
- $("cartItems").querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));
- $("cartItems").querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>removeItem(b.dataset.remove));
+ $("cartTotal").textContent=money(
+  items.reduce((s,p)=>s+p.price*p.qty,0)
+ );
+
+ if(!items.length){
+  $("cartItems").innerHTML='<p class="notice">এখনো কোনো পণ্য যোগ করা হয়নি।</p>';
+  return;
+ }
+
+ $("cartItems").innerHTML=items.map(p=>`
+  <div class="cart-line">
+   <div class="cart-line-name">
+    <strong>${escapeHTML(p.name)}</strong><br>
+    ৳${money(p.price)} × ${p.qty} = ৳${money(p.price*p.qty)}
+   </div>
+   <div class="qty-controls">
+    <button type="button" data-minus="${escapeHTML(p.id)}" aria-label="একটি কমান">−</button>
+    <strong>${p.qty}</strong>
+    <button type="button" data-plus="${escapeHTML(p.id)}" aria-label="একটি বাড়ান">＋</button>
+    <button type="button" class="remove-btn" data-remove="${escapeHTML(p.id)}" aria-label="সরান">×</button>
+   </div>
+  </div>
+ `).join("");
+
+ $("cartItems").querySelectorAll("[data-minus]").forEach(b=>
+  b.onclick=()=>changeQty(b.dataset.minus,-1)
+ );
+
+ $("cartItems").querySelectorAll("[data-plus]").forEach(b=>
+  b.onclick=()=>changeQty(b.dataset.plus,1)
+ );
+
+ $("cartItems").querySelectorAll("[data-remove]").forEach(b=>
+  b.onclick=()=>removeItem(b.dataset.remove)
+ );
 }
-function goToCart(){$("cart").scrollIntoView({behavior:"smooth"})}
+
+function goToCart(){
+ $("cart").scrollIntoView({behavior:"smooth"});
+}
+
 function checkout(){
- if(!Object.keys(cart).length){alert("আগে কার্টে পণ্য যোগ করুন।");return}
- if(!currentUser){alert("অর্ডার করতে আগে লগইন করুন। এখন অ্যাকাউন্ট পেজে নেওয়া হবে।");location.href="account.html";return}
- $("checkoutForm").hidden=false;$("checkoutForm").scrollIntoView({behavior:"smooth"});
+ removeExpiredProducts();
+
+ if(!Object.keys(cart).length){
+  alert("আগে সক্রিয় বিক্রেতার পণ্য কার্টে যোগ করুন।");
+  return;
+ }
+
+ if(!currentUser){
+  alert("অর্ডার করতে আগে লগইন করুন।");
+  location.href="account.html";
+  return;
+ }
+
+ $("checkoutForm").hidden=false;
+ $("checkoutForm").scrollIntoView({behavior:"smooth"});
 }
-window.goToCart=goToCart;window.checkout=checkout;window.clearCart=clearCart;
+
+window.goToCart=goToCart;
+window.checkout=checkout;
+window.clearCart=clearCart;
+
 $("searchInput").addEventListener("input",renderProducts);
 $("sortSelect").addEventListener("change",renderProducts);
-onAuthStateChanged(auth,user=>{currentUser=user});
+
+onAuthStateChanged(auth,user=>{
+ currentUser=user;
+});
+
+// Membership রেকর্ড প্রতিটি Seller-এর UID দিয়ে আলাদাভাবে পড়া হবে।
+async function loadMemberships(sellerIds){
+ const uniqueIds=[...new Set(sellerIds.filter(Boolean))];
+
+ await Promise.all(uniqueIds.map(async sellerId=>{
+  try{
+   const snap=await getDoc(
+    doc(db,"publicSellerMemberships",sellerId)
+   );
+
+   if(snap.exists()){
+    membershipCache.set(sellerId,snap.data());
+   }else{
+    membershipCache.delete(sellerId);
+   }
+  }catch(error){
+   console.error("Membership load failed:",sellerId,error);
+   membershipCache.delete(sellerId);
+  }
+ }));
+}
+
 $("webOrderForm").addEventListener("submit",async event=>{
- event.preventDefault();if(submitting)return;
- if(!currentUser){$("orderMessage").textContent="অর্ডার করতে লগইন করুন।";return}
- const items=Object.values(cart);if(!items.length){$("orderMessage").textContent="কার্ট খালি।";return}
- const buyerName=$("buyerName").value.trim(),buyerPhone=$("buyerPhone").value.trim(),buyerAddress=$("buyerAddress").value.trim();
- if(buyerName.length<2||buyerPhone.length<7||buyerAddress.length<5){$("orderMessage").textContent="নাম, ফোন নম্বর ও সম্পূর্ণ ঠিকানা সঠিকভাবে লিখুন.";return}
- if(items.some(p=>!p.sellerId||!p.firestoreId||!Number.isSafeInteger(p.price)||p.price<1)){$("orderMessage").textContent="কার্টে এমন পণ্য আছে যার বিক্রেতার তথ্য নেই। সেটি সরিয়ে আবার চেষ্টা করুন.";return}
- submitting=true;$("placeOrderBtn").disabled=true;$("placeOrderBtn").textContent="অর্ডার জমা হচ্ছে...";$("orderMessage").textContent="অনুগ্রহ করে অপেক্ষা করুন...";
+ event.preventDefault();
+
+ if(submitting)return;
+
+ if(!currentUser){
+  $("orderMessage").textContent="অর্ডার করতে লগইন করুন।";
+  return;
+ }
+
+ await loadMemberships(products.map(p=>p.sellerId));
+ removeExpiredProducts();
+
+ const items=Object.values(cart);
+
+ if(!items.length){
+  $("orderMessage").textContent="কার্টে কোনো সক্রিয় পণ্য নেই।";
+  return;
+ }
+
+ const buyerName=$("buyerName").value.trim();
+ const buyerPhone=$("buyerPhone").value.trim();
+ const buyerAddress=$("buyerAddress").value.trim();
+
+ if(buyerName.length<2||buyerPhone.length<7||buyerAddress.length<5){
+  $("orderMessage").textContent="নাম, ফোন নম্বর ও সম্পূর্ণ ঠিকানা সঠিকভাবে লিখুন।";
+  return;
+ }
+
+ if(items.some(p=>
+  !p.sellerId||
+  !p.firestoreId||
+  !Number.isSafeInteger(p.price)||
+  p.price<1||
+  !isMembershipActive(p.sellerId)
+ )){
+  $("orderMessage").textContent="কার্টে মেয়াদ শেষ বা অবৈধ বিক্রেতার পণ্য আছে। কার্ট পরীক্ষা করুন।";
+  return;
+ }
+
+ submitting=true;
+ $("placeOrderBtn").disabled=true;
+ $("placeOrderBtn").textContent="অর্ডার জমা হচ্ছে...";
+ $("orderMessage").textContent="অনুগ্রহ করে অপেক্ষা করুন...";
+
  try{
   const grouped={};
-  for(const p of items){if(!grouped[p.sellerId])grouped[p.sellerId]=[];grouped[p.sellerId].push({productId:p.firestoreId,name:p.name,price:p.price,quantity:p.qty,image:p.image||"",lineTotal:p.price*p.qty})}
-  const batch=writeBatch(db),orderRefs=[];
-  for(const [sellerId,sellerItems] of Object.entries(grouped)){
-   const subtotal=sellerItems.reduce((s,p)=>s+p.lineTotal,0),orderRef=doc(collection(db,"orders"));
-   orderRefs.push(orderRef.id);
-   batch.set(orderRef,{buyerId:currentUser.uid,buyerEmail:currentUser.email||"",buyerName,buyerPhone,buyerAddress,sellerId,items:sellerItems,subtotal,deliveryCharge:0,total:subtotal,status:"pending",createdAt:serverTimestamp()});
+
+  for(const p of items){
+   if(!grouped[p.sellerId])grouped[p.sellerId]=[];
+
+   grouped[p.sellerId].push({
+    productId:p.firestoreId,
+    name:p.name,
+    price:p.price,
+    quantity:p.qty,
+    image:p.image||"",
+    lineTotal:p.price*p.qty
+   });
   }
-  await batch.commit();cart={};renderCart();$("webOrderForm").reset();
-  $("orderMessage").textContent="অর্ডার সফলভাবে জমা হয়েছে! অর্ডার নম্বর: "+orderRefs.join(", ")+". ডেলিভারি চার্জ পরে বিক্রেতা নিশ্চিত করবেন।";
+
+  const batch=writeBatch(db);
+  const orderRefs=[];
+
+  for(const [sellerId,sellerItems] of Object.entries(grouped)){
+   if(!isMembershipActive(sellerId)){
+    throw new Error("SELLER_MEMBERSHIP_EXPIRED");
+   }
+
+   const subtotal=sellerItems.reduce((s,p)=>s+p.lineTotal,0);
+   const orderRef=doc(collection(db,"orders"));
+
+   orderRefs.push(orderRef.id);
+
+   batch.set(orderRef,{
+    buyerId:currentUser.uid,
+    buyerEmail:currentUser.email||"",
+    buyerName,
+    buyerPhone,
+    buyerAddress,
+    sellerId,
+    items:sellerItems,
+    subtotal,
+    deliveryCharge:0,
+    total:subtotal,
+    status:"pending",
+    createdAt:serverTimestamp()
+   });
+  }
+
+  await batch.commit();
+
+  cart={};
+  renderCart();
+  $("webOrderForm").reset();
+
+  $("orderMessage").textContent=
+   "অর্ডার সফলভাবে জমা হয়েছে! অর্ডার নম্বর: "+
+   orderRefs.join(", ")+
+   ". ডেলিভারি চার্জ পরে বিক্রেতা নিশ্চিত করবেন।";
+
  }catch(error){
   console.error("Order submission failed:",error);
-  $("orderMessage").textContent="অর্ডার জমা হয়নি। Error: "+(error.code||"unknown")+" — "+(error.message||"অজানা সমস্যা");
- }finally{submitting=false;$("placeOrderBtn").disabled=false;$("placeOrderBtn").textContent="অর্ডার নিশ্চিত করুন"}
+
+  $("orderMessage").textContent=
+   error.message==="SELLER_MEMBERSHIP_EXPIRED"
+   ?"বিক্রেতার সদস্যপদের মেয়াদ শেষ। অর্ডার করা যাচ্ছে না।"
+   :"অর্ডার জমা হয়নি। "+(error.code||"")+" "+(error.message||"অজানা সমস্যা");
+
+ }finally{
+  submitting=false;
+  $("placeOrderBtn").disabled=false;
+  $("placeOrderBtn").textContent="অর্ডার নিশ্চিত করুন";
+ }
 });
+
+// Products লোড
 try{
- onSnapshot(collection(db,"products"),snapshot=>{
-  const remote=snapshot.docs.map(item=>{const d=item.data();return{id:item.id,firestoreId:item.id,name:String(d.name||d.title||"নতুন পণ্য"),price:Number(d.price),category:normalizeCategory(d.category),image:String(d.imageUrl||d.image||""),sellerId:String(d.sellerId||""),sellerEmail:String(d.sellerEmail||""),status:String(d.status||"")} }).filter(p=>p.sellerId&&["approved","active"].includes(p.status)&&Number.isSafeInteger(p.price)&&p.price>0);
-  products=remote;$("firebaseStatus").textContent=`${remote.length}টি অনুমোদিত বিক্রেতার পণ্য পাওয়া গেছে।`;renderProducts();
- },error=>{console.error(error);$("firebaseStatus").textContent="Firebase পণ্য লোড হয়নি।";products=[];renderProducts()});
-}catch(error){console.error(error);$("firebaseStatus").textContent="Firebase সংযোগে সমস্যা।"}
-renderCategories();renderCart();renderProducts();
-</script>
+ onSnapshot(collection(db,"products"),async snapshot=>{
+  const remote=snapshot.docs.map(item=>{
+   const d=item.data();
+
+   return {
+    id:item.id,
+    firestoreId:item.id,
+    name:String(d.name||d.title||"নতুন পণ্য"),
+    price:Number(d.price),
+    category:normalizeCategory(d.category),
+    image:String(d.imageUrl||d.image||""),
+    sellerId:String(d.sellerId||""),
+    sellerEmail:String(d.sellerEmail||""),
+    status:String(d.status||"")
+   };
+  }).filter(p=>
+   p.sellerId&&
+   ["approved","active"].includes(p.status)&&
+   Number.isSafeInteger(p.price)&&
+   p.price>0
+  );
+
+  products=remote;
+
+  $("firebaseStatus").textContent="বিক্রেতার সদস্যপদ যাচাই হচ্ছে...";
+
+  await loadMemberships(remote.map(p=>p.sellerId));
+
+  removeExpiredProducts();
+  renderProducts();
+
+  const activeCount=remote.filter(p=>
+   isMembershipActive(p.sellerId)
+  ).length;
+
+  $("firebaseStatus").textContent=
+   `${activeCount}টি সক্রিয় সদস্যের পণ্য পাওয়া গেছে।`;
+
+ },error=>{
+  console.error(error);
+  $("firebaseStatus").textContent="Firebase পণ্য লোড হয়নি।";
+  products=[];
+  membershipCache.clear();
+  renderProducts();
+ });
+
+}catch(error){
+ console.error(error);
+ $("firebaseStatus").textContent="Firebase সংযোগে সমস্যা।";
+}
+
+// পেজ খোলা থাকলেও প্রতি ১ মিনিটে মেয়াদ পরীক্ষা
+setInterval(()=>{
+ removeExpiredProducts();
+ renderProducts();
+},60000);
+
+renderCategories();
+renderCart();
+renderProducts();
+ </script>
 
 <script>
 (function(){
