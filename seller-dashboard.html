@@ -107,8 +107,18 @@
       border-radius: 9px;
       background: #fff7ed;
       color: #9a3412;
-      line-height: 1.6;
+      line-height: 1.7;
       overflow-wrap: anywhere;
+    }
+
+    .success-notice {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .danger-notice {
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .product, .order {
@@ -187,15 +197,20 @@
 </head>
 
 <body>
+
 <header>
   <h2>🛍️ Mishor's Shop</h2>
   <p>বিক্রেতা ড্যাশবোর্ড</p>
 </header>
 
 <main>
+
   <section class="card">
     <h3>👤 আপনার অ্যাকাউন্ট</h3>
-    <p id="accountInfo">Firebase-এর সঙ্গে সংযোগ করা হচ্ছে...</p>
+
+    <p id="accountInfo">
+      Firebase-এর সঙ্গে সংযোগ করা হচ্ছে...
+    </p>
 
     <p id="membershipInfo" class="notice">
       সদস্যপদের তথ্য যাচাই করা হচ্ছে।
@@ -205,8 +220,8 @@
       লগইন করুন
     </button>
 
-    <button id="feeBtn" class="secondary hidden">
-      সদস্য ফি জমা দিন
+    <button id="feeBtn" class="primary hidden">
+      সদস্য ফি জমা দিন / নবায়ন করুন
     </button>
 
     <button id="logoutBtn" class="secondary hidden">
@@ -218,18 +233,30 @@
     <h3>➕ নতুন পণ্য যোগ করুন</h3>
 
     <p class="muted">
-      পণ্যের তথ্য সঠিকভাবে পূরণ করো। অনুমোদিত বিক্রেতার পোস্ট করা পণ্য
-      বর্তমানে approved স্ট্যাটাসে প্রকাশিত হবে।
+      পণ্যের তথ্য সঠিকভাবে পূরণ করো।
+      শুধু সক্রিয় সদস্যপদ থাকা অনুমোদিত বিক্রেতারাই পণ্য পোস্ট করতে পারবে।
     </p>
 
     <form id="productForm">
+
       <label for="productName">পণ্যের নাম *</label>
-      <input id="productName" maxlength="100" required
-        placeholder="যেমন: সুন্দর একটি শার্ট">
+      <input
+        id="productName"
+        maxlength="100"
+        required
+        placeholder="যেমন: সুন্দর একটি শার্ট"
+      >
 
       <label for="price">দাম (টাকা) *</label>
-      <input id="price" type="number" min="1"
-        max="10000000" step="1" required placeholder="যেমন: 500">
+      <input
+        id="price"
+        type="number"
+        min="1"
+        max="10000000"
+        step="1"
+        required
+        placeholder="যেমন: 500"
+      >
 
       <label for="category">বিভাগ *</label>
       <select id="category" required>
@@ -242,57 +269,79 @@
       </select>
 
       <label for="imageUrl">পণ্যের ছবির লিংক *</label>
-      <input id="imageUrl" type="url" required
-        placeholder="https://example.com/product.jpg">
+      <input
+        id="imageUrl"
+        type="url"
+        required
+        placeholder="https://example.com/product.jpg"
+      >
 
       <p class="muted">
         আপাতত অনলাইনে থাকা ছবির URL দিতে হবে।
       </p>
 
       <label for="description">পণ্যের বিবরণ *</label>
-      <textarea id="description" maxlength="1500" required
-        placeholder="পণ্যের আকার, রং ও বৈশিষ্ট্য লিখো"></textarea>
+      <textarea
+        id="description"
+        maxlength="1500"
+        required
+        placeholder="পণ্যের আকার, রং ও বৈশিষ্ট্য লিখো"
+      ></textarea>
 
       <button id="submitBtn" class="primary" type="submit">
         পণ্য পোস্ট করুন
       </button>
+
     </form>
   </section>
 
   <section class="card">
+
     <div class="section-heading">
       <h3>📦 আমার অর্ডার</h3>
+
       <button id="refreshOrdersBtn" class="secondary hidden">
         ↻ রিফ্রেশ
       </button>
     </div>
 
     <p class="muted">
-      তোমার পণ্যের অর্ডার এখানে দেখা যাবে। অর্ডার গ্রহণ বা অগ্রগতির
-      অবস্থা পরিবর্তন করতে পারবে।
+      তোমার পণ্যের অর্ডার এখানে দেখা যাবে।
+      অর্ডার গ্রহণ বা অগ্রগতির অবস্থা পরিবর্তন করতে পারবে।
     </p>
 
     <div id="myOrders">অর্ডার লোড হচ্ছে...</div>
+
   </section>
 
   <section class="card">
+
     <div class="section-heading">
       <h3>🛍️ আমার পণ্য</h3>
+
       <button id="refreshProductsBtn" class="secondary hidden">
         ↻ রিফ্রেশ
       </button>
     </div>
 
     <div id="myProducts">পণ্য লোড হচ্ছে...</div>
+
   </section>
 
   <p id="message" class="status" role="status" aria-live="polite"></p>
 
-  <p><a href="index.html">← দোকানের মূল পেজে ফিরে যাও</a></p>
-  <p><a href="account.html">আমার অ্যাকাউন্ট</a></p>
+  <p>
+    <a href="index.html">← দোকানের মূল পেজে ফিরে যাও</a>
+  </p>
+
+  <p>
+    <a href="account.html">আমার অ্যাকাউন্ট</a>
+  </p>
+
 </main>
 
 <script type="module">
+
   import { initializeApp } from
     "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 
@@ -317,6 +366,11 @@
   } from
     "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
+
+  // =====================================
+  // FIREBASE CONFIG
+  // =====================================
+
   const firebaseConfig = {
     apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
     authDomain: "mishors-shop-admin.firebaseapp.com",
@@ -329,7 +383,13 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+
   const $ = id => document.getElementById(id);
+
+
+  // =====================================
+  // GLOBAL VARIABLES
+  // =====================================
 
   let currentUser = null;
   let canSubmit = false;
@@ -345,40 +405,98 @@
     cancelled: "বাতিল"
   };
 
+
+  // =====================================
+  // GENERAL FUNCTIONS
+  // =====================================
+
   function showMessage(text, isError = false) {
     $("message").textContent = text;
-    $("message").style.color = isError ? "#b91c1c" : "#166534";
+    $("message").style.color =
+      isError ? "#b91c1c" : "#166534";
   }
 
-  function setMembershipMessage(text) {
+  function setMembershipMessage(text, type = "notice") {
     $("membershipInfo").textContent = text;
+    $("membershipInfo").className = "notice";
+
+    if (type === "success") {
+      $("membershipInfo").classList.add("success-notice");
+    }
+
+    if (type === "danger") {
+      $("membershipInfo").classList.add("danger-notice");
+    }
   }
 
   function addText(parent, tag, text, className = "") {
     const el = document.createElement(tag);
     el.textContent = text;
-    if (className) el.className = className;
+
+    if (className) {
+      el.className = className;
+    }
+
     parent.appendChild(el);
     return el;
   }
+
+  function getMembershipExpiry(profile) {
+    const expiry = profile.membershipExpiresAt;
+
+    if (!expiry || typeof expiry.toDate !== "function") {
+      return null;
+    }
+
+    return expiry.toDate();
+  }
+
+  function getRemainingDays(expiryDate) {
+    const remaining =
+      expiryDate.getTime() - Date.now();
+
+    if (remaining <= 0) return 0;
+
+    return Math.ceil(
+      remaining / (1000 * 60 * 60 * 24)
+    );
+  }
+
+
+  // =====================================
+  // RESET PAGE
+  // =====================================
 
   function resetPage() {
     currentUser = null;
     canSubmit = false;
 
     $("accountInfo").textContent = "লগইন করা নেই।";
-    setMembershipMessage("বিক্রেতার তথ্য দেখতে লগইন করো.");
+
+    setMembershipMessage(
+      "বিক্রেতার তথ্য দেখতে লগইন করো।"
+    );
 
     $("formCard").classList.add("hidden");
     $("logoutBtn").classList.add("hidden");
     $("feeBtn").classList.add("hidden");
+
     $("loginBtn").classList.remove("hidden");
+
     $("refreshOrdersBtn").classList.add("hidden");
     $("refreshProductsBtn").classList.add("hidden");
 
-    $("myProducts").textContent = "পণ্য দেখতে লগইন করো।";
-    $("myOrders").textContent = "অর্ডার দেখতে লগইন করো।";
+    $("myProducts").textContent =
+      "পণ্য দেখতে লগইন করো।";
+
+    $("myOrders").textContent =
+      "অর্ডার দেখতে লগইন করো।";
   }
+
+
+  // =====================================
+  // BUTTON EVENTS
+  // =====================================
 
   $("loginBtn").addEventListener("click", () => {
     location.href = "account.html";
@@ -394,18 +512,59 @@
       location.href = "account.html";
     } catch (error) {
       console.error(error);
-      showMessage("লগআউট করা যায়নি। আবার চেষ্টা করো।", true);
+      showMessage(
+        "লগআউট করা যায়নি। আবার চেষ্টা করো।",
+        true
+      );
     }
   });
 
+
+  // =====================================
+  // CHECK PENDING PAYMENT
+  // =====================================
+
+  async function findPendingPayment(uid) {
+
+    const result = await getDocs(
+      query(
+        collection(db, "sellerPayments"),
+        where("uid", "==", uid)
+      )
+    );
+
+    const payments = result.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    payments.sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+
+    return payments;
+  }
+
+
+  // =====================================
+  // LOAD MY PRODUCTS
+  // =====================================
+
   async function loadMyProducts(uid) {
-    $("myProducts").textContent = "পণ্য লোড হচ্ছে...";
+
+    $("myProducts").textContent =
+      "পণ্য লোড হচ্ছে...";
 
     try {
-      const result = await getDocs(query(
-        collection(db, "products"),
-        where("sellerId", "==", uid)
-      ));
+
+      const result = await getDocs(
+        query(
+          collection(db, "products"),
+          where("sellerId", "==", uid)
+        )
+      );
 
       if (auth.currentUser?.uid !== uid) return;
 
@@ -413,7 +572,8 @@
       container.replaceChildren();
 
       if (result.empty) {
-        container.textContent = "এখনো কোনো পণ্য পোস্ট করোনি।";
+        container.textContent =
+          "এখনো কোনো পণ্য পোস্ট করোনি।";
         return;
       }
 
@@ -428,27 +588,47 @@
       );
 
       for (const product of rows) {
+
         const card = document.createElement("div");
         card.className = "product";
 
-        addText(card, "h4",
-          product.name || product.title || "নাম দেওয়া হয়নি");
+        addText(
+          card,
+          "h4",
+          product.name || product.title || "নাম দেওয়া হয়নি"
+        );
 
-        const imageUrl = product.imageUrl || product.image || "";
+        const imageUrl =
+          product.imageUrl || product.image || "";
 
-        if (typeof imageUrl === "string" &&
-            /^https?:\/\//i.test(imageUrl)) {
+        if (
+          typeof imageUrl === "string" &&
+          /^https?:\/\//i.test(imageUrl)
+        ) {
+
           const img = document.createElement("img");
+
           img.src = imageUrl;
           img.alt = product.name || "পণ্যের ছবি";
           img.loading = "lazy";
           img.referrerPolicy = "no-referrer";
+
           img.addEventListener("error", () => img.remove());
+
           card.appendChild(img);
         }
 
-        addText(card, "p", "দাম: ৳" + (product.price ?? "—"));
-        addText(card, "p", "বিভাগ: " + (product.category || "অন্যান্য"));
+        addText(
+          card,
+          "p",
+          "দাম: ৳" + (product.price ?? "—")
+        );
+
+        addText(
+          card,
+          "p",
+          "বিভাগ: " + (product.category || "অন্যান্য")
+        );
 
         const labels = {
           approved: "অনুমোদিত",
@@ -457,9 +637,13 @@
           rejected: "প্রত্যাখ্যাত"
         };
 
-        addText(card, "p",
-          "অবস্থা: " + (labels[product.status] || "যাচাই করা হচ্ছে"),
-          "status");
+        addText(
+          card,
+          "p",
+          "অবস্থা: " +
+            (labels[product.status] || "যাচাই করা হচ্ছে"),
+          "status"
+        );
 
         if (product.description) {
           addText(card, "p", product.description);
@@ -467,14 +651,23 @@
 
         container.appendChild(card);
       }
+
     } catch (error) {
+
       console.error("loadMyProducts:", error);
+
       $("myProducts").textContent =
         "পণ্য লোড হয়নি। ইন্টারনেট ও Firebase Rules পরীক্ষা করো।";
     }
   }
 
+
+  // =====================================
+  // ORDER STATUS
+  // =====================================
+
   function allowedNextStatuses(status) {
+
     const transitions = {
       pending: ["confirmed", "cancelled"],
       confirmed: ["processing", "cancelled"],
@@ -487,52 +680,87 @@
     return transitions[status] || [];
   }
 
-  async function changeOrderStatus(orderId, oldStatus, newStatus, button) {
+
+  async function changeOrderStatus(
+    orderId,
+    oldStatus,
+    newStatus,
+    button
+  ) {
+
     if (!currentUser || !canSubmit) {
-      showMessage("অনুমোদিত বিক্রেতা হিসেবে লগইন করো।", true);
+      showMessage(
+        "সক্রিয় সদস্যপদ থাকা অনুমোদিত বিক্রেতা হিসেবে লগইন করো।",
+        true
+      );
       return;
     }
 
-    if (!allowedNextStatuses(oldStatus).includes(newStatus)) {
-      showMessage("এই অর্ডারের স্ট্যাটাস পরিবর্তন করা যাবে না।", true);
+    if (
+      !allowedNextStatuses(oldStatus).includes(newStatus)
+    ) {
+      showMessage(
+        "এই অর্ডারের স্ট্যাটাস পরিবর্তন করা যাবে না।",
+        true
+      );
       return;
     }
 
     const confirmation =
-      "অর্ডারের অবস্থা '" + statusLabels[newStatus] + "' করতে চাও?";
+      "অর্ডারের অবস্থা '" +
+      statusLabels[newStatus] +
+      "' করতে চাও?";
 
     if (!confirm(confirmation)) return;
 
     button.disabled = true;
 
     try {
-      // Firestore Rules verify that this seller owns this order.
-      await updateDoc(doc(db, "orders", orderId), {
-        status: newStatus
-      });
+
+      // Firestore Rules also verify membership and ownership.
+      await updateDoc(
+        doc(db, "orders", orderId),
+        {
+          status: newStatus
+        }
+      );
 
       showMessage("অর্ডারের অবস্থা আপডেট হয়েছে।");
+
       await loadMyOrders(currentUser.uid);
+
     } catch (error) {
+
       console.error("changeOrderStatus:", error);
+
       showMessage(
-        "স্ট্যাটাস আপডেট হয়নি। Firebase Rules বা অর্ডারের মালিকানা পরীক্ষা করো।",
+        "স্ট্যাটাস আপডেট হয়নি। Membership, Firebase Rules বা অর্ডারের মালিকানা পরীক্ষা করো।",
         true
       );
+
     } finally {
       button.disabled = false;
     }
   }
 
+
+  // =====================================
+  // LOAD MY ORDERS
+  // =====================================
+
   async function loadMyOrders(uid) {
-    $("myOrders").textContent = "অর্ডার লোড হচ্ছে...";
+
+    $("myOrders").textContent =
+      "অর্ডার লোড হচ্ছে...";
 
     try {
-      // No orderBy is used, to reduce the chance of requiring a composite index.
-      const result = await getDocs(query(
-        collection(db, "orders"),
-        where("sellerId", "==", uid)
-      ));
+
+      const result = await getDocs(
+        query(
+          collection(db, "orders"),
+          where("sellerId", "==", uid)
+        )
+      );
 
       if (auth.currentUser?.uid !== uid) return;
 
@@ -540,7 +768,8 @@
       container.replaceChildren();
 
       if (result.empty) {
-        container.textContent = "এখনো কোনো অর্ডার আসেনি।";
+        container.textContent =
+          "এখনো কোনো অর্ডার আসেনি।";
         return;
       }
 
@@ -555,24 +784,59 @@
       );
 
       for (const order of rows) {
+
         const card = document.createElement("div");
         card.className = "order";
 
-        addText(card, "h4", "অর্ডার #" + order.id.slice(0, 8));
+        addText(
+          card,
+          "h4",
+          "অর্ডার #" + order.id.slice(0, 8)
+        );
 
-        const status = statusLabels[order.status] || order.status || "অজানা";
-        addText(card, "p", "অবস্থা: " + status, "status");
+        const status =
+          statusLabels[order.status] ||
+          order.status ||
+          "অজানা";
 
-        addText(card, "p", "ক্রেতা: " + (order.buyerName || "তথ্য নেই"));
-        addText(card, "p", "ফোন: " + (order.buyerPhone || "তথ্য নেই"));
-        addText(card, "p", "ঠিকানা: " + (order.buyerAddress || "তথ্য নেই"));
+        addText(
+          card,
+          "p",
+          "অবস্থা: " + status,
+          "status"
+        );
+
+        addText(
+          card,
+          "p",
+          "ক্রেতা: " + (order.buyerName || "তথ্য নেই")
+        );
+
+        addText(
+          card,
+          "p",
+          "ফোন: " + (order.buyerPhone || "তথ্য নেই")
+        );
+
+        addText(
+          card,
+          "p",
+          "ঠিকানা: " + (order.buyerAddress || "তথ্য নেই")
+        );
 
         const itemBox = document.createElement("div");
         itemBox.className = "order-items";
-        addText(itemBox, "strong", "পণ্যের বিবরণ");
+
+        addText(
+          itemBox,
+          "strong",
+          "পণ্যের বিবরণ"
+        );
 
         if (Array.isArray(order.items)) {
+
           for (const item of order.items) {
+
             const name = item.name || "পণ্য";
             const qty = Number(item.quantity) || 1;
             const price = Number(item.price) || 0;
@@ -580,37 +844,55 @@
             addText(
               itemBox,
               "p",
-              name + " × " + qty + " — ৳" + (price * qty)
+              name + " × " + qty +
+              " — ৳" + (price * qty)
             );
           }
         }
 
         card.appendChild(itemBox);
 
-        addText(card, "p", "মোট: ৳" + (order.total ?? order.subtotal ?? "—"));
+        addText(
+          card,
+          "p",
+          "মোট: ৳" +
+            (order.total ?? order.subtotal ?? "—")
+        );
 
         const date = order.createdAt?.toDate?.();
 
         if (date) {
-          addText(card, "p", "অর্ডারের সময়: " + date.toLocaleString("bn-BD"));
+          addText(
+            card,
+            "p",
+            "অর্ডারের সময়: " +
+              date.toLocaleString("bn-BD")
+          );
         }
 
-        const nextStatuses = allowedNextStatuses(order.status);
+        const nextStatuses =
+          allowedNextStatuses(order.status);
 
         for (const nextStatus of nextStatuses) {
+
           const button = document.createElement("button");
+
           button.textContent = statusLabels[nextStatus];
+
           button.className =
             nextStatus === "cancelled" ? "red" :
-            nextStatus === "delivered" ? "green" : "blue";
+            nextStatus === "delivered" ? "green" :
+            "blue";
 
           button.addEventListener("click", () => {
+
             changeOrderStatus(
               order.id,
               order.status,
               nextStatus,
               button
             );
+
           });
 
           card.appendChild(button);
@@ -618,39 +900,65 @@
 
         container.appendChild(card);
       }
+
     } catch (error) {
+
       console.error("loadMyOrders:", error);
+
       $("myOrders").textContent =
-        "অর্ডার লোড হয়নি। Firebase Rules, লগইন ও ইন্টারনেট পরীক্ষা করো।";
+        "অর্ডার লোড হয়নি। Membership, Firebase Rules ও ইন্টারনেট পরীক্ষা করো।";
     }
   }
 
-  $("refreshOrdersBtn").addEventListener("click", async () => {
-    if (!currentUser || refreshInProgress) return;
 
-    refreshInProgress = true;
-    $("refreshOrdersBtn").disabled = true;
+  // =====================================
+  // REFRESH BUTTONS
+  // =====================================
 
-    try {
-      await loadMyOrders(currentUser.uid);
-    } finally {
-      refreshInProgress = false;
-      $("refreshOrdersBtn").disabled = false;
+  $("refreshOrdersBtn").addEventListener(
+    "click",
+    async () => {
+
+      if (!currentUser || refreshInProgress) return;
+
+      refreshInProgress = true;
+      $("refreshOrdersBtn").disabled = true;
+
+      try {
+        await loadMyOrders(currentUser.uid);
+      } finally {
+        refreshInProgress = false;
+        $("refreshOrdersBtn").disabled = false;
+      }
     }
-  });
+  );
 
-  $("refreshProductsBtn").addEventListener("click", async () => {
-    if (!currentUser) return;
-    await loadMyProducts(currentUser.uid);
-  });
+
+  $("refreshProductsBtn").addEventListener(
+    "click",
+    async () => {
+
+      if (!currentUser) return;
+
+      await loadMyProducts(currentUser.uid);
+    }
+  );
+
+
+  // =====================================
+  // CHECK SELLER AND MEMBERSHIP
+  // =====================================
 
   async function checkSeller(user, version) {
+
     canSubmit = false;
 
     $("formCard").classList.add("hidden");
     $("feeBtn").classList.add("hidden");
     $("loginBtn").classList.add("hidden");
+
     $("logoutBtn").classList.remove("hidden");
+
     $("refreshOrdersBtn").classList.remove("hidden");
     $("refreshProductsBtn").classList.remove("hidden");
 
@@ -660,7 +968,10 @@
     setMembershipMessage("অ্যাকাউন্ট যাচাই হচ্ছে...");
 
     try {
-      const userSnap = await getDoc(doc(db, "users", user.uid));
+
+      const userSnap = await getDoc(
+        doc(db, "users", user.uid)
+      );
 
       if (
         version !== authCheckVersion ||
@@ -668,46 +979,79 @@
       ) return;
 
       if (!userSnap.exists()) {
+
         setMembershipMessage(
-          "তোমার প্রোফাইল পাওয়া যায়নি। account.html থেকে অ্যাকাউন্ট পরীক্ষা করো।"
+          "তোমার প্রোফাইল পাওয়া যায়নি। account.html থেকে অ্যাকাউন্ট পরীক্ষা করো।",
+          "danger"
         );
-        $("myOrders").textContent = "বিক্রেতার প্রোফাইল পাওয়া যায়নি।";
-        await loadMyProducts(user.uid);
+
+        $("myOrders").textContent =
+          "বিক্রেতার প্রোফাইল পাওয়া যায়নি।";
+
+        $("myProducts").textContent =
+          "প্রোফাইল পাওয়া যায়নি।";
+
         return;
       }
 
       const profile = userSnap.data();
 
+      // Find payment records using UID field.
+      // Payment document IDs are automatically generated.
+      const payments = await findPendingPayment(user.uid);
+
+      if (
+        version !== authCheckVersion ||
+        auth.currentUser?.uid !== user.uid
+      ) return;
+
+      const pendingPayment = payments.find(
+        p => p.status === "pending"
+      );
+
+      const rejectedPayment = payments.find(
+        p => p.status === "rejected"
+      );
+
+      // =================================
+      // NOT AN APPROVED SELLER
+      // =================================
+
       if (
         profile.role !== "seller" ||
         profile.sellerStatus !== "approved"
       ) {
-        const paymentSnap = await getDoc(
-          doc(db, "sellerPayments", user.uid)
-        );
 
-        if (version !== authCheckVersion) return;
+        if (pendingPayment) {
 
-        if (paymentSnap.exists() &&
-            paymentSnap.data().status === "pending") {
           setMembershipMessage(
-            "তোমার ৳১০০ সদস্য ফি আবেদন যাচাইয়ের অপেক্ষায় আছে।"
+            "তোমার ৳১০০ সদস্য ফি আবেদন Admin-এর যাচাইয়ের অপেক্ষায় আছে।",
+            "notice"
           );
-        } else if (paymentSnap.exists() &&
-                   paymentSnap.data().status === "rejected") {
+
+        } else if (rejectedPayment) {
+
           setMembershipMessage(
-            "সদস্য ফি আবেদন বাতিল হয়েছে। তথ্য যাচাই করে আবার জমা দাও।"
+            "সদস্য ফি আবেদন বাতিল হয়েছে। তথ্য যাচাই করে আবার জমা দিতে পারো।",
+            "danger"
           );
+
           $("feeBtn").classList.remove("hidden");
+
         } else if (profile.sellerStatus === "pending") {
+
           setMembershipMessage(
-            "তোমার বিক্রেতা আবেদন অপেক্ষায় আছে। Admin অনুমোদনের পর পণ্য পোস্ট করতে পারবে।"
+            "তোমার বিক্রেতা আবেদন অপেক্ষায় আছে। সদস্য ফি জমা ও Admin অনুমোদনের পর পণ্য পোস্ট করতে পারবে।"
           );
+
           $("feeBtn").classList.remove("hidden");
+
         } else {
+
           setMembershipMessage(
-            "বিক্রেতা হতে সদস্য ফি জমা দিয়ে Admin-এর অনুমোদন নিতে হবে।"
+            "বিক্রেতা হতে ৳১০০ সদস্য ফি জমা দিয়ে Admin-এর অনুমোদন নিতে হবে।"
           );
+
           $("feeBtn").classList.remove("hidden");
         }
 
@@ -718,11 +1062,77 @@
         return;
       }
 
+
+      // =================================
+      // APPROVED SELLER MEMBERSHIP
+      // =================================
+
+      const expiryDate = getMembershipExpiry(profile);
+
+      if (!expiryDate) {
+
+        setMembershipMessage(
+          "তোমার Seller অনুমোদিত, কিন্তু Membership-এর মেয়াদ সেট করা নেই। Admin-এর সঙ্গে যোগাযোগ করো।",
+          "danger"
+        );
+
+        $("feeBtn").classList.remove("hidden");
+
+        $("myOrders").textContent =
+          "Membership-এর তথ্য ঠিক না হওয়া পর্যন্ত অর্ডার পরিচালনা বন্ধ থাকবে।";
+
+        await loadMyProducts(user.uid);
+        return;
+      }
+
+      const remainingDays =
+        getRemainingDays(expiryDate);
+
+      // =================================
+      // EXPIRED MEMBERSHIP
+      // =================================
+
+      if (remainingDays <= 0) {
+
+        canSubmit = false;
+
+        setMembershipMessage(
+          "তোমার Membership-এর মেয়াদ শেষ হয়েছে। নতুন পণ্য পোস্ট ও অর্ডার পরিচালনা বন্ধ আছে। নবায়ন করতে ৳১০০ সদস্য ফি জমা দাও।",
+          "danger"
+        );
+
+        $("feeBtn").classList.remove("hidden");
+        $("feeBtn").textContent = "৳১০০ দিয়ে Membership নবায়ন করুন";
+
+        $("myOrders").textContent =
+          "Membership-এর মেয়াদ শেষ। নবায়নের পর অর্ডার পরিচালনা করতে পারবে।";
+
+        await loadMyProducts(user.uid);
+        return;
+      }
+
+
+      // =================================
+      // ACTIVE MEMBERSHIP
+      // =================================
+
       canSubmit = true;
 
+      const expiryText =
+        expiryDate.toLocaleDateString("bn-BD");
+
       setMembershipMessage(
-        "সদস্যপদ অনুমোদিত! এখন তুমি পণ্য ও অর্ডার পরিচালনা করতে পারবে।"
+        "সদস্যপদ সক্রিয় আছে! বাকি " +
+        remainingDays +
+        " দিন। মেয়াদ শেষ হবে: " +
+        expiryText +
+        "। তুমি পণ্য ও অর্ডার পরিচালনা করতে পারবে।",
+        "success"
       );
+
+      $("feeBtn").classList.remove("hidden");
+      $("feeBtn").textContent =
+        "সদস্যপদ আগেই নবায়ন করতে চাইলে এখানে চাপো";
 
       $("formCard").classList.remove("hidden");
 
@@ -730,24 +1140,39 @@
         loadMyProducts(user.uid),
         loadMyOrders(user.uid)
       ]);
+
     } catch (error) {
+
       console.error("checkSeller:", error);
 
       if (version !== authCheckVersion) return;
 
+      canSubmit = false;
+
       setMembershipMessage(
-        "অ্যাকাউন্ট যাচাই করা যায়নি। Firebase Rules ও প্রোফাইল পরীক্ষা করো।"
+        "অ্যাকাউন্ট যাচাই করা যায়নি। Firebase Rules, Membership তথ্য ও ইন্টারনেট পরীক্ষা করো।",
+        "danger"
       );
 
       $("myOrders").textContent =
         "অ্যাকাউন্ট যাচাই না হওয়ায় অর্ডার দেখানো যাচ্ছে না।";
 
-      showMessage("অ্যাকাউন্ট যাচাই ব্যর্থ হয়েছে।", true);
+      showMessage(
+        "অ্যাকাউন্ট যাচাই ব্যর্থ হয়েছে।",
+        true
+      );
     }
   }
 
+
+  // =====================================
+  // AUTH STATE
+  // =====================================
+
   onAuthStateChanged(auth, async user => {
+
     const version = ++authCheckVersion;
+
     currentUser = user;
     canSubmit = false;
 
@@ -761,83 +1186,175 @@
     await checkSeller(user, version);
   });
 
-  $("productForm").addEventListener("submit", async event => {
-    event.preventDefault();
 
-    if (!currentUser || auth.currentUser?.uid !== currentUser.uid) {
-      showMessage("প্রথমে লগইন করো।", true);
-      return;
+  // =====================================
+  // ADD NEW PRODUCT
+  // =====================================
+
+  $("productForm").addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+      if (
+        !currentUser ||
+        auth.currentUser?.uid !== currentUser.uid
+      ) {
+
+        showMessage(
+          "প্রথমে লগইন করো।",
+          true
+        );
+
+        return;
+      }
+
+      if (!canSubmit) {
+
+        showMessage(
+          "সক্রিয় Membership থাকা অনুমোদিত বিক্রেতা ছাড়া পণ্য পোস্ট করা যাবে না।",
+          true
+        );
+
+        return;
+      }
+
+      const name = $("productName").value.trim();
+      const price = Number($("price").value);
+      const category = $("category").value;
+      const imageUrl = $("imageUrl").value.trim();
+      const description = $("description").value.trim();
+
+      let parsedUrl;
+
+      try {
+        parsedUrl = new URL(imageUrl);
+      } catch {
+        showMessage(
+          "পণ্যের ছবির সঠিক URL দাও।",
+          true
+        );
+        return;
+      }
+
+      if (
+        !name ||
+        name.length > 100 ||
+        !Number.isSafeInteger(price) ||
+        price < 1 ||
+        price > 10000000 ||
+        !category ||
+        !description ||
+        description.length > 1500 ||
+        parsedUrl.protocol !== "https:"
+      ) {
+
+        showMessage(
+          "সব তথ্য সঠিকভাবে পূরণ করো। ছবির লিংক অবশ্যই HTTPS হতে হবে।",
+          true
+        );
+
+        return;
+      }
+
+      $("submitBtn").disabled = true;
+      $("submitBtn").textContent = "পোস্ট হচ্ছে...";
+
+      try {
+
+        // Read membership again before posting.
+        // Firestore Rules also enforce expiry on the server.
+
+        const latestProfile = await getDoc(
+          doc(db, "users", currentUser.uid)
+        );
+
+        if (!latestProfile.exists()) {
+          throw new Error("PROFILE_NOT_FOUND");
+        }
+
+        const latestData = latestProfile.data();
+        const latestExpiry = getMembershipExpiry(latestData);
+
+        if (
+          latestData.role !== "seller" ||
+          latestData.sellerStatus !== "approved" ||
+          !latestExpiry ||
+          latestExpiry.getTime() <= Date.now()
+        ) {
+
+          canSubmit = false;
+
+          $("formCard").classList.add("hidden");
+          $("feeBtn").classList.remove("hidden");
+
+          setMembershipMessage(
+            "Membership-এর মেয়াদ শেষ বা অনুমোদন নেই। নবায়ন করে আবার চেষ্টা করো।",
+            "danger"
+          );
+
+          throw new Error("MEMBERSHIP_EXPIRED");
+        }
+
+        await addDoc(
+          collection(db, "products"),
+          {
+            name,
+            title: name,
+            price,
+            category,
+            image: imageUrl,
+            imageUrl,
+            description,
+            sellerId: currentUser.uid,
+            sellerEmail: currentUser.email || "",
+            status: "approved",
+            createdAt: serverTimestamp()
+          }
+        );
+
+        $("productForm").reset();
+
+        showMessage(
+          "পণ্য সফলভাবে পোস্ট হয়েছে!"
+        );
+
+        await loadMyProducts(currentUser.uid);
+
+      } catch (error) {
+
+        console.error(
+          "product submission:",
+          error
+        );
+
+        if (error.message === "MEMBERSHIP_EXPIRED") {
+
+          showMessage(
+            "Membership নবায়ন করে আবার চেষ্টা করো।",
+            true
+          );
+
+        } else {
+
+          showMessage(
+            "পণ্য পোস্ট হয়নি। Seller অনুমোদন, Membership, Firestore Rules ও ইন্টারনেট পরীক্ষা করো।",
+            true
+          );
+        }
+
+      } finally {
+
+        $("submitBtn").disabled = false;
+
+        $("submitBtn").textContent =
+          "পণ্য পোস্ট করুন";
+      }
     }
+  );
 
-    if (!canSubmit) {
-      showMessage("Admin অনুমোদিত বিক্রেতা ছাড়া পণ্য পোস্ট করা যাবে না.", true);
-      return;
-    }
-
-    const name = $("productName").value.trim();
-    const price = Number($("price").value);
-    const category = $("category").value;
-    const imageUrl = $("imageUrl").value.trim();
-    const description = $("description").value.trim();
-
-    let parsedUrl;
-
-    try {
-      parsedUrl = new URL(imageUrl);
-    } catch {
-      showMessage("পণ্যের ছবির সঠিক URL দাও।", true);
-      return;
-    }
-
-    if (
-      !name ||
-      name.length > 100 ||
-      !Number.isSafeInteger(price) ||
-      price < 1 ||
-      price > 10000000 ||
-      !category ||
-      !description ||
-      description.length > 1500 ||
-      !["https:", "http:"].includes(parsedUrl.protocol)
-    ) {
-      showMessage("সব তথ্য সঠিকভাবে পূরণ করো।", true);
-      return;
-    }
-
-    $("submitBtn").disabled = true;
-    $("submitBtn").textContent = "পোস্ট হচ্ছে...";
-
-    try {
-      await addDoc(collection(db, "products"), {
-        name,
-        title: name,
-        price,
-        category,
-        image: imageUrl,
-        imageUrl,
-        description,
-        sellerId: currentUser.uid,
-        sellerEmail: currentUser.email || "",
-        status: "approved",
-        createdAt: serverTimestamp()
-      });
-
-      $("productForm").reset();
-
-      showMessage("পণ্য সফলভাবে পোস্ট হয়েছে!");
-      await loadMyProducts(currentUser.uid);
-    } catch (error) {
-      console.error("product submission:", error);
-
-      showMessage(
-        "পণ্য পোস্ট হয়নি। Seller অনুমোদন, Firestore Rules ও ইন্টারনেট পরীক্ষা করো।",
-        true
-      );
-    } finally {
-      $("submitBtn").disabled = false;
-      $("submitBtn").textContent = "পণ্য পোস্ট করুন";
-    }
-  });
 </script>
+
 </body>
 </html>
