@@ -13,14 +13,14 @@ h2{color:#ea580c}
 input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:9px;font-size:15px}
 input,select{border:1px solid #ddd;background:white}
 button{border:0;background:#f97316;color:white;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.6}
+button:disabled{opacity:.6;cursor:not-allowed}
 .secondary{background:#475569}
 .danger{background:#dc2626}
 .success{background:#15803d}
 .item{border:1px solid #eee;padding:13px;border-radius:10px;margin-top:12px;overflow-wrap:anywhere}
 .actions{display:flex;gap:8px}
 .actions button{flex:1}
-.small{font-size:13px;color:#64748b;line-height:1.6}
+.small{font-size:13px;color:#64748b;line-height:1.7}
 #panel{display:none}
 .preview{width:100%;max-width:220px;max-height:220px;object-fit:contain;border:1px solid #ddd;border-radius:10px;display:none;margin:10px 0}
 .product-thumb{width:100px;height:100px;object-fit:contain;border:1px solid #eee;border-radius:8px;display:block;margin:8px 0}
@@ -28,6 +28,7 @@ button:disabled{opacity:.6}
 .order-items{background:#f8fafc;padding:10px;border-radius:8px;margin:8px 0}
 .status{font-weight:bold;color:#ea580c}
 hr{margin:30px 0;border:0;border-top:1px solid #ddd}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;background:#ffedd5;color:#9a3412;font-size:12px;font-weight:bold}
 </style>
 </head>
 
@@ -47,26 +48,29 @@ hr{margin:30px 0;border:0;border-top:1px solid #ddd}
 <button id="logout" class="secondary" hidden>লগআউট</button>
 </section>
 
-
 <section class="box" id="panel">
 
-<!-- MEMBERSHIP MANAGEMENT -->
+<h2>👑 Admin Dashboard</h2>
+<p class="small">Admin UID যাচাই সফল হয়েছে।</p>
 
-<h2>👥 Seller Membership</h2>
+<!-- MEMBERSHIP PAYMENTS -->
+
+<h2>💳 Seller Membership Payments</h2>
+
 <p class="small">
-বার্ষিক Seller Fee: ৳১০০। পেমেন্ট যাচাই করে Approve করতে হবে।
+বার্ষিক সদস্য ফি ৳১০০। Transaction ID ও পেমেন্ট তথ্য যাচাই করে Approve করো।
 </p>
 
 <div id="membershipSummary" class="summary">
-Membership তথ্য লোড হচ্ছে...
+পেমেন্টের তথ্য লোড হচ্ছে...
 </div>
 
 <button id="refreshApplications" class="secondary" type="button">
-🔄 আবেদন রিফ্রেশ
+🔄 পেমেন্ট রিফ্রেশ
 </button>
 
-<h3>⏳ Pending Seller Applications</h3>
-<div id="applicationList">আবেদন লোড হচ্ছে...</div>
+<h3>⏳ Pending Payment Applications</h3>
+<div id="applicationList">পেমেন্ট লোড হচ্ছে...</div>
 
 <hr>
 
@@ -114,6 +118,7 @@ Membership তথ্য লোড হচ্ছে...
 <input id="emoji" maxlength="10" placeholder="🎒">
 
 <button id="saveButton" type="submit">পণ্য Firebase-এ যোগ করুন</button>
+
 <button id="cancelEdit" class="secondary" type="button" hidden>
 সম্পাদনা বাতিল
 </button>
@@ -144,7 +149,6 @@ Membership তথ্য লোড হচ্ছে...
 
 </section>
 
-
 <script type="module">
 
 import { initializeApp }
@@ -162,13 +166,14 @@ import {
  collection,
  addDoc,
  getDocs,
+ getDoc,
  query,
  orderBy,
  serverTimestamp,
  updateDoc,
  deleteDoc,
  doc,
- setDoc,
+ writeBatch,
  Timestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
@@ -179,6 +184,10 @@ import {
  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-storage.js";
 
+
+// =====================================
+// FIREBASE CONFIG
+// =====================================
 
 const firebaseConfig = {
  apiKey: "AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
@@ -198,17 +207,22 @@ const adminUID = "A2kBB273NcSzQ2naJF2PBrue47k2";
 
 const $ = id => document.getElementById(id);
 
+let busy = false;
 let editingId = null;
 let oldImageUrl = "";
 let editingSellerId = "";
 let editingStatus = "";
-let busy = false;
 let previewObjectUrl = "";
 
 const categories = [
- "Fashion","Sports","Electronics","Gift",
- "Necessary Products","Shoes",
- "Beauty & Personal Care","Home & Living"
+ "Fashion",
+ "Sports",
+ "Electronics",
+ "Gift",
+ "Necessary Products",
+ "Shoes",
+ "Beauty & Personal Care",
+ "Home & Living"
 ];
 
 const statusLabels = {
@@ -222,8 +236,14 @@ const statusLabels = {
 
 const orderStatuses = Object.keys(statusLabels);
 
+
+// =====================================
+// ADMIN AUTHORIZATION
+// =====================================
+
 function isAdmin(){
- return !!auth.currentUser && auth.currentUser.uid === adminUID;
+ return !!auth.currentUser &&
+ auth.currentUser.uid === adminUID;
 }
 
 function setBusy(value){
@@ -233,49 +253,73 @@ function setBusy(value){
 }
 
 
+// =====================================
 // LOGIN
+// =====================================
 
 $("loginForm").addEventListener("submit",async e=>{
+
  e.preventDefault();
- $("message").textContent="লগইন হচ্ছে...";
+
+ $("message").textContent = "লগইন হচ্ছে...";
 
  try{
-  const result=await signInWithEmailAndPassword(
-   auth,$("email").value.trim(),$("password").value
+
+  const result = await signInWithEmailAndPassword(
+   auth,
+   $("email").value.trim(),
+   $("password").value
   );
 
-  if(result.user.uid!==adminUID){
+  if(result.user.uid !== adminUID){
+
    await signOut(auth);
-   $("message").textContent="এই অ্যাকাউন্ট Admin নয়।";
+
+   $("message").textContent =
+   "এই অ্যাকাউন্ট Admin নয়।";
+
    return;
   }
 
-  $("message").textContent="লগইন সফল!";
+  $("message").textContent = "Admin লগইন সফল!";
 
  }catch(error){
+
   console.error(error);
-  $("message").textContent="লগইন হয়নি। ইমেইল ও পাসওয়ার্ড পরীক্ষা করো।";
+
+  $("message").textContent =
+  "লগইন হয়নি। ইমেইল ও পাসওয়ার্ড পরীক্ষা করো।";
  }
 });
 
 $("logout").addEventListener("click",async()=>{
+
  await signOut(auth);
- $("message").textContent="লগআউট হয়েছে।";
+
+ $("message").textContent = "লগআউট হয়েছে।";
 });
 
 onAuthStateChanged(auth,async user=>{
- const allowed=!!user && user.uid===adminUID;
 
- $("panel").style.display=allowed?"block":"none";
- $("loginForm").style.display=allowed?"none":"block";
- $("logout").hidden=!allowed;
+ const allowed = !!user && user.uid === adminUID;
 
- if(user&&!allowed){
+ $("panel").style.display = allowed ? "block" : "none";
+ $("loginForm").style.display = allowed ? "none" : "block";
+ $("logout").hidden = !allowed;
+
+ if(user && !allowed){
+
   await signOut(auth);
-  $("message").textContent="Admin অনুমতি নেই।";
+
+  $("message").textContent = "Admin অনুমতি নেই।";
+
+  return;
  }
 
  if(allowed){
+
+  $("message").textContent = "Admin লগইন সফল!";
+
   await loadApplications();
   await loadSellers();
   await loadProducts();
@@ -284,100 +328,141 @@ onAuthStateChanged(auth,async user=>{
 });
 
 
-// MEMBERSHIP MANAGEMENT
+// =====================================
+// COMMON HELPERS
+// =====================================
 
 function dateText(value){
+
  if(!value) return "তারিখ নেই";
 
  try{
-  const date=value.toDate ? value.toDate() : new Date(value);
+
+  const date = value.toDate
+   ? value.toDate()
+   : new Date(value);
+
   if(Number.isNaN(date.getTime())) return "তারিখ নেই";
-  return date.toLocaleDateString("bn-BD");
+
+  return date.toLocaleString("bn-BD");
+
  }catch{
+
   return "তারিখ নেই";
  }
 }
 
 function makeText(tag,value){
- const el=document.createElement(tag);
- el.textContent=value;
+
+ const el = document.createElement(tag);
+
+ el.textContent = value;
+
  return el;
 }
+
+function paymentStatusText(status){
+
+ if(status === "pending") return "যাচাইয়ের অপেক্ষায়";
+ if(status === "approved") return "অনুমোদিত";
+ if(status === "rejected") return "বাতিল";
+
+ return status || "অজানা";
+}
+
+
+// =====================================
+// LOAD PAYMENT APPLICATIONS
+// Collection: sellerPayments
+// =====================================
 
 async function loadApplications(){
 
  if(!isAdmin()) return;
 
- const list=$("applicationList");
- list.textContent="আবেদন লোড হচ্ছে...";
+ const list = $("applicationList");
+
+ list.textContent = "পেমেন্ট লোড হচ্ছে...";
 
  try{
 
-  const result=await getDocs(
-   query(collection(db,"sellerApplications"),orderBy("createdAt","desc"))
+  const result = await getDocs(
+   query(
+    collection(db,"sellerPayments"),
+    orderBy("createdAt","desc")
+   )
   );
 
   list.replaceChildren();
 
-  let pending=0;
-  let approved=0;
-  let rejected=0;
+  let pending = 0;
+  let approved = 0;
+  let rejected = 0;
 
   result.forEach(snap=>{
-   const a=snap.data();
-   if(a.status==="pending") pending++;
-   if(a.status==="approved") approved++;
-   if(a.status==="rejected") rejected++;
+
+   const p = snap.data();
+
+   if(p.status === "pending") pending++;
+   if(p.status === "approved") approved++;
+   if(p.status === "rejected") rejected++;
   });
 
-  $("membershipSummary").textContent=
-   "মোট আবেদন: "+result.size+
-   "\nPending: "+pending+
-   "\nApproved: "+approved+
-   "\nRejected: "+rejected+
+  $("membershipSummary").textContent =
+   "মোট আবেদন: " + result.size +
+   "\nPending: " + pending +
+   "\nApproved: " + approved +
+   "\nRejected: " + rejected +
    "\nবার্ষিক ফি: ৳১০০";
 
   if(result.empty){
-   list.textContent="এখনো কোনো Seller আবেদন আসেনি।";
+
+   list.textContent = "এখনো কোনো পেমেন্ট আবেদন আসেনি।";
+
    return;
   }
 
   result.forEach(snap=>{
 
-   const a=snap.data();
-   const card=document.createElement("div");
-   card.className="item";
+   const p = snap.data();
+
+   const card = document.createElement("div");
+
+   card.className = "item";
 
    card.append(
-    makeText("h3","👤 "+(a.name||"নাম দেওয়া হয়নি")),
-    makeText("p","Shop: "+(a.shopName||"নাম নেই")),
-    makeText("p","Email: "+(a.email||"নেই")),
-    makeText("p","Phone: "+(a.phone||"নেই")),
-    makeText("p","Seller UID: "+(a.uid||"নেই")),
-    makeText("p","আবেদনের ধরন: "+(a.type==="renewal"?"Membership Renewal":"নতুন Membership")),
-    makeText("p","পেমেন্ট পদ্ধতি: "+(a.paymentMethod||"নেই")),
-    makeText("p","যে নম্বর থেকে পাঠিয়েছে: "+(a.senderPhone||"নেই")),
-    makeText("p","Transaction ID: "+(a.transactionId||"নেই")),
-    makeText("p","জমার পরিমাণ: ৳"+(Number(a.amount)||0)),
-    makeText("p","আবেদনের তারিখ: "+dateText(a.createdAt)),
-    makeText("p","বর্তমান অবস্থা: "+(a.status||"অজানা"))
+    makeText("h3","💳 Membership Payment"),
+    makeText("p","Seller UID: "+(p.uid||"নেই")),
+    makeText("p","পেমেন্ট পদ্ধতি: "+(p.paymentMethod||"নেই")),
+    makeText("p","যে নম্বর থেকে পাঠিয়েছে: "+(p.senderPhone||"নেই")),
+    makeText("p","Transaction ID: "+(p.transactionId||"নেই")),
+    makeText("p","জমার পরিমাণ: ৳"+(Number(p.feeAmount)||0)),
+    makeText("p","আবেদনের ধরন: "+(p.type==="renewal"?"Membership Renewal":"নতুন Membership")),
+    makeText("p","আবেদনের তারিখ: "+dateText(p.createdAt)),
+    makeText("p","বর্তমান অবস্থা: "+paymentStatusText(p.status))
    );
 
-   if(a.status==="pending"){
+   if(p.status === "pending"){
 
-    const approve=document.createElement("button");
-    approve.textContent="✅ পেমেন্ট যাচাই করে Approve";
-    approve.className="success";
+    const approve = document.createElement("button");
+
+    approve.textContent = "✅ যাচাই করে Approve";
+
+    approve.className = "success";
 
     approve.addEventListener("click",()=>{
-     approveApplication(snap.id,a,approve);
+
+     approveApplication(snap.id,p,approve);
     });
 
-    const reject=document.createElement("button");
-    reject.textContent="❌ Reject";
-    reject.className="danger";
+    const reject = document.createElement("button");
+
+    reject.textContent = "❌ Reject";
+
+    reject.className = "danger";
 
     reject.addEventListener("click",()=>{
+
      rejectApplication(snap.id,reject);
     });
 
@@ -388,166 +473,284 @@ async function loadApplications(){
   });
 
  }catch(error){
+
   console.error(error);
-  list.textContent="আবেদন লোড হয়নি। Firestore Rules পরীক্ষা করো।";
+
+  list.textContent =
+  "পেমেন্ট লোড হয়নি। Firestore Rules ও Index পরীক্ষা করো।";
  }
 }
 
 
-// APPROVE MEMBERSHIP
+// =====================================
+// APPROVE MEMBERSHIP PAYMENT
+//
+// 1. sellerPayments update
+// 2. users update
+// 3. publicSellerMemberships create/update
+//
+// All three operations are committed together.
+// =====================================
 
-async function approveApplication(applicationId,a,button){
+async function approveApplication(paymentId,payment,button){
 
  if(!isAdmin()) return;
 
- if(!a.uid){
-  alert("আবেদনে Seller UID নেই।");
+ if(!payment.uid){
+
+  alert("পেমেন্ট আবেদনে Seller UID নেই।");
+
   return;
  }
 
- if(Number(a.amount)!==100){
+ if(Number(payment.feeAmount) !== 100){
+
   alert("আবেদনের ফি ৳১০০ নয়। যাচাই ছাড়া Approve করা যাবে না।");
+
   return;
  }
 
- if(!a.transactionId||!a.senderPhone||!a.paymentMethod){
+ if(
+  !payment.transactionId ||
+  !payment.senderPhone ||
+  payment.paymentMethod !== "Nagad"
+ ){
+
   alert("পেমেন্টের প্রয়োজনীয় তথ্য অসম্পূর্ণ।");
+
   return;
  }
 
- const confirmed=confirm(
-  "তুমি কি সত্যিই এই Seller-এর ৳১০০ পেমেন্ট পেয়েছ এবং Transaction ID যাচাই করেছ?"
+ if(!/^[0-9A-Za-z]{1,120}$/.test(payment.transactionId)){
+
+  alert("Transaction ID সঠিক নয়।");
+
+  return;
+ }
+
+ if(!/^01[3-9][0-9]{8}$/.test(payment.senderPhone)){
+
+  alert("প্রেরকের ফোন নম্বর সঠিক নয়।");
+
+  return;
+ }
+
+ const confirmed = confirm(
+  "তুমি কি সত্যিই এই Seller-এর ৳১০০ পেমেন্ট পেয়েছ এবং Nagad Transaction ID যাচাই করেছ?"
  );
 
  if(!confirmed) return;
 
- button.disabled=true;
- button.textContent="Approve হচ্ছে...";
+ button.disabled = true;
+
+ button.textContent = "Approve হচ্ছে...";
 
  try{
 
-  const sellerRef=doc(db,"sellers",a.uid);
-  const sellerSnap=await getDocs(
-   query(collection(db,"sellers"))
-  );
+  // Seller user document
+  const userRef = doc(db,"users",payment.uid);
 
-  let existing=null;
+  const userSnap = await getDoc(userRef);
 
-  sellerSnap.forEach(s=>{
-   if(s.id===a.uid) existing=s.data();
-  });
+  if(!userSnap.exists()){
 
-  const now=new Date();
+   throw new Error("Seller-এর users ডকুমেন্ট পাওয়া যায়নি।");
+  }
 
-  let startDate=now;
+  const seller = userSnap.data();
 
-  if(a.type==="renewal" && existing?.membershipExpiresAt){
+  // Check that this is not an Admin account
+  if(payment.uid === adminUID){
 
-   const oldExpiry=existing.membershipExpiresAt.toDate();
+   throw new Error("Admin নিজের Seller Membership আবেদন Approve করতে পারবেন না।");
+  }
 
-   if(oldExpiry>now){
-    startDate=oldExpiry;
+  // Do not approve an already processed payment
+  if(payment.status !== "pending"){
+
+   throw new Error("এই পেমেন্ট আগে থেকেই যাচাই করা হয়েছে।");
+  }
+
+  const now = new Date();
+
+  let startDate = now;
+
+  // Renewal extends from existing expiry if still active
+  if(
+   payment.type === "renewal" &&
+   seller.membershipExpiresAt &&
+   seller.membershipExpiresAt.toDate
+  ){
+
+   const oldExpiry = seller.membershipExpiresAt.toDate();
+
+   if(oldExpiry > now){
+
+    startDate = oldExpiry;
    }
   }
 
-  const expiry=new Date(startDate);
+  const expiry = new Date(startDate);
+
   expiry.setDate(expiry.getDate()+365);
 
-  await setDoc(sellerRef,{
-   uid:a.uid,
-   name:a.name||"",
-   email:a.email||"",
-   phone:a.phone||"",
-   shopName:a.shopName||"",
-   membershipStatus:"active",
-   membershipStartedAt:Timestamp.fromDate(now),
-   membershipExpiresAt:Timestamp.fromDate(expiry),
-   updatedAt:serverTimestamp()
-  },{merge:true});
+  const startTimestamp = Timestamp.fromDate(now);
 
-  await updateDoc(doc(db,"sellerApplications",applicationId),{
-   status:"approved",
-   approvedAt:serverTimestamp(),
-   membershipExpiresAt:Timestamp.fromDate(expiry)
-  });
+  const expiryTimestamp = Timestamp.fromDate(expiry);
+
+  // Create an atomic batch
+  const batch = writeBatch(db);
+
+  // 1. Mark payment approved
+  batch.update(
+   doc(db,"sellerPayments",paymentId),
+   {
+    status:"approved",
+    reviewedAt:serverTimestamp()
+   }
+  );
+
+  // 2. Activate seller in users collection
+  batch.update(
+   userRef,
+   {
+    role:"seller",
+    sellerStatus:"approved",
+    membershipStatus:"active",
+    membershipStartedAt:startTimestamp,
+    membershipExpiresAt:expiryTimestamp
+   }
+  );
+
+  // 3. Update public membership
+  batch.set(
+   doc(db,"publicSellerMemberships",payment.uid),
+   {
+    sellerId:payment.uid,
+    membershipStatus:"active",
+    membershipExpiresAt:expiryTimestamp,
+    updatedAt:serverTimestamp()
+   }
+  );
+
+  // Save all changes together
+  await batch.commit();
 
   alert(
-   "Seller Membership Active হয়েছে!\nমেয়াদ শেষ: "+expiry.toLocaleDateString("bn-BD")
+   "Seller Membership সফলভাবে চালু হয়েছে!\n\n"+
+   "Seller UID: "+payment.uid+
+   "\nমেয়াদ শেষ: "+expiry.toLocaleDateString("bn-BD")
   );
 
   await loadApplications();
+
   await loadSellers();
 
  }catch(error){
+
   console.error(error);
-  alert("Approve করা যায়নি। Firestore Rules পরীক্ষা করো।");
-  button.disabled=false;
-  button.textContent="✅ পেমেন্ট যাচাই করে Approve";
+
+  alert(
+   "Approve করা যায়নি:\n"+
+   (error.message || "Firebase Rules পরীক্ষা করো।")
+  );
+
+  button.disabled = false;
+
+  button.textContent = "✅ যাচাই করে Approve";
  }
 }
 
 
-// REJECT APPLICATION
+// =====================================
+// REJECT PAYMENT
+// =====================================
 
-async function rejectApplication(id,button){
+async function rejectApplication(paymentId,button){
 
  if(!isAdmin()) return;
 
- if(!confirm("এই Seller আবেদন Reject করতে চাও?")) return;
+ if(!confirm("এই পেমেন্ট আবেদন Reject করতে চাও?")) return;
 
- button.disabled=true;
+ button.disabled = true;
+
+ button.textContent = "Reject হচ্ছে...";
 
  try{
 
-  await updateDoc(doc(db,"sellerApplications",id),{
-   status:"rejected",
-   rejectedAt:serverTimestamp()
-  });
+  await updateDoc(
+   doc(db,"sellerPayments",paymentId),
+   {
+    status:"rejected",
+    reviewedAt:serverTimestamp()
+   }
+  );
+
+  alert("পেমেন্ট আবেদন Reject করা হয়েছে।");
 
   await loadApplications();
 
  }catch(error){
+
   console.error(error);
-  alert("Reject করা যায়নি।");
-  button.disabled=false;
+
+  alert("Reject করা যায়নি: "+error.message);
+
+  button.disabled = false;
+
+  button.textContent = "❌ Reject";
  }
 }
 
 
-// SELLER LIST
+// =====================================
+// REGISTERED SELLERS
+// Collection: users
+// =====================================
 
 async function loadSellers(){
 
  if(!isAdmin()) return;
 
- const list=$("sellerList");
- list.textContent="Seller লোড হচ্ছে...";
+ const list = $("sellerList");
+
+ list.textContent = "Seller লোড হচ্ছে...";
 
  try{
 
-  const result=await getDocs(collection(db,"sellers"));
+  const result = await getDocs(
+   collection(db,"users")
+  );
+
   list.replaceChildren();
 
-  if(result.empty){
-   list.textContent="এখনো কোনো Seller Active হয়নি।";
-   return;
-  }
+  let count = 0;
 
   result.forEach(snap=>{
 
-   const s=snap.data();
-   const card=document.createElement("div");
-   card.className="item";
+   const s = snap.data();
 
-   const expiry=s.membershipExpiresAt?.toDate?.();
-   const active=!!expiry && expiry>new Date() &&
-    s.membershipStatus==="active";
+   if(s.role !== "seller") return;
+
+   count++;
+
+   const card = document.createElement("div");
+
+   card.className = "item";
+
+   const expiry = s.membershipExpiresAt?.toDate?.();
+
+   const active =
+    !!expiry &&
+    expiry > new Date() &&
+    s.membershipStatus === "active" &&
+    s.sellerStatus === "approved";
 
    card.append(
     makeText("h3","👤 "+(s.name||"Seller")),
-    makeText("p","Shop: "+(s.shopName||"নেই")),
     makeText("p","Email: "+(s.email||"নেই")),
     makeText("p","Seller UID: "+snap.id),
+    makeText("p","Seller Status: "+(s.sellerStatus||"নেই")),
     makeText("p","Membership: "+(active?"Active":"Expired / Inactive")),
     makeText("p","মেয়াদ শেষ: "+dateText(s.membershipExpiresAt))
    );
@@ -555,198 +758,322 @@ async function loadSellers(){
    list.append(card);
   });
 
+  if(count === 0){
+
+   list.textContent = "এখনো কোনো Approved Seller নেই।";
+  }
+
  }catch(error){
+
   console.error(error);
-  list.textContent="Seller তালিকা লোড হয়নি।";
+
+  list.textContent =
+  "Seller তালিকা লোড হয়নি। Firestore Rules পরীক্ষা করো।";
  }
 }
 
 $("refreshApplications").addEventListener("click",async()=>{
+
  await loadApplications();
+
  await loadSellers();
 });
 
 
+// =====================================
 // PRODUCT MANAGEMENT
+// =====================================
 
-const photoInput=$("photo");
-const preview=$("preview");
+const photoInput = $("photo");
+
+const preview = $("preview");
 
 function showPreview(url){
 
  if(previewObjectUrl){
+
   URL.revokeObjectURL(previewObjectUrl);
-  previewObjectUrl="";
+
+  previewObjectUrl = "";
  }
 
  if(url){
-  preview.src=url;
-  preview.style.display="block";
+
+  preview.src = url;
+
+  preview.style.display = "block";
+
  }else{
+
   preview.removeAttribute("src");
-  preview.style.display="none";
+
+  preview.style.display = "none";
  }
 }
 
 photoInput.addEventListener("change",()=>{
 
- const file=photoInput.files[0];
+ const file = photoInput.files[0];
+
  if(!file) return;
 
  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
-  photoInput.value="";
-  $("productMessage").textContent="JPG, PNG অথবা WebP ছবি বেছে নাও।";
+
+  photoInput.value = "";
+
+  $("productMessage").textContent =
+  "JPG, PNG অথবা WebP ছবি বেছে নাও।";
+
   return;
  }
 
- if(file.size>5*1024*1024){
-  photoInput.value="";
-  $("productMessage").textContent="ছবির সাইজ 5 MB-এর কম হতে হবে।";
+ if(file.size > 5*1024*1024){
+
+  photoInput.value = "";
+
+  $("productMessage").textContent =
+  "ছবির সাইজ 5 MB-এর কম হতে হবে।";
+
   return;
  }
 
- previewObjectUrl=URL.createObjectURL(file);
- preview.src=previewObjectUrl;
- preview.style.display="block";
- $("image").value="";
+ if(previewObjectUrl){
+
+  URL.revokeObjectURL(previewObjectUrl);
+ }
+
+ previewObjectUrl = URL.createObjectURL(file);
+
+ preview.src = previewObjectUrl;
+
+ preview.style.display = "block";
+
+ $("image").value = "";
 });
 
 function resetForm(){
 
- editingId=null;
- editingSellerId="";
- editingStatus="";
- oldImageUrl="";
+ editingId = null;
+
+ editingSellerId = "";
+
+ editingStatus = "";
+
+ oldImageUrl = "";
 
  $("productForm").reset();
+
  showPreview("");
 
- $("formTitle").textContent="নতুন পণ্য যোগ করুন";
- $("saveButton").textContent="পণ্য Firebase-এ যোগ করুন";
- $("cancelEdit").hidden=true;
+ $("formTitle").textContent = "নতুন পণ্য যোগ করুন";
+
+ $("saveButton").textContent = "পণ্য Firebase-এ যোগ করুন";
+
+ $("cancelEdit").hidden = true;
 }
 
 $("cancelEdit").addEventListener("click",resetForm);
 
 async function uploadProductImage(file){
 
- const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
- const imageRef=ref(storage,"product-images/"+Date.now()+"_"+safeName);
+ const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
 
- await uploadBytes(imageRef,file,{contentType:file.type});
+ const imageRef = ref(
+  storage,
+  "product-images/"+Date.now()+"_"+safeName
+ );
+
+ await uploadBytes(
+  imageRef,
+  file,
+  {contentType:file.type}
+ );
+
  return await getDownloadURL(imageRef);
 }
+
+
+// SAVE PRODUCT
 
 $("productForm").addEventListener("submit",async e=>{
 
  e.preventDefault();
 
- if(busy||!isAdmin()) return;
+ if(busy || !isAdmin()) return;
 
- const name=$("name").value.trim();
- const price=Number($("price").value);
- const category=$("category").value;
- const emoji=$("emoji").value.trim();
- const image=$("image").value.trim();
- const file=photoInput.files[0];
+ const name = $("name").value.trim();
 
- if(!name||!Number.isSafeInteger(price)||price<1||price>10000000){
-  $("productMessage").textContent="পণ্যের নাম ও দাম সঠিকভাবে দাও।";
+ const price = Number($("price").value);
+
+ const category = $("category").value;
+
+ const emoji = $("emoji").value.trim();
+
+ const image = $("image").value.trim();
+
+ const file = photoInput.files[0];
+
+ if(
+  !name ||
+  !Number.isSafeInteger(price) ||
+  price < 1 ||
+  price > 10000000
+ ){
+
+  $("productMessage").textContent =
+  "পণ্যের নাম ও দাম সঠিকভাবে দাও।";
+
   return;
  }
 
  if(image){
+
   try{
-   if(new URL(image).protocol!=="https:") throw new Error();
+
+   if(new URL(image).protocol !== "https:"){
+
+    throw new Error();
+   }
+
   }catch{
-   $("productMessage").textContent="ছবির লিংক HTTPS হতে হবে।";
+
+   $("productMessage").textContent =
+   "ছবির লিংক HTTPS হতে হবে।";
+
    return;
   }
  }
 
- if(file&&file.size>5*1024*1024){
-  $("productMessage").textContent="ছবির সাইজ 5 MB-এর কম হতে হবে।";
+ if(file && file.size > 5*1024*1024){
+
+  $("productMessage").textContent =
+  "ছবির সাইজ 5 MB-এর কম হতে হবে।";
+
   return;
  }
 
  setBusy(true);
- $("productMessage").textContent="পণ্য সংরক্ষণ হচ্ছে...";
+
+ $("productMessage").textContent =
+ "পণ্য সংরক্ষণ হচ্ছে...";
 
  try{
 
-  let imageUrl=image||oldImageUrl;
+  let imageUrl = image || oldImageUrl;
 
   if(file){
-   imageUrl=await uploadProductImage(file);
+
+   imageUrl = await uploadProductImage(file);
   }
 
-  const data={
+  const data = {
+
    name,
+
    price,
+
    category,
+
    emoji,
-   image:imageUrl||"",
-   sellerId:editingId?(editingSellerId||adminUID):adminUID,
-   status:editingId?(editingStatus||"active"):"active",
+
+   image:imageUrl || "",
+
+   sellerId:editingId
+    ? (editingSellerId || adminUID)
+    : adminUID,
+
+   status:editingId
+    ? (editingStatus || "active")
+    : "active",
+
    updatedAt:serverTimestamp()
   };
 
   if(editingId){
 
-   await updateDoc(doc(db,"products",editingId),data);
+   await updateDoc(
+    doc(db,"products",editingId),
+    data
+   );
 
   }else{
 
-   await addDoc(collection(db,"products"),{
-    ...data,
-    createdAt:serverTimestamp()
-   });
-
+   await addDoc(
+    collection(db,"products"),
+    {
+     ...data,
+     createdAt:serverTimestamp()
+    }
+   );
   }
 
   resetForm();
-  $("productMessage").textContent="পণ্য সংরক্ষণ হয়েছে!";
+
+  $("productMessage").textContent =
+  "পণ্য সংরক্ষণ হয়েছে!";
+
   await loadProducts();
 
  }catch(error){
+
   console.error(error);
-  $("productMessage").textContent="পণ্য সংরক্ষণ হয়নি। Firebase Rules পরীক্ষা করো।";
+
+  $("productMessage").textContent =
+  "পণ্য সংরক্ষণ হয়নি: "+error.message;
+
  }finally{
+
   setBusy(false);
  }
 });
+
+
+// LOAD PRODUCTS
 
 async function loadProducts(){
 
  if(!isAdmin()) return;
 
- const list=$("productList");
- list.textContent="পণ্য লোড হচ্ছে...";
+ const list = $("productList");
+
+ list.textContent = "পণ্য লোড হচ্ছে...";
 
  try{
 
-  const result=await getDocs(
-   query(collection(db,"products"),orderBy("createdAt","desc"))
+  const result = await getDocs(
+   query(
+    collection(db,"products"),
+    orderBy("createdAt","desc")
+   )
   );
 
   list.replaceChildren();
 
   if(result.empty){
-   list.textContent="এখনো কোনো পণ্য নেই।";
+
+   list.textContent = "এখনো কোনো পণ্য নেই।";
+
    return;
   }
 
   result.forEach(snap=>{
 
-   const p=snap.data();
-   const card=document.createElement("div");
-   card.className="item";
+   const p = snap.data();
+
+   const card = document.createElement("div");
+
+   card.className = "item";
 
    if(p.image){
-    const img=document.createElement("img");
-    img.className="product-thumb";
-    img.src=p.image;
-    img.alt=p.name||"পণ্য";
+
+    const img = document.createElement("img");
+
+    img.className = "product-thumb";
+
+    img.src = p.image;
+
+    img.alt = p.name || "পণ্য";
+
     card.append(img);
    }
 
@@ -757,88 +1084,139 @@ async function loadProducts(){
     makeText("p","Status: "+(p.status||"পুরোনো পণ্য"))
    );
 
-   const actions=document.createElement("div");
-   actions.className="actions";
+   const actions = document.createElement("div");
 
-   const edit=document.createElement("button");
-   edit.textContent="✏️ সম্পাদনা";
+   actions.className = "actions";
 
-   edit.onclick=()=>{
-    editingId=snap.id;
-    editingSellerId=p.sellerId||"";
-    editingStatus=p.status||"";
-    oldImageUrl=p.image||"";
+   const edit = document.createElement("button");
 
-    $("name").value=p.name||"";
-    $("price").value=p.price??"";
-    $("category").value=categories.includes(p.category)?p.category:"Fashion";
-    $("emoji").value=p.emoji||"";
-    $("image").value=p.image||"";
+   edit.textContent = "✏️ সম্পাদনা";
 
-    photoInput.value="";
-    showPreview(p.image||"");
+   edit.onclick = ()=>{
 
-    $("formTitle").textContent="পণ্য সম্পাদনা করো";
-    $("saveButton").textContent="পরিবর্তন সংরক্ষণ করুন";
-    $("cancelEdit").hidden=false;
+    editingId = snap.id;
 
-    $("formTitle").scrollIntoView({behavior:"smooth"});
+    editingSellerId = p.sellerId || "";
+
+    editingStatus = p.status || "";
+
+    oldImageUrl = p.image || "";
+
+    $("name").value = p.name || "";
+
+    $("price").value = p.price ?? "";
+
+    $("category").value =
+     categories.includes(p.category)
+      ? p.category
+      : "Fashion";
+
+    $("emoji").value = p.emoji || "";
+
+    $("image").value = p.image || "";
+
+    photoInput.value = "";
+
+    showPreview(p.image || "");
+
+    $("formTitle").textContent = "পণ্য সম্পাদনা করো";
+
+    $("saveButton").textContent = "পরিবর্তন সংরক্ষণ করুন";
+
+    $("cancelEdit").hidden = false;
+
+    $("formTitle").scrollIntoView({
+     behavior:"smooth"
+    });
    };
 
-   const remove=document.createElement("button");
-   remove.textContent="🗑️ মুছুন";
-   remove.className="danger";
+   const remove = document.createElement("button");
 
-   remove.onclick=async()=>{
+   remove.textContent = "🗑️ মুছুন";
+
+   remove.className = "danger";
+
+   remove.onclick = async()=>{
 
     if(!confirm("এই পণ্য মুছে ফেলতে চাও?")) return;
 
     try{
-     await deleteDoc(doc(db,"products",snap.id));
-     if(editingId===snap.id) resetForm();
+
+     await deleteDoc(
+      doc(db,"products",snap.id)
+     );
+
+     if(editingId === snap.id){
+
+      resetForm();
+     }
+
      await loadProducts();
+
     }catch(error){
+
      console.error(error);
-     alert("পণ্য মুছতে পারিনি।");
+
+     alert("পণ্য মুছতে পারিনি: "+error.message);
     }
    };
 
    actions.append(edit,remove);
+
    card.append(actions);
+
    list.append(card);
   });
 
  }catch(error){
+
   console.error(error);
-  list.textContent="পণ্য লোড হয়নি। Firestore Rules পরীক্ষা করো।";
+
+  list.textContent =
+  "পণ্য লোড হয়নি: "+error.message;
  }
 }
 
 
+// =====================================
 // ORDER MANAGEMENT
+// =====================================
 
 async function loadOrders(){
 
  if(!isAdmin()) return;
 
- const list=$("orderList");
- list.textContent="অর্ডার লোড হচ্ছে...";
+ const list = $("orderList");
+
+ list.textContent = "অর্ডার লোড হচ্ছে...";
 
  try{
 
-  const result=await getDocs(
-   query(collection(db,"orders"),orderBy("createdAt","desc"))
+  const result = await getDocs(
+   query(
+    collection(db,"orders"),
+    orderBy("createdAt","desc")
+   )
   );
 
-  const counts={};
-  orderStatuses.forEach(s=>counts[s]=0);
+  const counts = {};
 
-  result.forEach(snap=>{
-   const status=snap.data().status;
-   if(counts[status]!==undefined) counts[status]++;
+  orderStatuses.forEach(s=>{
+
+   counts[s] = 0;
   });
 
-  $("orderSummary").textContent=
+  result.forEach(snap=>{
+
+   const status = snap.data().status;
+
+   if(counts[status] !== undefined){
+
+    counts[status]++;
+   }
+  });
+
+  $("orderSummary").textContent =
    "মোট অর্ডার: "+result.size+
    "\nনতুন: "+counts.pending+
    " | নিশ্চিত: "+counts.confirmed+
@@ -850,31 +1228,41 @@ async function loadOrders(){
   list.replaceChildren();
 
   if(result.empty){
-   list.textContent="এখনো কোনো অর্ডার নেই।";
+
+   list.textContent = "এখনো কোনো অর্ডার নেই।";
+
    return;
   }
 
   result.forEach(snap=>{
 
-   const o=snap.data();
-   const card=document.createElement("div");
-   card.className="item";
+   const o = snap.data();
+
+   const card = document.createElement("div");
+
+   card.className = "item";
 
    card.append(
     makeText("h3","📦 অর্ডার #"+snap.id),
     makeText("p","Customer: "+(o.buyerName||"নাম নেই")),
+    makeText("p","Email: "+(o.buyerEmail||"নেই")),
     makeText("p","ফোন: "+(o.buyerPhone||"নেই")),
     makeText("p","ঠিকানা: "+(o.buyerAddress||"নেই")),
-    makeText("p","Seller ID: "+(o.sellerId||"নেই"))
+    makeText("p","Seller ID: "+(o.sellerId||"নেই")),
+    makeText("p","অর্ডারের তারিখ: "+dateText(o.createdAt))
    );
 
-   const items=document.createElement("div");
-   items.className="order-items";
+   const items = document.createElement("div");
+
+   items.className = "order-items";
 
    (Array.isArray(o.items)?o.items:[]).forEach(p=>{
+
     items.append(
-     makeText("p",
-      (p.name||"পণ্য")+" × "+(p.quantity||0)+
+     makeText(
+      "p",
+      (p.name||"পণ্য")+
+      " × "+(p.quantity||0)+
       " = ৳"+(Number(p.lineTotal)||0)
      )
     );
@@ -887,53 +1275,77 @@ async function loadOrders(){
     items
    );
 
-   const status=makeText(
-    "p","বর্তমান অবস্থা: "+(statusLabels[o.status]||o.status||"অজানা")
+   const status = makeText(
+    "p",
+    "বর্তমান অবস্থা: "+
+    (statusLabels[o.status]||o.status||"অজানা")
    );
-   status.className="status";
+
+   status.className = "status";
+
    card.append(status);
 
-   const select=document.createElement("select");
+   const select = document.createElement("select");
 
    orderStatuses.forEach(s=>{
-    const option=document.createElement("option");
-    option.value=s;
-    option.textContent=statusLabels[s];
+
+    const option = document.createElement("option");
+
+    option.value = s;
+
+    option.textContent = statusLabels[s];
+
     select.append(option);
    });
 
-   select.value=orderStatuses.includes(o.status)?o.status:"pending";
+   select.value = orderStatuses.includes(o.status)
+    ? o.status
+    : "pending";
 
-   const update=document.createElement("button");
-   update.textContent="স্ট্যাটাস আপডেট করুন";
+   const update = document.createElement("button");
 
-   update.onclick=async()=>{
+   update.textContent = "স্ট্যাটাস আপডেট করুন";
 
-    update.disabled=true;
+   update.onclick = async()=>{
+
+    update.disabled = true;
 
     try{
-     await updateDoc(doc(db,"orders",snap.id),{
-      status:select.value,
-      updatedAt:serverTimestamp()
-     });
 
-     $("orderMessage").textContent="অর্ডারের Status আপডেট হয়েছে!";
+     // Rules allow Admin to update only the status field.
+     await updateDoc(
+      doc(db,"orders",snap.id),
+      {
+       status:select.value
+      }
+     );
+
+     $("orderMessage").textContent =
+     "অর্ডারের Status আপডেট হয়েছে!";
+
      await loadOrders();
 
     }catch(error){
+
      console.error(error);
-     alert("অর্ডার আপডেট হয়নি। Firestore Rules পরীক্ষা করো।");
-     update.disabled=false;
+
+     alert("অর্ডার আপডেট হয়নি: "+error.message);
+
+     update.disabled = false;
     }
    };
 
    card.append(select,update);
+
    list.append(card);
   });
 
  }catch(error){
+
   console.error(error);
-  list.textContent="অর্ডার লোড হয়নি। Firestore Rules পরীক্ষা করো।";
+
+  list.textContent =
+  "অর্ডার লোড হয়নি: "+error.message;
  }
 }
 
@@ -941,4 +1353,4 @@ $("refreshOrders").addEventListener("click",loadOrders);
 
 </script>
 </body>
- </html>
+</html>
