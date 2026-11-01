@@ -230,11 +230,11 @@
   </section>
 
   <section id="formCard" class="card hidden">
-    <h3>➕ নতুন পণ্য যোগ করুন</h3>
+    <h3>➕ নতুন পণ্য পোস্ট করুন</h3>
 
     <p class="muted">
-      পণ্যের তথ্য সঠিকভাবে পূরণ করো।
-      শুধু সক্রিয় সদস্যপদ থাকা অনুমোদিত বিক্রেতারাই পণ্য পোস্ট করতে পারবে।
+      পণ্যের সঠিক নাম, দাম, ছবি ও বিবরণ দাও।
+      শুধু সক্রিয় সদস্যপদ থাকা অনুমোদিত বিক্রেতারাই পোস্ট করতে পারবে।
     </p>
 
     <form id="productForm">
@@ -277,7 +277,7 @@
       >
 
       <p class="muted">
-        আপাতত অনলাইনে থাকা ছবির URL দিতে হবে।
+        আপাতত অনলাইনে থাকা ছবির HTTPS URL দিতে হবে।
       </p>
 
       <label for="description">পণ্যের বিবরণ *</label>
@@ -395,6 +395,7 @@
   let canSubmit = false;
   let authCheckVersion = 0;
   let refreshInProgress = false;
+  let currentSellerName = "অনুমোদিত বিক্রেতা";
 
   const statusLabels = {
     pending: "নতুন অর্ডার",
@@ -462,6 +463,19 @@
     );
   }
 
+  // বিক্রেতার নাম বের করা
+  function getSellerName(profile, user) {
+    const name =
+      profile?.sellerName ||
+      profile?.shopName ||
+      profile?.name ||
+      profile?.displayName ||
+      user?.displayName ||
+      "";
+
+    return String(name).trim() || "অনুমোদিত বিক্রেতা";
+  }
+
 
   // =====================================
   // RESET PAGE
@@ -470,6 +484,7 @@
   function resetPage() {
     currentUser = null;
     canSubmit = false;
+    currentSellerName = "অনুমোদিত বিক্রেতা";
 
     $("accountInfo").textContent = "লগইন করা নেই।";
 
@@ -598,12 +613,21 @@
           product.name || product.title || "নাম দেওয়া হয়নি"
         );
 
+        // বিক্রেতার নাম
+        addText(
+          card,
+          "p",
+          "বিক্রেতা: " +
+            (product.sellerName || currentSellerName),
+          "muted"
+        );
+
         const imageUrl =
           product.imageUrl || product.image || "";
 
         if (
           typeof imageUrl === "string" &&
-          /^https?:\/\//i.test(imageUrl)
+          /^https:\/\//i.test(imageUrl)
         ) {
 
           const img = document.createElement("img");
@@ -717,7 +741,6 @@
 
     try {
 
-      // Firestore Rules also verify membership and ownership.
       await updateDoc(
         doc(db, "orders", orderId),
         {
@@ -996,8 +1019,13 @@
 
       const profile = userSnap.data();
 
-      // Find payment records using UID field.
-      // Payment document IDs are automatically generated.
+      // বিক্রেতার নাম সংরক্ষণ
+      currentSellerName = getSellerName(profile, user);
+
+      $("accountInfo").textContent =
+        "বিক্রেতা: " + currentSellerName +
+        " | লগইন: " + (user.email || user.uid);
+
       const payments = await findPendingPayment(user.uid);
 
       if (
@@ -1012,6 +1040,7 @@
       const rejectedPayment = payments.find(
         p => p.status === "rejected"
       );
+
 
       // =================================
       // NOT AN APPROVED SELLER
@@ -1087,6 +1116,7 @@
 
       const remainingDays =
         getRemainingDays(expiryDate);
+
 
       // =================================
       // EXPIRED MEMBERSHIP
@@ -1263,9 +1293,7 @@
 
       try {
 
-        // Read membership again before posting.
-        // Firestore Rules also enforce expiry on the server.
-
+        // পোস্টের আগে Membership আবার যাচাই
         const latestProfile = await getDoc(
           doc(db, "users", currentUser.uid)
         );
@@ -1297,6 +1325,16 @@
           throw new Error("MEMBERSHIP_EXPIRED");
         }
 
+        // সর্বশেষ প্রোফাইল থেকে বিক্রেতার নাম
+        const sellerName = getSellerName(
+          latestData,
+          currentUser
+        );
+
+        currentSellerName = sellerName;
+
+        // নতুন পণ্য Firestore-এ পোস্ট
+        // sellerEmail ইচ্ছাকৃতভাবে রাখা হয়নি।
         await addDoc(
           collection(db, "products"),
           {
@@ -1307,8 +1345,10 @@
             image: imageUrl,
             imageUrl,
             description,
+
             sellerId: currentUser.uid,
-            sellerEmail: currentUser.email || "",
+            sellerName: sellerName,
+
             status: "approved",
             createdAt: serverTimestamp()
           }
@@ -1357,4 +1397,4 @@
 </script>
 
 </body>
-</html>
+  </html>
