@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,23 +8,65 @@
 <title>Admin Payment Verification | Mishor's Shop</title>
 
 <style>
-body{font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f3f5f9;color:#172033;margin:0;padding:16px}
+*{box-sizing:border-box}
+body{
+ font-family:Arial,"Noto Sans Bengali",sans-serif;
+ background:#f3f5f9;
+ color:#172033;
+ margin:0;
+ padding:16px;
+}
 main{max-width:750px;margin:20px auto}
-.card{background:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0000000d;overflow-wrap:anywhere}
+.card{
+ background:#fff;
+ border-radius:14px;
+ padding:18px;
+ margin:14px 0;
+ box-shadow:0 3px 12px #0000000d;
+ overflow-wrap:anywhere;
+}
 h1{font-size:23px}
 h2{font-size:18px}
-input,button{box-sizing:border-box;width:100%;padding:12px;margin-top:9px;border-radius:8px;font-size:15px}
+input,button{
+ width:100%;
+ padding:12px;
+ margin-top:9px;
+ border-radius:8px;
+ font-size:15px;
+}
 input{border:1px solid #cbd5e1}
-button{border:0;background:#087f5b;color:white;font-weight:bold;cursor:pointer}
+button{
+ border:0;
+ background:#087f5b;
+ color:white;
+ font-weight:bold;
+ cursor:pointer;
+}
 button:disabled{opacity:.5;cursor:not-allowed}
 .secondary{background:#334155}
 .reject{background:#b91c1c}
 .migration{background:#1d4ed8}
-.small{font-size:13px;color:#64748b;line-height:1.6}
+.small{
+ font-size:13px;
+ color:#64748b;
+ line-height:1.7;
+}
 .status{white-space:pre-wrap;line-height:1.7}
 .actions{display:flex;gap:8px}
 .actions button{flex:1}
+.payment-status{
+ display:inline-block;
+ padding:5px 10px;
+ border-radius:20px;
+ background:#e2e8f0;
+ font-size:13px;
+ font-weight:bold;
+}
+.pending{background:#fef3c7;color:#92400e}
+.approved{background:#dcfce7;color:#166534}
+.rejected{background:#fee2e2;color:#991b1b}
 [hidden]{display:none!important}
+a{color:#087f5b}
 </style>
 </head>
 
@@ -31,48 +74,65 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <main>
 
 <div class="card">
-<h1>🛡️ Admin Payment Verification</h1>
-<p>বিক্রেতাদের Nagad সদস্য ফি যাচাই</p>
-<p><b>বার্ষিক সদস্য ফি: ৳১০০</b></p>
+ <h1>🛡️ Admin Payment Verification</h1>
+ <p>বিক্রেতাদের Nagad সদস্য ফি যাচাই</p>
+ <p><b>বার্ষিক সদস্য ফি: ৳১০০</b></p>
 
-<div id="loginBox">
-<form id="loginForm">
-<input id="email" type="email" placeholder="Admin ইমেইল" required>
-<input id="password" type="password" placeholder="পাসওয়ার্ড" required>
-<button type="submit">Admin লগইন</button>
-</form>
-</div>
+ <div id="loginBox">
+  <form id="loginForm">
+   <input id="email" type="email"
+    placeholder="Admin ইমেইল" required>
 
-<div id="dashboard" hidden>
-<p id="adminInfo"></p>
+   <input id="password" type="password"
+    placeholder="পাসওয়ার্ড" required>
 
-<button id="refreshBtn" class="secondary">আবেদন রিফ্রেশ</button>
+   <button id="loginBtn" type="submit">
+    Admin লগইন
+   </button>
+  </form>
+ </div>
 
-<button id="migrationBtn" class="migration">
-পুরোনো Seller Membership Migration
-</button>
+ <div id="dashboard" hidden>
+  <p id="adminInfo"></p>
 
-<button id="logoutBtn" class="secondary">লগআউট</button>
+  <button id="refreshBtn" class="secondary">
+   আবেদন রিফ্রেশ
+  </button>
 
-<p class="small">
-Migration চালালে যেসব পুরোনো অনুমোদিত Seller-এর Membership এখনো সক্রিয়
-এবং মেয়াদ ভবিষ্যতে আছে, শুধু তাদের Public Membership রেকর্ড তৈরি হবে।
-</p>
-</div>
+  <button id="migrationBtn" class="migration">
+   পুরোনো Seller Membership Migration
+  </button>
 
-<p id="message" class="status">Firebase সংযোগ হচ্ছে...</p>
+  <button id="logoutBtn" class="secondary">
+   লগআউট
+  </button>
+
+  <p class="small">
+   Migration চালালে যেসব পুরোনো Seller-এর
+   role=seller, sellerStatus=approved এবং
+   membershipStatus=active, শুধু তাদের ভবিষ্যৎ মেয়াদ
+   থাকা Membership-এর Public রেকর্ড তৈরি হবে।
+  </p>
+ </div>
+
+ <p id="message" class="status">
+  Firebase সংযোগ হচ্ছে...
+ </p>
 </div>
 
 <div id="payments"></div>
 
 <div class="card">
-<a href="index.html">← Mishor's Shop-এ ফিরে যাও</a>
+ <a href="index.html">← Mishor's Shop-এ ফিরে যাও</a>
 </div>
 
 </main>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+import {
+ initializeApp
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 
 import {
  getAuth,
@@ -93,6 +153,9 @@ import {
  Timestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
+
+/* Firebase configuration */
+
 const firebaseConfig={
  apiKey:"AIzaSyCxxTa5mxcaErL_bGO6FxboZNJA1t_B0UE",
  authDomain:"mishors-shop-admin.firebaseapp.com",
@@ -102,11 +165,20 @@ const firebaseConfig={
  appId:"1:828816512879:web:3e297717db9b391f09fa9a"
 };
 
+
+/* Admin UID */
+
 const ADMIN_UID="A2kBB273NcSzQ2naJF2PBrue47k2";
+
+
+/* Initialize Firebase */
 
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
+
+
+/* HTML elements */
 
 const $=id=>document.getElementById(id);
 
@@ -117,8 +189,11 @@ const payments=$("payments");
 
 let busy=false;
 
-function say(t){
- message.textContent=t;
+
+/* Helper functions */
+
+function say(text){
+ message.textContent=text;
 }
 
 function safe(value){
@@ -132,22 +207,44 @@ function safe(value){
 }
 
 function requireAdmin(){
- if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
+ if(
+  !auth.currentUser||
+  auth.currentUser.uid!==ADMIN_UID
+ ){
   throw new Error("ADMIN_ONLY");
  }
-}
-
-function dateText(value){
- return value?.toDate
-  ? value.toDate().toLocaleString("bn-BD")
-  : "তথ্য নেই";
 }
 
 function getDate(value){
  return value?.toDate?.()||null;
 }
 
+function dateText(value){
+ const date=getDate(value);
+
+ return date
+  ?date.toLocaleString("bn-BD")
+  :"তথ্য নেই";
+}
+
+function statusClass(status){
+ if(status==="approved")return "approved";
+ if(status==="rejected")return "rejected";
+ return "pending";
+}
+
+function statusText(status){
+ if(status==="approved")return "অনুমোদিত";
+ if(status==="rejected")return "বাতিল";
+ if(status==="pending")return "অপেক্ষমাণ";
+ return status||"অজানা";
+}
+
+
+/* Authentication */
+
 onAuthStateChanged(auth,async user=>{
+
  payments.replaceChildren();
 
  if(!user){
@@ -158,9 +255,12 @@ onAuthStateChanged(auth,async user=>{
  }
 
  if(user.uid!==ADMIN_UID){
+
   loginBox.hidden=true;
   dashboard.hidden=true;
+
   say("এই অ্যাকাউন্টের Admin অনুমতি নেই।");
+
   await signOut(auth);
   return;
  }
@@ -168,44 +268,85 @@ onAuthStateChanged(auth,async user=>{
  loginBox.hidden=true;
  dashboard.hidden=false;
 
- $("adminInfo").textContent="Admin: "+(user.email||user.uid);
+ $("adminInfo").textContent=
+  "Admin: "+(user.email||user.uid);
 
  await loadPayments();
+
 });
 
+
+/* Login */
+
 $("loginForm").addEventListener("submit",async e=>{
+
  e.preventDefault();
 
+ const loginBtn=$("loginBtn");
+
+ loginBtn.disabled=true;
  say("লগইন হচ্ছে...");
 
  try{
+
   await signInWithEmailAndPassword(
    auth,
    $("email").value.trim(),
    $("password").value
   );
+
  }catch(err){
+
   console.error(err);
   say("লগইন হয়নি। ইমেইল ও পাসওয়ার্ড পরীক্ষা করো।");
+
+ }finally{
+
+  loginBtn.disabled=false;
+
  }
+
 });
 
-$("logoutBtn").addEventListener("click",()=>signOut(auth));
+
+/* Logout and refresh */
+
+$("logoutBtn").addEventListener("click",async()=>{
+
+ try{
+  await signOut(auth);
+ }catch(err){
+  console.error(err);
+  say("লগআউট করা যায়নি।");
+ }
+
+});
 
 $("refreshBtn").addEventListener("click",loadPayments);
 
+
+/* Load payment applications */
+
 async function loadPayments(){
+
+ if(busy)return;
+
  try{
+
   requireAdmin();
 
   say("আবেদন লোড হচ্ছে...");
   payments.replaceChildren();
 
-  const snapshot=await getDocs(collection(db,"sellerPayments"));
+  const snapshot=await getDocs(
+   collection(db,"sellerPayments")
+  );
 
   if(snapshot.empty){
+
    say("এখনো কোনো সদস্য ফি-এর আবেদন নেই।");
    return;
+
   }
 
   const rows=snapshot.docs.map(s=>({
@@ -218,9 +359,28 @@ async function loadPayments(){
    (a.createdAt?.toMillis?.()||0)
   );
 
-  say("মোট আবেদন: "+rows.length);
+  const pendingCount=rows.filter(
+   p=>p.status==="pending"
+  ).length;
+
+  const approvedCount=rows.filter(
+   p=>p.status==="approved"
+  ).length;
+
+  const rejectedCount=rows.filter(
+   p=>p.status==="rejected"
+  ).length;
+
+  say(
+   "মোট আবেদন: "+rows.length+
+   "\nঅপেক্ষমাণ: "+pendingCount+
+   "\nঅনুমোদিত: "+approvedCount+
+   "\nবাতিল: "+rejectedCount
+  );
+
 
   for(const p of rows){
+
    const card=document.createElement("section");
    card.className="card";
 
@@ -228,112 +388,227 @@ async function loadPayments(){
    let userData={};
 
    if(uid){
+
     try{
-     const userSnap=await getDoc(doc(db,"users",uid));
+
+     const userSnap=await getDoc(
+      doc(db,"users",uid)
+     );
 
      if(userSnap.exists()){
       userData=userSnap.data();
      }
+
     }catch(err){
+
      console.error("User read error:",err);
+
     }
+
    }
 
    const expiry=userData.membershipExpiresAt;
 
    card.innerHTML=`
+
     <h2>💳 সদস্য ফি আবেদন</h2>
 
-    <p><b>নাম:</b> ${safe(userData.name||"নাম পাওয়া যায়নি")}</p>
-    <p><b>ইমেইল:</b> ${safe(userData.email||"পাওয়া যায়নি")}</p>
-    <p><b>UID:</b> ${safe(uid||"নেই")}</p>
-    <p><b>আবেদনের ধরন:</b> ${safe(p.type||"new")}</p>
-    <p><b>ফি:</b> ৳${safe(p.feeAmount)}</p>
-    <p><b>পেমেন্ট মাধ্যম:</b> ${safe(p.paymentMethod||"Nagad")}</p>
-    <p><b>প্রেরকের নম্বর:</b> ${safe(p.senderPhone||"নেই")}</p>
-    <p><b>Transaction ID:</b> ${safe(p.transactionId||"নেই")}</p>
-    <p><b>জমার সময়:</b> ${safe(dateText(p.createdAt))}</p>
-    <p><b>পেমেন্ট অবস্থা:</b> ${safe(p.status)}</p>
-    <p><b>বর্তমান সদস্যপদ:</b> ${safe(userData.sellerStatus||"অজানা")}</p>
-    <p><b>বর্তমান মেয়াদ শেষ:</b> ${safe(dateText(expiry))}</p>
+    <p>
+     <b>নাম:</b>
+     ${safe(userData.name||"নাম পাওয়া যায়নি")}
+    </p>
+
+    <p>
+     <b>ইমেইল:</b>
+     ${safe(userData.email||"পাওয়া যায়নি")}
+    </p>
+
+    <p>
+     <b>UID:</b>
+     ${safe(uid||"নেই")}
+    </p>
+
+    <p>
+     <b>আবেদনের ধরন:</b>
+     ${safe(p.type||"new")}
+    </p>
+
+    <p>
+     <b>ফি:</b>
+     ৳${safe(p.feeAmount)}
+    </p>
+
+    <p>
+     <b>পেমেন্ট মাধ্যম:</b>
+     ${safe(p.paymentMethod||"Nagad")}
+    </p>
+
+    <p>
+     <b>প্রেরকের নম্বর:</b>
+     ${safe(p.senderPhone||"নেই")}
+    </p>
+
+    <p>
+     <b>Transaction ID:</b>
+     ${safe(p.transactionId||"নেই")}
+    </p>
+
+    <p>
+     <b>জমার সময়:</b>
+     ${safe(dateText(p.createdAt))}
+    </p>
+
+    <p>
+     <b>পেমেন্ট অবস্থা:</b>
+     <span class="payment-status ${statusClass(p.status)}">
+      ${safe(statusText(p.status))}
+     </span>
+    </p>
+
+    <p>
+     <b>বর্তমান সদস্যপদ:</b>
+     ${safe(userData.sellerStatus||"অজানা")}
+    </p>
+
+    <p>
+     <b>বর্তমান মেয়াদ শেষ:</b>
+     ${safe(dateText(expiry))}
+    </p>
 
     <p class="small">
-     Nagad লেনদেনের ইতিহাসে নম্বর, Transaction ID এবং ৳১০০ মিলিয়ে নাও।
+     Nagad লেনদেনের ইতিহাসে প্রেরকের নম্বর,
+     Transaction ID এবং ৳১০০ মিলিয়ে নাও।
      টাকা নিশ্চিত না হয়ে Approve কোরো না।
     </p>
 
     <div class="actions">
-     <button data-approve>অনুমোদন</button>
-     <button class="reject" data-reject>বাতিল</button>
+
+     <button data-approve>
+      অনুমোদন
+     </button>
+
+     <button class="reject" data-reject>
+      বাতিল
+     </button>
+
     </div>
+
    `;
 
    const approveBtn=card.querySelector("[data-approve]");
    const rejectBtn=card.querySelector("[data-reject]");
 
    if(p.status!=="pending"||!uid){
+
     approveBtn.disabled=true;
     rejectBtn.disabled=true;
+
    }
 
-   approveBtn.addEventListener("click",()=>
-    approvePayment(p,approveBtn,rejectBtn)
-   );
+   approveBtn.addEventListener("click",()=>{
 
-   rejectBtn.addEventListener("click",()=>
-    rejectPayment(p,approveBtn,rejectBtn)
-   );
+    approvePayment(p,approveBtn,rejectBtn);
+
+   });
+
+   rejectBtn.addEventListener("click",()=>{
+
+    rejectPayment(p,approveBtn,rejectBtn);
+
+   });
 
    payments.appendChild(card);
+
   }
 
  }catch(err){
+
   console.error(err);
-  say("আবেদন লোড হয়নি। Admin UID ও Firestore Rules পরীক্ষা করো।");
+
+  say(
+   "আবেদন লোড হয়নি: "+
+   (err.code||err.message||"অজানা সমস্যা")+
+   "\nAdmin UID ও Firestore Rules পরীক্ষা করো।"
+  );
+
  }
+
 }
+
+
+/* Approve payment */
 
 async function approvePayment(p,approveBtn,rejectBtn){
 
  if(busy)return;
 
- if(!confirm(
-  "Nagad-এ ৳১০০ পাওয়া নিশ্চিত করেছো? নিশ্চিত হলে অনুমোদন করো।"
- ))return;
+ const confirmed=confirm(
+  "Nagad-এ ৳১০০ পাওয়া নিশ্চিত করেছো?\n\n"+
+  "Transaction ID এবং প্রেরকের নম্বর মিলিয়ে "+
+  "নিশ্চিত হলে অনুমোদন করো।"
+ );
+
+ if(!confirmed)return;
 
  busy=true;
+
  approveBtn.disabled=true;
  rejectBtn.disabled=true;
 
  try{
+
   requireAdmin();
+
+  /* Validate payment data */
 
   if(
    !p.uid||
    Number(p.feeAmount)!==100||
    !p.transactionId||
    !p.senderPhone||
-   p.paymentMethod!=="Nagad"
+   p.paymentMethod!=="Nagad"||
+   p.status!=="pending"
   ){
+
    throw new Error("INVALID_PAYMENT_RECORD");
+
   }
 
+
   const userRef=doc(db,"users",p.uid);
-  const paymentRef=doc(db,"sellerPayments",p.id);
+
+  const paymentRef=doc(
+   db,
+   "sellerPayments",
+   p.id
+  );
+
   const publicMembershipRef=doc(
    db,
    "publicSellerMemberships",
    p.uid
   );
 
+
+  /* Read latest records */
+
   const [userSnap,paymentSnap]=await Promise.all([
+
    getDoc(userRef),
+
    getDoc(paymentRef)
+
   ]);
 
-  if(!userSnap.exists()||!paymentSnap.exists()){
-   throw new Error("MISSING_DOCUMENT");
+
+  if(!userSnap.exists()){
+   throw new Error("USER_NOT_FOUND");
   }
+
+  if(!paymentSnap.exists()){
+   throw new Error("PAYMENT_NOT_FOUND");
+  }
+
 
   const payment=paymentSnap.data();
 
@@ -345,82 +620,136 @@ async function approvePayment(p,approveBtn,rejectBtn){
    payment.senderPhone!==p.senderPhone||
    payment.paymentMethod!=="Nagad"
   ){
-   throw new Error("INVALID_OR_REVIEWED_PAYMENT");
+
+   throw new Error("INVALID_OR_ALREADY_REVIEWED_PAYMENT");
+
   }
+
 
   const user=userSnap.data();
 
+
+  /* Calculate membership expiry */
+
   const now=new Date();
-  const oldExpiry=getDate(user.membershipExpiresAt);
 
-  const oldExpiryIsFuture=oldExpiry&&oldExpiry>now;
-
-  const baseDate=oldExpiryIsFuture?oldExpiry:now;
-
-  const newExpiry=new Date(
-   baseDate.getTime()+365*24*60*60*1000
+  const oldExpiry=getDate(
+   user.membershipExpiresAt
   );
 
-  const oldStart=getDate(user.membershipStartedAt);
+  const oldExpiryIsFuture=
+   oldExpiry&&oldExpiry>now;
+
+  const baseDate=
+   oldExpiryIsFuture
+    ?oldExpiry
+    :now;
+
+  const newExpiry=new Date(
+   baseDate.getTime()+
+   365*24*60*60*1000
+  );
+
+  const oldStart=getDate(
+   user.membershipStartedAt
+  );
 
   const startDate=
    oldExpiryIsFuture&&oldStart
     ?oldStart
     :now;
 
-  const expiryTimestamp=Timestamp.fromDate(newExpiry);
+  const expiryTimestamp=
+   Timestamp.fromDate(newExpiry);
+
+
+  /* Atomic Firestore batch */
 
   const batch=writeBatch(db);
 
-  // 1. Payment approved
+
+  // 1. Approve payment
+
   batch.update(paymentRef,{
+
    status:"approved",
+
    reviewedAt:serverTimestamp()
+
   });
 
-  // 2. Private seller profile updated
+
+  // 2. Update seller account
+
   batch.update(userRef,{
+
    role:"seller",
+
    sellerStatus:"approved",
+
    membershipStatus:"active",
-   membershipStartedAt:Timestamp.fromDate(startDate),
-   membershipExpiresAt:expiryTimestamp
+
+   membershipStartedAt:
+    Timestamp.fromDate(startDate),
+
+   membershipExpiresAt:
+    expiryTimestamp
+
   });
 
-  // 3. Public-safe membership record
+
+  // 3. Create/update public membership
+
   batch.set(publicMembershipRef,{
+
    sellerId:p.uid,
+
    membershipStatus:"active",
-   membershipExpiresAt:expiryTimestamp,
+
+   membershipExpiresAt:
+    expiryTimestamp,
+
    updatedAt:serverTimestamp()
+
   });
+
 
   await batch.commit();
 
+
   alert(
-   "পেমেন্ট অনুমোদিত হয়েছে।\n"+
+   "পেমেন্ট অনুমোদিত হয়েছে!\n\n"+
    "নতুন মেয়াদ শেষ: "+
    newExpiry.toLocaleDateString("bn-BD")
   );
 
+
   await loadPayments();
 
+
  }catch(err){
+
   console.error(err);
 
   say(
-   "অনুমোদন হয়নি: "+
+   "অনুমোদন হয়নি:\n"+
    (err.code||err.message||"অজানা সমস্যা")+
-   "। Firestore Rules পরীক্ষা করো।"
+   "\nFirestore Rules পরীক্ষা করো।"
   );
 
   approveBtn.disabled=false;
   rejectBtn.disabled=false;
 
  }finally{
+
   busy=false;
+
  }
+
 }
+
+
+/* Reject payment */
 
 async function rejectPayment(p,approveBtn,rejectBtn){
 
@@ -429,94 +758,168 @@ async function rejectPayment(p,approveBtn,rejectBtn){
  if(!confirm("এই পেমেন্ট আবেদন বাতিল করবে?"))return;
 
  busy=true;
+
  approveBtn.disabled=true;
  rejectBtn.disabled=true;
 
  try{
+
   requireAdmin();
 
-  const paymentRef=doc(db,"sellerPayments",p.id);
+  const paymentRef=doc(
+   db,
+   "sellerPayments",
+   p.id
+  );
+
   const paymentSnap=await getDoc(paymentRef);
 
-  if(
-   !paymentSnap.exists()||
-   paymentSnap.data().status!=="pending"
-  ){
-   throw new Error("ALREADY_REVIEWED");
+  if(!paymentSnap.exists()){
+   throw new Error("PAYMENT_NOT_FOUND");
   }
 
+  const payment=paymentSnap.data();
+
+  if(
+   payment.status!=="pending"||
+   payment.uid!==p.uid
+  ){
+
+   throw new Error("ALREADY_REVIEWED");
+
+  }
+
+
   await updateDoc(paymentRef,{
+
    status:"rejected",
+
    reviewedAt:serverTimestamp()
+
   });
+
 
   alert("আবেদন বাতিল করা হয়েছে।");
 
   await loadPayments();
 
+
  }catch(err){
+
   console.error(err);
-  say("বাতিল করা যায়নি: "+(err.code||err.message||"অজানা সমস্যা"));
+
+  say(
+   "বাতিল করা যায়নি:\n"+
+   (err.code||err.message||"অজানা সমস্যা")
+  );
 
   approveBtn.disabled=false;
   rejectBtn.disabled=false;
 
  }finally{
+
   busy=false;
+
  }
+
 }
 
-// পুরোনো সক্রিয় Seller-দের Public Membership তৈরি
+
+/* Old seller membership migration */
+
 async function migrateOldSellers(){
 
  if(busy)return;
 
- if(!confirm(
+ const confirmed=confirm(
+
   "পুরোনো Seller-দের Membership Migration শুরু করবে?\n\n"+
-  "শুধু যাদের role=seller, sellerStatus=approved এবং "+
-  "membershipExpiresAt ভবিষ্যতের তারিখ, তাদের রেকর্ড তৈরি হবে।"
- ))return;
+
+  "শুধু যাদের:\n"+
+  "role = seller\n"+
+  "sellerStatus = approved\n"+
+  "membershipStatus = active\n"+
+  "এবং মেয়াদ ভবিষ্যতের তারিখ\n\n"+
+
+  "তাদের Public Membership রেকর্ড তৈরি হবে।"
+
+ );
+
+ if(!confirmed)return;
+
 
  busy=true;
+
  $("migrationBtn").disabled=true;
 
  try{
+
   requireAdmin();
 
   say("পুরোনো Seller তালিকা যাচাই হচ্ছে...");
 
-  const usersSnapshot=await getDocs(collection(db,"users"));
+
+  const usersSnapshot=await getDocs(
+   collection(db,"users")
+  );
 
   const now=Date.now();
+
   const eligible=[];
 
+
   for(const userDoc of usersSnapshot.docs){
+
    const u=userDoc.data();
 
    if(
     u.role!=="seller"||
     u.sellerStatus!=="approved"||
     u.membershipStatus!=="active"
-   )continue;
+   ){
 
-   const expiry=getDate(u.membershipExpiresAt);
+    continue;
 
-   if(!expiry||expiry.getTime()<=now)continue;
+   }
+
+   const expiry=getDate(
+    u.membershipExpiresAt
+   );
+
+   if(
+    !expiry||
+    expiry.getTime()<=now
+   ){
+
+    continue;
+
+   }
 
    eligible.push({
+
     uid:userDoc.id,
-    expiry
+
+    expiry:expiry
+
    });
+
   }
+
 
   if(!eligible.length){
+
    say(
-    "Migration করার মতো সক্রিয় মেয়াদ থাকা পুরোনো Seller পাওয়া যায়নি।"
+    "Migration করার মতো সক্রিয় মেয়াদ থাকা "+
+    "পুরোনো Seller পাওয়া যায়নি।"
    );
+
    return;
+
   }
 
-  // Firestore batch limit 500; নিরাপদে 400 করে লেখা
+
+  /* Firestore batch limit is 500 */
+
   let migrated=0;
 
   for(let i=0;i<eligible.length;i+=400){
@@ -524,9 +927,12 @@ async function migrateOldSellers(){
    requireAdmin();
 
    const chunk=eligible.slice(i,i+400);
+
    const batch=writeBatch(db);
 
+
    for(const seller of chunk){
+
     const publicRef=doc(
      db,
      "publicSellerMemberships",
@@ -534,50 +940,73 @@ async function migrateOldSellers(){
     );
 
     batch.set(publicRef,{
+
      sellerId:seller.uid,
+
      membershipStatus:"active",
-     membershipExpiresAt:Timestamp.fromDate(seller.expiry),
+
+     membershipExpiresAt:
+      Timestamp.fromDate(seller.expiry),
+
      updatedAt:serverTimestamp()
+
     });
+
    }
 
+
    await batch.commit();
+
    migrated+=chunk.length;
 
    say(
     "Migration চলছে...\n"+
-    migrated+" / "+eligible.length+" জন Seller সম্পন্ন।"
+    migrated+" / "+eligible.length+
+    " জন Seller সম্পন্ন।"
    );
+
   }
+
 
   say(
    "Migration সফল!\n"+
-   "মোট "+migrated+" জন সক্রিয় Seller-এর Public Membership তৈরি হয়েছে।"
+   "মোট "+migrated+
+   " জন সক্রিয় Seller-এর Public Membership তৈরি হয়েছে।"
   );
+
 
   alert(
    "Migration সফল!\n"+
-   migrated+" জন Seller-এর Membership রেকর্ড তৈরি হয়েছে।"
+   migrated+
+   " জন Seller-এর Membership রেকর্ড তৈরি হয়েছে।"
   );
 
+
  }catch(err){
+
   console.error(err);
 
   say(
-   "Migration সম্পন্ন হয়নি: "+
+   "Migration সম্পন্ন হয়নি:\n"+
    (err.code||err.message||"অজানা সমস্যা")
   );
 
  }finally{
+
   busy=false;
+
   $("migrationBtn").disabled=false;
+
  }
+
 }
+
 
 $("migrationBtn").addEventListener(
  "click",
  migrateOldSellers
 );
+
 </script>
 
 </body>
