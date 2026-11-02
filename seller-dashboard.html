@@ -1274,11 +1274,11 @@ $("productForm").addEventListener("submit",async event=>{
    description:description,
 
    sellerId:currentUser.uid,
-   sellerName:sellerName,
 
-   status:"approved",
+status:"approved",
+active:true,
 
-   createdAt:serverTimestamp()
+createdAt:serverTimestamp()
   });
 
   $("productForm").reset();
